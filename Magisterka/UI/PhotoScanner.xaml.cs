@@ -136,13 +136,13 @@ namespace UI
             var resolutions = new List<string>();
             try
             {
-    
+                _twain32.SourceIndex = Scanners.IndexOf(SelectedScanner);
+
                 if (_twain32.OpenDataSource())
                     _twain32.CloseDataSource();
 
                 _twain32.OpenDataSource();
-
-                _twain32.SourceIndex = Scanners.IndexOf(SelectedScanner);
+                _twain32.OpenDSM();
 
                 var xResolutions = _twain32.Capabilities.XResolution.Get();
 
