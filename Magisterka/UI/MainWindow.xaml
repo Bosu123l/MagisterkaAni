@@ -1,12 +1,100 @@
-﻿<Window x:Class="UI.MainWindow"
+﻿<Window x:Name="window" x:Class="UI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+       Title="MainWindow"
+    Background="#FF9B9B9B">
     <Grid>
-        
+        <Grid Margin="5" VerticalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="343*" />
+                <RowDefinition Height="125*" />
+            </Grid.RowDefinitions>
+            <Label
+                x:Name="label"
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="170.382,0,151.382,0"
+                Content="Przed"
+                d:LayoutOverrides="TopMargin, BottomMargin" />
+            <Label
+                x:Name="label1"
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="175.847,0"
+                Content="Po"
+                d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin" />
+            <Grid
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="5,5,5,-39"
+                Background="#FFD4D4D4"
+                d:LayoutOverrides="LeftMargin, RightMargin">
+                <Image Source="{Binding OryginalImage, ElementName=window}" Stretch="Uniform"/>
+            </Grid>
+            <Grid
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="5,5,5,-39"
+                Background="#FFD4D4D4"
+                d:LayoutOverrides="LeftMargin, RightMargin">
+                <Image Source="{Binding CleanedImage, ElementName=window}"  />
+
+            </Grid>
+            <Grid
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                d:LayoutOverrides="LeftMargin, RightMargin" Margin="0,44,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="40*"/>
+                    <ColumnDefinition Width="334*"/>
+                </Grid.ColumnDefinitions>
+                <Button
+                    x:Name="BrowsePictureButton"
+                    Width="86"
+                    Height="23.37"
+                    Margin="4.333,0,-10.333,54.58"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                  Click="BrowsePictureButton_Click"
+                    Content="Przeglądaj..." Grid.Column="1" />
+                <Border
+                    Width="0"
+                    Height="17.03"
+                    Margin="-126,271.97,0,-207.989"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    BorderBrush="Black"
+                    BorderThickness="1" />
+                <Label
+                    x:Name="BrowsePictureURL"
+                    Margin="-70,31.42,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Content="..." Grid.Column="2" Width="362.994" />
+                <Button
+                    x:Name="DustReductionButton"
+                    Height="23.37"
+                    Margin="8,0,-14,4.63"
+                    VerticalAlignment="Bottom"
+                  Click="DustReductionButton_Click"
+                    Content="Usuń kurz" Grid.Column="1" d:LayoutOverrides="VerticalAlignment" />
+                <Button x:Name="BCut" Content="Wykrywanie krawędzi" Grid.Column="2" HorizontalAlignment="Left" Margin="19,0,0,4.63" VerticalAlignment="Bottom" Width="126" Height="25.33" Click="BCut_Click"/>
+                <Button x:Name="BSmudgeClaner" Content="Plamy" Grid.Column="2" HorizontalAlignment="Left" Margin="150,0,0,4.63" Width="54.994" VerticalAlignment="Bottom" Height="25.33" Click="BSmudgeClaner_Click"/>
+                <Button x:Name="BSave" Content="Zapisz" Grid.Column="2" Margin="137.333,3.05,0,0" VerticalAlignment="Top" Click="BSave_Click" HorizontalAlignment="Left" Width="86" Height="23.37"/>
+                <Button x:Name="BPreview" Content="Podgląd" Grid.Column="2" HorizontalAlignment="Left" Margin="209.994,0,0,4.63" VerticalAlignment="Bottom" Width="83" Height="25.33" Click="BPreview_Click"/>
+                <Button x:Name="BPhotoScanner" Content="Pobierz ze skanera" Grid.Column="2" HorizontalAlignment="Left" Margin="15.333,3.05,0,0" Width="117" VerticalAlignment="Top" Height="23.37" Click="BPhotoScanner_Click"/>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
