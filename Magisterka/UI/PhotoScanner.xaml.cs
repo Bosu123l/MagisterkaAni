@@ -12,9 +12,9 @@ namespace UI
     /// <summary>
     /// Interaction logic for PhotoScanner.xaml
     /// </summary>
-    public partial class PhotoScanner : Window, IDisposable, INotifyPropertyChanged
+    public partial class PhotoScanner : Window, INotifyPropertyChanged, IDisposable
     {
-        public event EventHandler<Image> ImageReceiver;
+        public event EventHandler<Image> ImageReceiver;      
 
         #region Property
 
@@ -38,13 +38,13 @@ namespace UI
         {
             get
             {
-                return _resolutions;
+                return _selectedResolutions;
             }
             set
             {
-                if (_resolutions != value)
+                if (_selectedResolutions != value)
                 {
-                    _resolutions = value;
+                    _selectedResolutions = value;
                     OnPropertyChanged("Resolutions");
                 }
             }
@@ -85,42 +85,106 @@ namespace UI
         private Twain32 _twain32;
 
         private int _selectedResolutionIndex;
-        private List<string> _resolutions;
-        private List<string> _scanners;
+        private List<string> _selectedResolutions;       
+        private List<List<string>> _resolutions;//all resolution
+        private List<string> _scanners;//list of all scanners
 
         public PhotoScanner()
         {
             SelectedResolutionIndex = -1;
-            var scanners = new List<string>();
-            Resolutions = new List<string>();
+            _scanners = new List<string>();
+            _resolutions = new List<List<string>>();
+
+            LoadParametes();
 
             InitializeComponent();
 
+            //try
+            //{
+
+            //    _twain32 = new Twain32();
+            //    _twain32.Country = Saraff.Twain.TwCountry.POLAND;
+            //    _twain32.Language = Saraff.Twain.TwLanguage.POLISH;
+
+            //    _twain32.ShowUI = false;
+            //    _twain32.IsTwain2Enable = true;
+               
+            //    _twain32.OpenDSM();
+            //    for (int i = 0; i < _twain32.SourcesCount; i++)
+            //        scanners.Add(_twain32.GetSourceProductName(i));
+
+            //    Scanners = new List<string>(scanners);
+
+            //    if (Scanners.Count > 0)
+            //    {
+            //        SelectedResolution = Scanners.FirstOrDefault();
+            //    }
+
+            //    _twain32.AcquireCompleted += _twain32_AcquireCompleted;
+            //}
+            //catch (Exception ex)
+            //{
+            //    System.Diagnostics.Debug.WriteLine(ex.Message);
+            //}
+        }
+
+        private void LoadParametes()
+        {
             try
             {
-
-                _twain32 = new Twain32();
-                _twain32.Country = Saraff.Twain.TwCountry.POLAND;
-                _twain32.Language = Saraff.Twain.TwLanguage.POLISH;
+                _twain32 = new Twain32();                
 
                 _twain32.ShowUI = false;
                 _twain32.IsTwain2Enable = true;
-               
                 _twain32.OpenDSM();
+
+
                 for (int i = 0; i < _twain32.SourcesCount; i++)
-                    scanners.Add(_twain32.GetSourceProductName(i));
-
-                Scanners = new List<string>(scanners);
-
-                if (Scanners.Count > 0)
                 {
-                    SelectedResolution = Scanners.FirstOrDefault();
-                }
+                    #region Get scanner
+                    _scanners.Add(_twain32.GetSourceProductName(i));
+
+
+                    #region Get resolutions of scanner
+
+                        _resolutions.Add(new List<string>());
+
+                        
+                        _twain32.CloseDataSource();
+                        _twain32.SourceIndex = Scanners.IndexOf(_twain32.GetSourceProductName(i));
+                        _twain32.OpenDataSource();
+                        Twain32.Enumeration xResolutions = _twain32.Capabilities.XResolution.Get();
+
+                        if (xResolutions.Count < 20)
+                        {
+                            for (int j = 0; j < xResolutions.Count && !(Int32.Parse(xResolutions[j].ToString()) > 2400); j++)
+                            {                              
+                                _resolutions[i].Add(string.Format("{0}", xResolutions[j]));                                
+                            }
+                        }else
+                            {
+                                foreach (var _val in new float[] { 100f, 200f, 300f, 600f, 1200f, 2400f })
+                                {
+                                    for (int j = _resolutions.Count - 1; j >= 0; j--)
+                                    {
+                                        _resolutions[j].Add(string.Format("{0}", _val));
+                                    }                            
+                                }
+                            }
+
+                    #endregion
+
+                    #endregion
+
+                    SelectedScanner = Scanners.FirstOrDefault();
+                }          
 
                 _twain32.AcquireCompleted += _twain32_AcquireCompleted;
             }
             catch (Exception ex)
             {
+                //_twain32.CloseDataSource();                
+                Resolutions = new List<string>();              
                 System.Diagnostics.Debug.WriteLine(ex.Message);
             }
         }
@@ -133,36 +197,10 @@ namespace UI
 
         private void CBScannersList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            var resolutions = new List<string>();
-            try
-            {
-                _twain32.SourceIndex = Scanners.IndexOf(SelectedScanner);
+            int id = Scanners.IndexOf(SelectedScanner);
 
-                if (_twain32.OpenDataSource())
-                    _twain32.CloseDataSource();
-
-                _twain32.OpenDataSource();
-                _twain32.OpenDSM();
-
-                var xResolutions = _twain32.Capabilities.XResolution.Get();
-
-                for (int i = 0; i < xResolutions.Count && !(Int32.Parse(xResolutions[i].ToString()) > 2400); i++)
-                {
-                    if (Int32.Parse(xResolutions[i].ToString()) % 50 == 0)
-                    {
-                        resolutions.Add(string.Format("{0} dpi", xResolutions[i]));
-                    }
-                }
-
-                Resolutions = new List<string>(resolutions);
-            }
-            catch (Exception ex)
-            {
-                _twain32.CloseDataSource();
-                //_twain32.CloseDSM();
-                Resolutions = new List<string>();
-                System.Diagnostics.Debug.WriteLine(ex.Message);
-            }
+            _selectedResolutions = new List<string>(_resolutions[in]);
+            _selectedResolutionIndex = int.Parse(_selectedResolutions.FirstOrDefault());
         }
 
         [NotifyPropertyChangedInvocator]
@@ -178,8 +216,8 @@ namespace UI
 
         public void Dispose()
         {
-            _twain32?.CloseDataSource();
-            _twain32?.CloseDSM();
+            //_twain32?.CloseDataSource();
+            //_twain32?.CloseDSM();
             _twain32?.Dispose();
         }
 

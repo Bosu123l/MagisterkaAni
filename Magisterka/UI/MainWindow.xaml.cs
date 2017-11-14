@@ -100,7 +100,7 @@ namespace UI
             try
             {
                 using (PhotoScanner PS = new PhotoScanner())
-                {
+                {                    
                     PS.ImageReceiver += PS_ImageReceiver;
                     PS.Show();
                 }
