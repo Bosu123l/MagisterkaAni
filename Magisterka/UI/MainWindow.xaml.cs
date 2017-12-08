@@ -9,6 +9,7 @@ using Emgu.CV;
 using Emgu.CV.Structure;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Domain;
+using System.Diagnostics;
 
 namespace UI
 {
@@ -87,20 +88,28 @@ namespace UI
         }
 
         private void _scanPhoto_Click(object sender, RoutedEventArgs e)
-        {            
-            try
-            {
-                using (PhotoScanner PS = new PhotoScanner())
-                {
-                    PS.ImageReceiver += PS_ImageReceiver;
-                    PS.Show();
-                }
+        {
 
-            }
-            catch (Exception exception)
-            {
-                throw;
-            }            
+            Process sm = new Process();
+            sm.StartInfo.FileName = @"C:\Users\annaj\Documents\GitHub\MagisterkaAni\Magisterka\ScannerManager\bin\Debug\ScannerManager.exe";
+            sm.EnableRaisingEvents = true;
+
+            sm.Start();
+            sm.WaitForExit();
+
+            //try
+            //{
+            //    using (PhotoScanner PS = new PhotoScanner())
+            //    {
+            //        PS.ImageReceiver += PS_ImageReceiver;
+            //        PS.Show();
+            //    }
+
+            //}
+            //catch (Exception exception)
+            //{
+            //    throw;
+            //}            
         }
 
         private void _savePhoto_Click(object sender, RoutedEventArgs e)

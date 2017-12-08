@@ -217,9 +217,9 @@ namespace UI
                 _twain32.IsTwain2Enable = true;
 
 
-            //_twain32.OpenDSM();
-            //_twain32.SourceIndex = Scanners.IndexOf(SelectedScanner);
-            //_twain32.OpenDataSource();
+            _twain32.OpenDSM();
+            _twain32.SourceIndex = Scanners.IndexOf(SelectedScanner);
+            _twain32.OpenDataSource();
             //_twain32.Capabilities.XResolution.Set(100);
             //_twain32.Capabilities.YResolution.Set(100);
             //_twain32.Capabilities.PixelType.Set(TwPixelType.RGB);
