@@ -17,7 +17,6 @@ namespace Domain
         private int _width;
         private int _height;
 
-
         public CutPhoto(Image<Bgr, byte> image)
         {
             if (image != null)
@@ -152,7 +151,6 @@ namespace Domain
                 image.Draw(line, new Bgr(0, 255, 0), 5);
             }
 
-
             //Dla lewej
             List<Point> left = new List<Point>();
             left = points.Where(x => x.X < minX).ToList();
@@ -185,17 +183,13 @@ namespace Domain
                 points.Add(p.P2);
             }
 
-
             points = points.OrderBy(x => x.X).ToList();
 
             Point[] brzeg = new Point[20];
             points.CopyTo(2, brzeg, 0, 20);
 
             brzeg.OrderBy(x => x.Y);
-
-
-
-
+            
 
             if (points.Count > 0)
             {
@@ -229,8 +223,6 @@ namespace Domain
                 //image.Draw(B, new Bgr(0, 255, 0), 3);
                 //image.Draw(C, new Bgr(0, 255, 0), 3);
                 //image.Draw(D, new Bgr(0, 255, 0), 3);
-
-
             }
 
             return image;

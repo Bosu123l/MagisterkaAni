@@ -16,9 +16,16 @@
                   ItemsSource="{Binding Scanners, ElementName=window}"                  
                   SelectionChanged="CBScannersList_SelectionChanged" 
                   />
-        <Label x:Name="label2" Content="Rozdzielczość (DPI): " HorizontalAlignment="Left" Margin="10,71,0,0" d:LayoutOverrides="HorizontalAlignment" VerticalAlignment="Top" Height="29"/>
+        <Label x:Name="label2" Content="Rozdzielczość (DPI): " HorizontalAlignment="Left" Margin="10,71,0,0" 
+               d:LayoutOverrides="HorizontalAlignment" 
+               VerticalAlignment="Top" 
+               Height="29"/>
         <ComboBox Margin="121,78,10,0" 
-                  VerticalAlignment="Top" ItemsSource="{Binding Resolutions, ElementName=window}"  />
+                  VerticalAlignment="Top" 
+                  ItemsSource="{Binding Resolutions, ElementName=window}"
+                  SelectedItem="{Binding SelectedResolutionIndex, ElementName=window}" 
+                  SelectedIndex="0"                   
+                  SelectionChanged="ComboBox_SelectionChanged"  />
         <Label x:Name="label1" Content="Urządzenie: " 
                HorizontalAlignment="Left" Margin="10,22,0,0" 
                VerticalAlignment="Top" Height="29"/>

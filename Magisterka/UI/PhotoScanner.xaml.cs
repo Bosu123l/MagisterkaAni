@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Windows;
 
@@ -98,34 +100,6 @@ namespace UI
             LoadParametes();
 
             InitializeComponent();
-
-            //try
-            //{
-
-            //    _twain32 = new Twain32();
-            //    _twain32.Country = Saraff.Twain.TwCountry.POLAND;
-            //    _twain32.Language = Saraff.Twain.TwLanguage.POLISH;
-
-            //    _twain32.ShowUI = false;
-            //    _twain32.IsTwain2Enable = true;
-               
-            //    _twain32.OpenDSM();
-            //    for (int i = 0; i < _twain32.SourcesCount; i++)
-            //        scanners.Add(_twain32.GetSourceProductName(i));
-
-            //    Scanners = new List<string>(scanners);
-
-            //    if (Scanners.Count > 0)
-            //    {
-            //        SelectedResolution = Scanners.FirstOrDefault();
-            //    }
-
-            //    _twain32.AcquireCompleted += _twain32_AcquireCompleted;
-            //}
-            //catch (Exception ex)
-            //{
-            //    System.Diagnostics.Debug.WriteLine(ex.Message);
-            //}
         }
 
         private void LoadParametes()
@@ -165,21 +139,19 @@ namespace UI
                             {
                                 foreach (var _val in new float[] { 100f, 200f, 300f, 600f, 1200f, 2400f })
                                 {
-                                    for (int j = _resolutions.Count - 1; j >= 0; j--)
-                                    {
-                                        _resolutions[j].Add(string.Format("{0}", _val));
-                                    }                            
+                                    _resolutions[i].Add(string.Format("{0}", _val));                                                              
                                 }
                             }
 
                     #endregion
 
-                    #endregion
+                    #endregion                   
+                }
 
-                    SelectedScanner = Scanners.FirstOrDefault();
-                }          
-
-                _twain32.AcquireCompleted += _twain32_AcquireCompleted;
+                _twain32?.CloseDSM();
+                _twain32?.CloseDataSource();
+                
+                SelectedScanner = Scanners.FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -187,6 +159,20 @@ namespace UI
                 Resolutions = new List<string>();              
                 System.Diagnostics.Debug.WriteLine(ex.Message);
             }
+        }
+
+        private void _twain32_AcquireError(object sender, Twain32.AcquireErrorEventArgs e)
+        {
+            MessageBox.Show(e.Exception.Message);
+        }
+
+        private void _twain32_EndXfer(object sender, Twain32.EndXferEventArgs e)
+        {
+            var _file = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.ChangeExtension(Path.GetFileName(Path.GetTempFileName()), ".Tiff"));
+            e.Image.Save(_file, ImageFormat.Tiff);
+            Console.WriteLine();
+            Console.WriteLine(string.Format("Saved in: {0}", _file));
+            e.Image.Dispose();
         }
 
         private void _twain32_AcquireCompleted(object sender, EventArgs e)
@@ -199,7 +185,7 @@ namespace UI
         {
             int id = Scanners.IndexOf(SelectedScanner);
 
-            _selectedResolutions = new List<string>(_resolutions[in]);
+            _selectedResolutions = new List<string>(_resolutions[id]);
             _selectedResolutionIndex = int.Parse(_selectedResolutions.FirstOrDefault());
         }
 
@@ -223,9 +209,33 @@ namespace UI
 
         private void BMakeScan_Click(object sender, RoutedEventArgs e)
         {
-            _twain32.Capabilities.PixelType.Set(TwPixelType.RGB);
+            //try
+            //{ 
+                _twain32?.Dispose();
+                _twain32 = new Twain32();
+                _twain32.ShowUI = true;
+                _twain32.IsTwain2Enable = true;
+
+
+            //_twain32.OpenDSM();
+            //_twain32.SourceIndex = Scanners.IndexOf(SelectedScanner);
+            //_twain32.OpenDataSource();
+            //_twain32.Capabilities.XResolution.Set(100);
+            //_twain32.Capabilities.YResolution.Set(100);
+            //_twain32.Capabilities.PixelType.Set(TwPixelType.RGB);
+
+            _twain32.EndXfer += _twain32_EndXfer;
+            _twain32.AcquireCompleted += _twain32_AcquireCompleted;
+            _twain32.AcquireError += _twain32_AcquireError;
 
             _twain32.Acquire();
+            //}catch(Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
+
+
+
 
             //_twain32.EndXfer += (object sender, Twain32.EndXferEventArgs e) => {
             //    try
@@ -243,6 +253,11 @@ namespace UI
             //        Console.WriteLine("{0}: {1}{2}{3}{2}", ex.GetType().Name, ex.Message, Environment.NewLine, ex.StackTrace);
             //    }
             //};
+        }
+
+        private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            int i=SelectedResolutionIndex;
         }
     }
 }

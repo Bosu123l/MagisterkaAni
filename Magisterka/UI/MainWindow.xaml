@@ -6,95 +6,32 @@
         xmlns:local="clr-namespace:UI"
         mc:Ignorable="d"
        Title="MainWindow"
-    Background="#FF9B9B9B">
+    Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}">
     <Grid>
-        <Grid Margin="5" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="343*" />
-                <RowDefinition Height="125*" />
-            </Grid.RowDefinitions>
-            <Label
-                x:Name="label"
-                Grid.Row="0"
-                Grid.Column="0"
-                Margin="170.382,0,151.382,0"
-                Content="Przed"
-                d:LayoutOverrides="TopMargin, BottomMargin" />
-            <Label
-                x:Name="label1"
-                Grid.Row="0"
-                Grid.Column="1"
-                Margin="175.847,0"
-                Content="Po"
-                d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin" />
-            <Grid
-                Grid.Row="1"
-                Grid.Column="0"
-                Margin="5,5,5,-39"
-                Background="#FFD4D4D4"
-                d:LayoutOverrides="LeftMargin, RightMargin">
-                <Image Source="{Binding OryginalImage, ElementName=window}" Stretch="Uniform"/>
-            </Grid>
-            <Grid
-                Grid.Row="1"
-                Grid.Column="1"
-                Margin="5,5,5,-39"
-                Background="#FFD4D4D4"
-                d:LayoutOverrides="LeftMargin, RightMargin">
-                <Image Source="{Binding CleanedImage, ElementName=window}"  />
-
-            </Grid>
-            <Grid
-                Grid.Row="2"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                d:LayoutOverrides="LeftMargin, RightMargin" Margin="0,44,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition Width="40*"/>
-                    <ColumnDefinition Width="334*"/>
-                </Grid.ColumnDefinitions>
-                <Button
-                    x:Name="BrowsePictureButton"
-                    Width="86"
-                    Height="23.37"
-                    Margin="4.333,0,-10.333,54.58"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Bottom"
-                  Click="BrowsePictureButton_Click"
-                    Content="Przeglądaj..." Grid.Column="1" />
-                <Border
-                    Width="0"
-                    Height="17.03"
-                    Margin="-126,271.97,0,-207.989"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    BorderBrush="Black"
-                    BorderThickness="1" />
-                <Label
-                    x:Name="BrowsePictureURL"
-                    Margin="-70,31.42,0,0"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    Content="..." Grid.Column="2" Width="362.994" />
-                <Button
-                    x:Name="DustReductionButton"
-                    Height="23.37"
-                    Margin="8,0,-14,4.63"
-                    VerticalAlignment="Bottom"
-                  Click="DustReductionButton_Click"
-                    Content="Usuń kurz" Grid.Column="1" d:LayoutOverrides="VerticalAlignment" />
-                <Button x:Name="BCut" Content="Wykrywanie krawędzi" Grid.Column="2" HorizontalAlignment="Left" Margin="19,0,0,4.63" VerticalAlignment="Bottom" Width="126" Height="25.33" Click="BCut_Click"/>
-                <Button x:Name="BSmudgeClaner" Content="Plamy" Grid.Column="2" HorizontalAlignment="Left" Margin="150,0,0,4.63" Width="54.994" VerticalAlignment="Bottom" Height="25.33" Click="BSmudgeClaner_Click"/>
-                <Button x:Name="BSave" Content="Zapisz" Grid.Column="2" Margin="137.333,3.05,0,0" VerticalAlignment="Top" Click="BSave_Click" HorizontalAlignment="Left" Width="86" Height="23.37"/>
-                <Button x:Name="BPreview" Content="Podgląd" Grid.Column="2" HorizontalAlignment="Left" Margin="209.994,0,0,4.63" VerticalAlignment="Bottom" Width="83" Height="25.33" Click="BPreview_Click"/>
-                <Button x:Name="BPhotoScanner" Content="Pobierz ze skanera" Grid.Column="2" HorizontalAlignment="Left" Margin="15.333,3.05,0,0" Width="117" VerticalAlignment="Top" Height="23.37" Click="BPhotoScanner_Click"/>
-            </Grid>
-        </Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" VerticalContentAlignment="Top" >
+            <MenuItem Header="Plik">
+                <MenuItem Header="Otwórz z pliku" Name="_openFromFile" Click="_openFromFile_Click"/>
+                <MenuItem Header="Pobierz ze skanera" Name="_scanPhoto" Click="_scanPhoto_Click"/>
+                <MenuItem Header="Zapisz" Name="_savePhoto" Click="_savePhoto_Click"/>
+                <MenuItem Header="Zapisz jako..." Name="_savePhotoAs" Click="_savePhotoAs_Click"/>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Header="Edycja">
+                <MenuItem Header="Usuń kurz" Name="_dustReduction" Click="_dustReduction_Click"/>
+                <MenuItem Header="Wykrywanie krawędzi" Name="_cutPhoto" Click="_cutPhoto_Click"/>
+                <MenuItem Header="Plamy" Name="_smudgeCleaner" Click="_smudgeCleaner_Click"/>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Header="Widok">
+                <MenuItem Header="Podgląd" Name="_preview" Click="_preview_Click"/>
+                <MenuItem Header="Pokaż oryginał" Name="_showOryginal" Click="_showOryginal_Click"/>
+            </MenuItem>
+            <Separator/>
+        </Menu>
+        <Image Grid.Row="1" Source="{Binding CleanedImage, ElementName=window}" OpacityMask="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
     </Grid>
 </Window>
