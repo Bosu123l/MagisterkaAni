@@ -10,6 +10,7 @@ using Emgu.CV.Structure;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Domain;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace UI
 {
@@ -31,15 +32,33 @@ namespace UI
             }
         }
 
+        public string ScanningPath
+        {
+            get
+            {
+                return _scanningPath;
+            }
+            set
+            {
+                if (value != _scanningPath)
+                {
+                    _scanningPath = value;
+                    OnPropertyChanged(nameof(ScanningPath));
+                }
+            }
+        }
+
         private BitmapImage _cleanedImage;
         private Image<Bgr, byte> _imageBefor;
         private Image<Bgr, byte> _imageAfter;
+        private string _scanningPath;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public MainWindow()
-        {
+        {            
             InitializeComponent();
+            ScanningPath = @"C:\Users\" + Environment.UserName + @"\Pictures\Scanner";
         }
 
         private void PS_ImageReceiver(object sender, System.Drawing.Image e)
@@ -68,7 +87,7 @@ namespace UI
             }
         }
 
-        private void _openFromFile_Click(object sender, RoutedEventArgs e)
+        private void openFromFile_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog()
             {
@@ -87,49 +106,38 @@ namespace UI
             }
         }
 
-        private void _scanPhoto_Click(object sender, RoutedEventArgs e)
+        private void scanPhoto_Click(object sender, RoutedEventArgs e)
         {
-
             Process sm = new Process();
+
+            sm.StartInfo.Arguments = _scanningPath;
+            
             sm.StartInfo.FileName = @"C:\Users\annaj\Documents\GitHub\MagisterkaAni\Magisterka\ScannerManager\bin\Debug\ScannerManager.exe";
             sm.EnableRaisingEvents = true;
 
             sm.Start();
+            
             sm.WaitForExit();
-
-            //try
-            //{
-            //    using (PhotoScanner PS = new PhotoScanner())
-            //    {
-            //        PS.ImageReceiver += PS_ImageReceiver;
-            //        PS.Show();
-            //    }
-
-            //}
-            //catch (Exception exception)
-            //{
-            //    throw;
-            //}            
         }
 
-        private void _savePhoto_Click(object sender, RoutedEventArgs e)
+        private void savePhoto_Click(object sender, RoutedEventArgs e)
         {
             _imageAfter.Save("C:\\Users\\Ania\\Desktop\\Edytowany" + DateTime.Now.Ticks + ".tif");
         }
 
-        private void _dustReduction_Click(object sender, RoutedEventArgs e)
+        private void dustReduction_Click(object sender, RoutedEventArgs e)
         {
             DustRemoval dr = new DustRemoval(_imageBefor);
             _imageAfter = dr.RemoveDust().Convert<Bgr, byte>();
             CleanedImage = BitmapToImageSource(_imageAfter.ToBitmap());
         }
 
-        private void _savePhotoAs_Click(object sender, RoutedEventArgs e)
+        private void savePhotoAs_Click(object sender, RoutedEventArgs e)
         {
 
         }
 
-        private void _cutPhoto_Click(object sender, RoutedEventArgs e)
+        private void cutPhoto_Click(object sender, RoutedEventArgs e)
         {
             CutPhoto cp = new CutPhoto(_imageAfter);
             _imageAfter = cp.AlignPhoto(_imageBefor);
@@ -140,22 +148,33 @@ namespace UI
             CleanedImage = BitmapToImageSource(_imageAfter.ToBitmap());            
         }
         
-        private void _smudgeCleaner_Click(object sender, RoutedEventArgs e)
+        private void smudgeCleaner_Click(object sender, RoutedEventArgs e)
         {
             SmudgeCleaner sc = new SmudgeCleaner(_imageAfter);
             _imageAfter = sc.OtherColorDetector();
             CleanedImage = BitmapToImageSource(_imageAfter.ToBitmap());
         }
 
-        private void _preview_Click(object sender, RoutedEventArgs e)
+        private void preview_Click(object sender, RoutedEventArgs e)
         {
             PreviewWindow PW = new PreviewWindow(CleanedImage);
             PW.Show();
         }
 
-        private void _showOryginal_Click(object sender, RoutedEventArgs e)
+        private void showOryginal_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void scanPath_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new FolderBrowserDialog();            
+            DialogResult result = dialog.ShowDialog();
+
+            if(result==System.Windows.Forms.DialogResult.OK)
+            {
+                ScanningPath = dialog.SelectedPath;
+            }
         }
     }
 }

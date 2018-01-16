@@ -12,23 +12,28 @@
             <RowDefinition Height="20"/>
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" VerticalContentAlignment="Top" >
+        <Menu Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" VerticalContentAlignment="Top" FontSize="14" >
             <MenuItem Header="Plik">
-                <MenuItem Header="Otwórz z pliku" Name="_openFromFile" Click="_openFromFile_Click"/>
-                <MenuItem Header="Pobierz ze skanera" Name="_scanPhoto" Click="_scanPhoto_Click"/>
-                <MenuItem Header="Zapisz" Name="_savePhoto" Click="_savePhoto_Click"/>
-                <MenuItem Header="Zapisz jako..." Name="_savePhotoAs" Click="_savePhotoAs_Click"/>
+                <MenuItem Header="Otwórz z pliku" Name="_openFromFile" Click="openFromFile_Click"/>
+                <Separator/>
+                <MenuItem Header="Pobierz ze skanera" Name="scanPhoto" Click="scanPhoto_Click"/>
+                <MenuItem Header="Folder skanowania" Name="scanPath" Click="scanPath_Click">
+                    <MenuItem Header="{Binding ScanningPath, ElementName=window}"/>
+                </MenuItem>
+            <Separator/>                
+                <MenuItem Header="Zapisz" Name="_savePhoto" Click="savePhoto_Click"/>
+                <MenuItem Header="Zapisz jako..." Name="savePhotoAs" Click="savePhotoAs_Click"/>
             </MenuItem>
             <Separator/>
             <MenuItem Header="Edycja">
-                <MenuItem Header="Usuń kurz" Name="_dustReduction" Click="_dustReduction_Click"/>
-                <MenuItem Header="Wykrywanie krawędzi" Name="_cutPhoto" Click="_cutPhoto_Click"/>
-                <MenuItem Header="Plamy" Name="_smudgeCleaner" Click="_smudgeCleaner_Click"/>
+                <MenuItem Header="Usuń kurz" Name="dustReduction" Click="dustReduction_Click"/>
+                <MenuItem Header="Wykrywanie krawędzi" Name="cutPhoto" Click="cutPhoto_Click"/>
+                <MenuItem Header="Plamy" Name="smudgeCleaner" Click="smudgeCleaner_Click"/>
             </MenuItem>
             <Separator/>
             <MenuItem Header="Widok">
-                <MenuItem Header="Podgląd" Name="_preview" Click="_preview_Click"/>
-                <MenuItem Header="Pokaż oryginał" Name="_showOryginal" Click="_showOryginal_Click"/>
+                <MenuItem Header="Podgląd" Name="preview" Click="preview_Click"/>
+                <MenuItem Header="Pokaż oryginał" Name="showOryginal" Click="showOryginal_Click"/>
             </MenuItem>
             <Separator/>
         </Menu>

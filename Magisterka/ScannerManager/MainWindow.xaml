@@ -6,12 +6,23 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525" WindowStyle="None">
     <Grid>
-        <ListView x:Name="_scannersListPreview" Margin="0,0,10,0" ItemsSource="{Binding Scanners, ElementName=window}" SelectionChanged="_scannersListPreview_SelectionChanged" SelectedItem="{Binding SelectedScanner, ElementName=window}">
+        <ListView x:Name="_scannersListPreview" ItemsSource="{Binding Scanners, ElementName=window}" SelectionChanged="_scannersListPreview_SelectionChanged" SelectedItem="{Binding SelectedScanner, ElementName=window}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" RenderTransformOrigin="1,0.5" Height="302" VerticalAlignment="Top" FontSize="14">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Urządzenie"/>
                 </GridView>
             </ListView.View>
         </ListView>
+        <Grid Height="40" VerticalAlignment="Bottom">
+            <Grid.ColumnDefinitions>                
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>                
+                <RowDefinition Height="1*" />                
+            </Grid.RowDefinitions>            
+            <Button Grid.Column="0" x:Name="bCancel" Content="Anuluj" Click="bCancel_Click" />
+            <Button Grid.Column="1" x:Name="bOK" Content="OK" Click="bOK_Click"/>
+        </Grid>
     </Grid>
 </Window>

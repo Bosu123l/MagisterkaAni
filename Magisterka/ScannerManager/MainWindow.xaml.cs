@@ -47,15 +47,16 @@ namespace ScannerManager
 
         private Twain32 _twain32;        
         private List<string> _scanners;
-        
+        private string _destinationPath;
+
         private void LoadParametes()
         {
             try
             {
                 _twain32 = new Twain32();
 
-                //_twain32.ShowUI = false;
-                //_twain32.IsTwain2Enable = true;
+                _twain32.ShowUI = true;
+                _twain32.IsTwain2Enable = true;
                 _twain32.OpenDSM();
 
                 #region Get scanners
@@ -82,24 +83,49 @@ namespace ScannerManager
         private void _twain32_AcquireError(object sender, Twain32.AcquireErrorEventArgs e)
         {
             MessageBox.Show(e.Exception.Message);
+            _twain32.Dispose();
+            this.Close();
+
         }
 
         private void _twain32_EndXfer(object sender, Twain32.EndXferEventArgs e)
         {
-            var _file = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.ChangeExtension(Path.GetFileName(Path.GetTempFileName()), ".Tiff"));
-            e.Image.Save(_file, ImageFormat.Tiff);
-            Console.WriteLine();
-            Console.WriteLine(string.Format("Saved in: {0}", _file));
-            e.Image.Dispose();
+            string fileName = $"{DateTime.Now.ToString("yyyyMMdd")}_SC";//poprawić date w sciezce
+            string regex = @"*" + fileName + @"*.Tiff";
+            int seqence = 1;
+            string max;
+
+            string[] files = Directory.EnumerateFiles(_destinationPath, regex).ToArray();
+
+            if (files.Count() > 0)
+            {
+                max = files.OrderBy(x => x).LastOrDefault();
+                max = max.Substring(max.Length - 4 - ".Tiff".Length, 4);               
+
+                int.TryParse(max, out seqence);
+                seqence = seqence + 1;                
+            }
+
+            fileName += seqence.ToString("D4");
+
+            var _file = Path.Combine(_destinationPath, fileName+".Tiff");
+            e.Image.Save(_file, ImageFormat.Tiff);          
+           
+
+            if(MessageBox.Show($"Zapisano obraz{fileName}.Tiff\n{_destinationPath}", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information)==MessageBoxResult.OK)
+            {
+                e.Image.Dispose();
+                _twain32.Dispose();
+                this.Close();
+            }            
         }
 
         private void _twain32_AcquireCompleted(object sender, EventArgs e)
         {
-            //if (_twain32.ImageCount > 0)
-            //    OnImageReceiver(_twain32.GetImage(0));
+            if (_twain32.ImageCount > 0)
+                OnImageReceiver(_twain32.GetImage(0));
         }
-
-
+        
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged(string propertyName)
         {
@@ -114,30 +140,19 @@ namespace ScannerManager
         public void Dispose()
         {
             _twain32?.Dispose();
-        }
+        }       
 
-        private void BMakeScan_Click(object sender, RoutedEventArgs e)
+        public MainWindow(string desinationPath)
         {
-           
-        }
+            _scanners = new List<string>();
+            _destinationPath = desinationPath;
 
-        private void CBScannersList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-           
-        }
-
-        public MainWindow()
-        {          
-             _scanners = new List<string>();
-            InitializeComponent();            
-
+            InitializeComponent();           
             LoadParametes();          
         }
 
         private void _scannersListPreview_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            //try
-            //{ 
             _twain32?.Dispose();
             _twain32 = new Twain32();
             _twain32.ShowUI = true;
@@ -147,39 +162,24 @@ namespace ScannerManager
             _twain32.OpenDSM();
             _twain32.SourceIndex = Scanners.IndexOf(SelectedScanner);
             _twain32.OpenDataSource();
-            //_twain32.Capabilities.XResolution.Set(100);
-            //_twain32.Capabilities.YResolution.Set(100);
-            //_twain32.Capabilities.PixelType.Set(TwPixelType.RGB);
 
             _twain32.EndXfer += _twain32_EndXfer;
             _twain32.AcquireCompleted += _twain32_AcquireCompleted;
             _twain32.AcquireError += _twain32_AcquireError;
 
-            _twain32.Acquire();
-            //}catch(Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message);
-            //}
+            _twain32.Acquire();           
+        }
 
+        private void bOK_Click(object sender, RoutedEventArgs e)
+        {
+            _twain32.Dispose();            
+            this.Close();
+        }
 
-
-
-            //_twain32.EndXfer += (object sender, Twain32.EndXferEventArgs e) => {
-            //    try
-            //    {
-            //        //e to obrazek w pamieci
-
-            //        var _file = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.ChangeExtension(Path.GetFileName(Path.GetTempFileName()), ".Tiff"));
-            //        e.Image.Save(_file, ImageFormat.Tiff);
-            //        Console.WriteLine();
-            //        Console.WriteLine(string.Format("Saved in: {0}", _file));
-            //        e.Image.Dispose();
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Console.WriteLine("{0}: {1}{2}{3}{2}", ex.GetType().Name, ex.Message, Environment.NewLine, ex.StackTrace);
-            //    }
-            //};
+        private void bCancel_Click(object sender, RoutedEventArgs e)
+        {
+            _twain32.Dispose();
+            this.Close();
         }
     }
 }
