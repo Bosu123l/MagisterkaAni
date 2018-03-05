@@ -75,14 +75,19 @@ namespace ScannerManager
                 _twain32?.CloseDataSource();
             }
             catch (Exception ex)
-            {               
-                System.Diagnostics.Debug.WriteLine(ex.Message);
+            {
+                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                _twain32.Dispose();
+                this.Close();
             }
         }
 
+        #region ScanningEnd
+
         private void _twain32_AcquireError(object sender, Twain32.AcquireErrorEventArgs e)
         {
-            MessageBox.Show(e.Exception.Message);
+
+            MessageBox.Show(e.Exception.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             _twain32.Dispose();
             this.Close();
 
@@ -94,27 +99,37 @@ namespace ScannerManager
             string regex = @"*" + fileName + @"*.Tiff";
             int seqence = 1;
             string max;
+            string[] files;
 
-            string[] files = Directory.EnumerateFiles(_destinationPath, regex).ToArray();
+            files = Directory.EnumerateFiles(_destinationPath, regex).ToArray();
 
-            if (files.Count() > 0)
+            try
             {
-                max = files.OrderBy(x => x).LastOrDefault();
-                max = max.Substring(max.Length - 4 - ".Tiff".Length, 4);               
+                if (files.Count() > 0)
+                {
+                    max = files.OrderBy(x => x).LastOrDefault();
+                    max = max.Substring(max.Length - 4 - ".Tiff".Length, 4);               
 
-                int.TryParse(max, out seqence);
-                seqence = seqence + 1;                
-            }
+                    int.TryParse(max, out seqence);
+                    seqence = seqence + 1;                
+                }
 
-            fileName += seqence.ToString("D4");
+                fileName += seqence.ToString("D4");
 
-            var _file = Path.Combine(_destinationPath, fileName+".Tiff");
-            e.Image.Save(_file, ImageFormat.Tiff);          
+                var _file = Path.Combine(_destinationPath, fileName+".Tiff");
+                e.Image.Save(_file, ImageFormat.Tiff);          
            
 
-            if(MessageBox.Show($"Zapisano obraz{fileName}.Tiff\n{_destinationPath}", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information)==MessageBoxResult.OK)
+                if(MessageBox.Show($"Zapisano obraz{fileName}.Tiff\n{_destinationPath}", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information)==MessageBoxResult.OK)
+                {
+                    e.Image.Dispose();
+                    _twain32.Dispose();
+                    this.Close();
+                }            
+            }
+            catch (Exception ex)
             {
-                e.Image.Dispose();
+                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
                 _twain32.Dispose();
                 this.Close();
             }            
@@ -125,7 +140,9 @@ namespace ScannerManager
             if (_twain32.ImageCount > 0)
                 OnImageReceiver(_twain32.GetImage(0));
         }
-        
+
+        #endregion ScanningEnd
+
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged(string propertyName)
         {
@@ -153,21 +170,30 @@ namespace ScannerManager
 
         private void _scannersListPreview_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            _twain32?.Dispose();
-            _twain32 = new Twain32();
-            _twain32.ShowUI = true;
-            _twain32.IsTwain2Enable = true;
+            try
+            {
+                _twain32?.Dispose();
+                _twain32 = new Twain32();
+                _twain32.ShowUI = true;
+                _twain32.IsTwain2Enable = true;
 
 
-            _twain32.OpenDSM();
-            _twain32.SourceIndex = Scanners.IndexOf(SelectedScanner);
-            _twain32.OpenDataSource();
+                _twain32.OpenDSM();
+                _twain32.SourceIndex = Scanners.IndexOf(SelectedScanner);
+                _twain32.OpenDataSource();
 
-            _twain32.EndXfer += _twain32_EndXfer;
-            _twain32.AcquireCompleted += _twain32_AcquireCompleted;
-            _twain32.AcquireError += _twain32_AcquireError;
+                _twain32.EndXfer += _twain32_EndXfer;
+                _twain32.AcquireCompleted += _twain32_AcquireCompleted;
+                _twain32.AcquireError += _twain32_AcquireError;
 
-            _twain32.Acquire();           
+                _twain32.Acquire();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                _twain32.Dispose();
+                this.Close();
+            }            
         }
 
         private void bOK_Click(object sender, RoutedEventArgs e)
