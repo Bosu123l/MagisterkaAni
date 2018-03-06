@@ -88,6 +88,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Drawing.Design" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -102,6 +103,7 @@
     <Compile Include="Annotations.cs" />
     <Compile Include="CutPhoto.cs" />
     <Compile Include="DustRemoval.cs" />
+    <Compile Include="FileOperations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SmudgeCleaner.cs" />
   </ItemGroup>

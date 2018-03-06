@@ -7,7 +7,6 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Emgu.CV;
 using Emgu.CV.Structure;
-using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Domain;
 using System.Diagnostics;
 using System.Windows.Forms;
@@ -58,7 +57,7 @@ namespace UI
         public MainWindow()
         {            
             InitializeComponent();
-            ScanningPath = @"C:\Users\" + Environment.UserName + @"\Pictures\Scanner";
+            ScanningPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Scanner");
         }
 
         private void PS_ImageReceiver(object sender, System.Drawing.Image e)
@@ -89,40 +88,43 @@ namespace UI
 
         private void openFromFile_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog dlg = new OpenFileDialog()
+            try
             {
-                DefaultExt = ".jpg",
-                Filter = "TIF (.tif)|*.tif|TIFF  (.tiff)|*.tiff"
-            };
-
-            Nullable<bool> result = dlg.ShowDialog();
-
-            if (result == true)
-            {
-                string filename = dlg.FileName;
-                _imageBefor = new Image<Bgr, byte>(filename);
-                _imageAfter = _imageBefor;
-                CleanedImage=BitmapToImageSource(_imageBefor.ToBitmap());
+                Image<Bgr,byte> image = FileOperations.GetImageFromDirectory();
+                if(image!=null)
+                {
+                    _imageBefor = image;
+                    _imageAfter = image;
+                    CleanedImage = BitmapToImageSource(_imageBefor.ToBitmap());
+                }                
             }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }           
         }
 
         private void scanPhoto_Click(object sender, RoutedEventArgs e)
         {
-            Process sm = new Process();
-
-            sm.StartInfo.Arguments = _scanningPath;
-            
-            sm.StartInfo.FileName = @"C:\Users\annaj\Documents\GitHub\MagisterkaAni\Magisterka\ScannerManager\bin\Debug\ScannerManager.exe";
-            sm.EnableRaisingEvents = true;
-
-            sm.Start();
-            
-            sm.WaitForExit();
+            try
+            {
+                Image<Bgr, byte> image = FileOperations.GetImageFromScanner(ScanningPath);
+                if (image != null)
+                {
+                    _imageBefor = image;
+                    _imageAfter = image;
+                    CleanedImage = BitmapToImageSource(_imageBefor.ToBitmap());
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void savePhoto_Click(object sender, RoutedEventArgs e)
         {
-            _imageAfter.Save("C:\\Users\\Ania\\Desktop\\Edytowany" + DateTime.Now.Ticks + ".tif");
+            FileOperations.SaveImageFileAs(_imageAfter);
         }
 
         private void dustReduction_Click(object sender, RoutedEventArgs e)
@@ -134,7 +136,7 @@ namespace UI
 
         private void savePhotoAs_Click(object sender, RoutedEventArgs e)
         {
-
+            FileOperations.SaveImageFileAs(_imageAfter);
         }
 
         private void cutPhoto_Click(object sender, RoutedEventArgs e)
