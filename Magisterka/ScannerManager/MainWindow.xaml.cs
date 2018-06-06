@@ -15,7 +15,7 @@ namespace ScannerManager
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged, IDisposable
-    {
+    {     
         public event EventHandler<Image> ImageReceiver;
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -192,19 +192,34 @@ namespace ScannerManager
             {
                 MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
                 _twain32.Dispose();
+                Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_DEVICE_UNREACHABLE;
                 this.Close();
             }            
         }
 
         private void bOK_Click(object sender, RoutedEventArgs e)
         {
-            _twain32.Dispose();            
-            this.Close();
+            try
+            {
+                _twain32.Dispose();
+                Environment.ExitCode = (int)ExitCodes.ExitCode.SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_FILE_NOT_FOUND;
+                this.Close();
+            }
+            
         }
 
         private void bCancel_Click(object sender, RoutedEventArgs e)
         {
             _twain32.Dispose();
+            Environment.ExitCode=(int)ExitCodes.ExitCode.ERROR_CANCELLED;
             this.Close();
         }
     }

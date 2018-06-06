@@ -15,7 +15,7 @@ namespace Domain
             _image = image;
         }
 
-        public Image<Bgr, byte> OtherColorDetector(int threshold = 50)
+        public Image<Bgr, byte> OtherColorDetector(int threshold = 40)
         //prog dla szarosci=22, prog dla polsepii=40, prog dla sepii=50
         {
             List<double> data = new List<double>();
@@ -25,6 +25,7 @@ namespace Domain
             double max = 0;
             double avg = 0;
             double mismatch = 0;
+            int count = 0;
 
             //for (int i = 2000; i < _image.Height; i++)
             //{
@@ -57,7 +58,7 @@ namespace Domain
                     {
                         double tmp = Math.Abs(_image.Data[i, j, k] - gray.Data[i, j, 0]);
 
-                        data.Add(tmp);
+                        count++;
                         if (tmp > max)
                             max = tmp;
 
@@ -79,8 +80,8 @@ namespace Domain
                 }
             }
 
-            mismatch = mismatch / data.Count();
-            avg = avg / data.Count();
+            mismatch = mismatch / (count>0 ? 1 :count);
+            avg = avg / (count > 0 ? 1 : count);
 
             return retImage;
         }

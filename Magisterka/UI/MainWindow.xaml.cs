@@ -47,16 +47,42 @@ namespace UI
             }
         }
 
+        public string BlockControls
+        {
+            get
+            {
+                return EnableControl ? "True" : "False";
+            }
+        }
+
+        public bool EnableControl
+        {
+            get
+            {
+                return _enableControl;
+            }
+            set
+            {
+                if (value != _enableControl)
+                {
+                    _enableControl = value;
+                    OnPropertyChanged(nameof(BlockControls));
+                }
+            }
+        }
+
         private BitmapImage _cleanedImage;
         private Image<Bgr, byte> _imageBefor;
         private Image<Bgr, byte> _imageAfter;
         private string _scanningPath;
+        private bool _enableControl;      
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public MainWindow()
         {            
             InitializeComponent();
+            EnableControl = true;
             ScanningPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Scanner");
         }
 
@@ -90,6 +116,8 @@ namespace UI
         {
             try
             {
+                EnableControl = false;
+
                 Image<Bgr,byte> image = FileOperations.GetImageFromDirectory();
                 if(image!=null)
                 {
@@ -101,13 +129,18 @@ namespace UI
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-            }           
+            }
+            finally
+            {
+                EnableControl = true;
+            }
         }
 
         private void scanPhoto_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+                EnableControl = false;
                 Image<Bgr, byte> image = FileOperations.GetImageFromScanner(ScanningPath);
                 if (image != null)
                 {
@@ -120,6 +153,10 @@ namespace UI
             {
                 System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            finally
+            {
+                EnableControl = true;
+            }
         }
 
         private void savePhoto_Click(object sender, RoutedEventArgs e)
@@ -129,9 +166,21 @@ namespace UI
 
         private void dustReduction_Click(object sender, RoutedEventArgs e)
         {
-            DustRemoval dr = new DustRemoval(_imageBefor);
-            _imageAfter = dr.RemoveDust().Convert<Bgr, byte>();
-            CleanedImage = BitmapToImageSource(_imageAfter.ToBitmap());
+            try
+            {
+                EnableControl = false;
+                DustRemoval dr = new DustRemoval(_imageBefor);
+                _imageAfter = dr.RemoveDust();
+                CleanedImage = BitmapToImageSource(_imageAfter.ToBitmap());
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                EnableControl = true;
+            }
         }
 
         private void savePhotoAs_Click(object sender, RoutedEventArgs e)
@@ -141,20 +190,46 @@ namespace UI
 
         private void cutPhoto_Click(object sender, RoutedEventArgs e)
         {
-            CutPhoto cp = new CutPhoto(_imageAfter);
-            _imageAfter = cp.AlignPhoto(_imageBefor);
-            //_imageAfter = cp.SetLines();
-            //_imageAfter = cp.Cut(_imageAfter);
-            //_imageBefor = cp.Cut(_imageBefor);
+            try
+            {
+                EnableControl = false;
+                CutPhoto cp = new CutPhoto(_imageAfter);
+                _imageAfter = cp.AlignPhoto(_imageBefor);
+                //_imageAfter = cp.SetLines();
+                //_imageAfter = cp.Cut(_imageAfter);
+                //_imageBefor = cp.Cut(_imageBefor);
 
-            CleanedImage = BitmapToImageSource(_imageAfter.ToBitmap());            
+                CleanedImage = BitmapToImageSource(_imageAfter.ToBitmap());        
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                EnableControl = true;
+            }
+               
         }
         
         private void smudgeCleaner_Click(object sender, RoutedEventArgs e)
         {
-            SmudgeCleaner sc = new SmudgeCleaner(_imageAfter);
-            _imageAfter = sc.OtherColorDetector();
-            CleanedImage = BitmapToImageSource(_imageAfter.ToBitmap());
+            try
+            {
+                EnableControl = false;
+                SmudgeCleaner sc = new SmudgeCleaner(_imageAfter);
+                _imageAfter = sc.OtherColorDetector();
+                CleanedImage = BitmapToImageSource(_imageAfter.ToBitmap());
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                EnableControl = true;
+            }
+           
         }
 
         private void preview_Click(object sender, RoutedEventArgs e)

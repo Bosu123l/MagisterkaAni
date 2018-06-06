@@ -75,6 +75,7 @@ namespace Domain
             Image<Bgr, byte> image;
             string[] files;
             string lastAddedFilePath;
+            ExitCodes.ExitCode exCode=ExitCodes.ExitCode.ERROR_FILE_NOT_FOUND;
 
             try
             {
@@ -86,20 +87,29 @@ namespace Domain
                 sm.Start();
 
                 sm.WaitForExit();
+                exCode=(ExitCodes.ExitCode)sm.ExitCode;
 
-                files = Directory.GetFiles(scanPath);
-                files = files.Where(x => Regex.IsMatch(Path.GetFileName(x), scanFilePattrn)).ToArray();
-
-                lastAddedFilePath = files.OrderByDescending(x => Path.GetFileName(x)).First();
-
-                if (string.IsNullOrEmpty(lastAddedFilePath))
+                switch (exCode)
                 {
-                    throw new Exception("Scanned file not found!");
-                }
+                    case ExitCodes.ExitCode.SUCCESS:
+                                                            {
+                                                                files = Directory.GetFiles(scanPath);
+                                                                files = files.Where(x => Regex.IsMatch(Path.GetFileName(x), scanFilePattrn)).ToArray();
 
-                image = new Image<Bgr, byte>(lastAddedFilePath);
-                return image;
+                                                                lastAddedFilePath = files.OrderByDescending(x => Path.GetFileName(x)).First();
 
+                                                                if (string.IsNullOrEmpty(lastAddedFilePath))
+                                                                {
+                                                                    throw new Exception("Scanned file not found!");
+                                                                }
+
+                                                                image = new Image<Bgr, byte>(lastAddedFilePath);
+                                                                return image;
+                                                            } break;
+                    case ExitCodes.ExitCode.ERROR_CANCELLED:
+                                                            { return null; } break;
+                    default:                                {throw new Exception(exCode.ToString()); }break;
+                } 
             }
             catch (Exception ex)
             {

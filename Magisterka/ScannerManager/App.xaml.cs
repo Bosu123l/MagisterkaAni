@@ -34,8 +34,7 @@ namespace ScannerManager
             }
 
             mw = new ScannerManager.MainWindow(desinationPath);
-            mw.Show();
-            
+            mw.Show();            
         }
     }
 }

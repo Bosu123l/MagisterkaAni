@@ -6,13 +6,13 @@
         xmlns:local="clr-namespace:UI"
         mc:Ignorable="d"
        Title="MainWindow"
-    Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" TextOptions.TextFormattingMode="Display" FontFamily="{DynamicResource {x:Static SystemFonts.MenuFontFamilyKey}}">
+    Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" TextOptions.TextFormattingMode="Display" FontFamily="{DynamicResource {x:Static SystemFonts.MenuFontFamilyKey}}">   
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" VerticalContentAlignment="Top" FontSize="14" >
+        <Menu Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" VerticalContentAlignment="Top" FontSize="14" IsEnabled="{Binding BlockControls,  ElementName=window}">
             <MenuItem Header="Plik">
                 <MenuItem Header="Otwórz z pliku" Name="_openFromFile" Click="openFromFile_Click"/>
                 <Separator/>
