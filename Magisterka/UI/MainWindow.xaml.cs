@@ -75,12 +75,12 @@ namespace UI
         private Image<Bgr, byte> _imageBefor;
         private Image<Bgr, byte> _imageAfter;
         private string _scanningPath;
-        private bool _enableControl;      
+        private bool _enableControl;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public MainWindow()
-        {            
+        {
             InitializeComponent();
             EnableControl = true;
             ScanningPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Scanner");
@@ -118,13 +118,13 @@ namespace UI
             {
                 EnableControl = false;
 
-                Image<Bgr,byte> image = FileOperations.GetImageFromDirectory();
-                if(image!=null)
+                Image<Bgr, byte> image = FileOperations.GetImageFromDirectory();
+                if (image != null)
                 {
                     _imageBefor = image;
                     _imageAfter = image;
                     CleanedImage = BitmapToImageSource(_imageBefor.ToBitmap());
-                }                
+                }
             }
             catch (Exception ex)
             {
@@ -199,7 +199,7 @@ namespace UI
                 //_imageAfter = cp.Cut(_imageAfter);
                 //_imageBefor = cp.Cut(_imageBefor);
 
-                CleanedImage = BitmapToImageSource(_imageAfter.ToBitmap());        
+                CleanedImage = BitmapToImageSource(_imageAfter.ToBitmap());
             }
             catch (Exception ex)
             {
@@ -209,9 +209,9 @@ namespace UI
             {
                 EnableControl = true;
             }
-               
+
         }
-        
+
         private void smudgeCleaner_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -229,7 +229,7 @@ namespace UI
             {
                 EnableControl = true;
             }
-           
+
         }
 
         private void preview_Click(object sender, RoutedEventArgs e)
@@ -245,10 +245,10 @@ namespace UI
 
         private void scanPath_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new FolderBrowserDialog();            
-            DialogResult result = dialog.ShowDialog();
+            var dialog = new FolderBrowserDialog();
 
-            if(result==System.Windows.Forms.DialogResult.OK)
+
+            if (dialog.ShowDialog()  == System.Windows.Forms.DialogResult.OK)
             {
                 ScanningPath = dialog.SelectedPath;
             }

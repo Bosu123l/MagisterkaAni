@@ -1,0 +1,22 @@
+﻿<Window x:Class="ScannerManager.InfoBox"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ScannerManager"
+        mc:Ignorable="d"
+        Title="{Binding WindowHeader, ElementName=window}" Height="163.473" Width="300">
+    <Grid Height="133" VerticalAlignment="Top">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="27*"/>
+            <ColumnDefinition Width="119*"/>
+        </Grid.ColumnDefinitions>
+        <TextBox x:Name="tbInformation" TextWrapping="Wrap" Text="{Binding Information, ElementName=window}" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+        <StackPanel Margin="0,91,0,0" Height="40" Orientation="Horizontal" VerticalAlignment="Top" Grid.ColumnSpan="2" HorizontalAlignment="Center">
+            <Button x:Name="BtAYes"     Content="Tak"       Visibility="{Binding YesButtonVisible,    ElementName=window}" Click="PositivResult_Click" Padding="20,1"/>
+            <Button x:Name="BtAOK"      Content="Ok"        Visibility="{Binding NoButtonVisible,     ElementName=window}" Click="PositivResult_Click" Padding="20,1"/>
+            <Button x:Name="BtANo"      Content="Nie"       Visibility="{Binding OKButtonVisible,     ElementName=window}" Click="NegativResult_Click" Padding="20,1"/>
+            <Button x:Name="BtACancel"  Content="Anuluj"    Visibility="{Binding CancelButtonVisible, ElementName=window}" Click="NegativResult_Click" Padding="20,1"/>
+        </StackPanel>
+    </Grid>
+</Window>

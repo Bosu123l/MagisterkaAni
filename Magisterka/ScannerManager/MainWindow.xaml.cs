@@ -15,7 +15,7 @@ namespace ScannerManager
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged, IDisposable
-    {     
+    {
         public event EventHandler<Image> ImageReceiver;
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -41,11 +41,11 @@ namespace ScannerManager
         {
             get;
             set;
-        } 
+        }
 
         #endregion Property
 
-        private Twain32 _twain32;        
+        private Twain32 _twain32;
         private List<string> _scanners;
         private string _destinationPath;
 
@@ -67,7 +67,6 @@ namespace ScannerManager
                 }
                 #endregion  
 
-
                 if (Scanners.Count > 0)
                     SelectedScanner = Scanners.FirstOrDefault();
 
@@ -76,9 +75,13 @@ namespace ScannerManager
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-                _twain32.Dispose();
-                this.Close();
+                var messagebox = CustomMessageBox.Show(ex.Message, "Error!", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Error);
+                if (messagebox == System.Windows.Forms.DialogResult.Yes)
+                {
+                    _twain32.Dispose();
+                    Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_DEVICE_UNREACHABLE;
+                    this.Close();
+                }
             }
         }
 
@@ -86,11 +89,14 @@ namespace ScannerManager
 
         private void _twain32_AcquireError(object sender, Twain32.AcquireErrorEventArgs e)
         {
-
-            MessageBox.Show(e.Exception.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-            _twain32.Dispose();
-            this.Close();
-
+            //    throw e.Exception;
+            //if (MessageBox.Show(e.Exception.Message, "Error!", MessageBoxButton.YesNo, MessageBoxImage.Error)==MessageBoxResult.Yes)
+            //{
+            //    _twain32.Dispose();
+            //    Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_NOT_ENOUGH_MEMORY;
+            //    //this.Close();
+            //}           
+            CustomMessageBox.Show("test", "test", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
         }
 
         private void _twain32_EndXfer(object sender, Twain32.EndXferEventArgs e)
@@ -108,31 +114,39 @@ namespace ScannerManager
                 if (files.Count() > 0)
                 {
                     max = files.OrderBy(x => x).LastOrDefault();
-                    max = max.Substring(max.Length - 4 - ".Tiff".Length, 4);               
+                    max = max.Substring(max.Length - 4 - ".Tiff".Length, 4);
 
                     int.TryParse(max, out seqence);
-                    seqence = seqence + 1;                
+                    seqence = seqence + 1;
                 }
 
                 fileName += seqence.ToString("D4");
 
-                var _file = Path.Combine(_destinationPath, fileName+".Tiff");
-                e.Image.Save(_file, ImageFormat.Tiff);          
-           
+                var _file = Path.Combine(_destinationPath, fileName + ".Tiff");
+                e.Image.Save(_file, ImageFormat.Tiff);
 
-                if(MessageBox.Show($"Zapisano obraz{fileName}.Tiff\n{_destinationPath}", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information)==MessageBoxResult.OK)
+                var messagebox = CustomMessageBox.Show($"Zapisano obraz{fileName}.Tiff\n{_destinationPath}", "Sukces", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+
+
+                if (messagebox == System.Windows.Forms.DialogResult.OK)
                 {
                     e.Image.Dispose();
                     _twain32.Dispose();
+                    Environment.ExitCode = (int)ExitCodes.ExitCode.SUCCESS;
                     this.Close();
-                }            
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-                _twain32.Dispose();
-                this.Close();
-            }            
+
+                var messagebox = CustomMessageBox.Show(ex.Message, "Error!", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                if (messagebox == System.Windows.Forms.DialogResult.OK)
+                {
+                    _twain32.Dispose();
+                    Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_DEVICE_UNREACHABLE;
+                    this.Close();
+                }
+            }
         }
 
         private void _twain32_AcquireCompleted(object sender, EventArgs e)
@@ -157,15 +171,15 @@ namespace ScannerManager
         public void Dispose()
         {
             _twain32?.Dispose();
-        }       
+        }
 
         public MainWindow(string desinationPath)
         {
             _scanners = new List<string>();
             _destinationPath = desinationPath;
 
-            InitializeComponent();           
-            LoadParametes();          
+            InitializeComponent();
+            LoadParametes();
         }
 
         private void _scannersListPreview_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -184,17 +198,26 @@ namespace ScannerManager
 
                 _twain32.EndXfer += _twain32_EndXfer;
                 _twain32.AcquireCompleted += _twain32_AcquireCompleted;
-                _twain32.AcquireError += _twain32_AcquireError;
+               _twain32.AcquireError += _twain32_AcquireError;
+                _twain32.MemXferEvent += _twain32_MemXferEvent;
 
                 _twain32.Acquire();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-                _twain32.Dispose();
-                Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_DEVICE_UNREACHABLE;
-                this.Close();
-            }            
+                var messagebox = CustomMessageBox.Show("jzues", "Maryja", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Error);
+                if (messagebox == System.Windows.Forms.DialogResult.Yes)
+                {
+                    Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_DEVICE_UNREACHABLE;
+                    _twain32.Dispose();
+                    this.Close();
+                }
+            }
+        }
+
+        private void _twain32_MemXferEvent(object sender, Twain32.MemXferEventArgs e)
+        {
+            CustomMessageBox.Show("test", "test", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
         }
 
         private void bOK_Click(object sender, RoutedEventArgs e)
@@ -202,7 +225,6 @@ namespace ScannerManager
             try
             {
                 _twain32.Dispose();
-                Environment.ExitCode = (int)ExitCodes.ExitCode.SUCCESS;
             }
             catch (Exception ex)
             {
@@ -213,13 +235,13 @@ namespace ScannerManager
                 Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_FILE_NOT_FOUND;
                 this.Close();
             }
-            
+
         }
 
         private void bCancel_Click(object sender, RoutedEventArgs e)
         {
             _twain32.Dispose();
-            Environment.ExitCode=(int)ExitCodes.ExitCode.ERROR_CANCELLED;
+            Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_CANCELLED;
             this.Close();
         }
     }
