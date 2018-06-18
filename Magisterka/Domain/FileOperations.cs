@@ -92,23 +92,24 @@ namespace Domain
                 switch (exCode)
                 {
                     case ExitCodes.ExitCode.SUCCESS:
-                                                            {
-                                                                files = Directory.GetFiles(scanPath);
-                                                                files = files.Where(x => Regex.IsMatch(Path.GetFileName(x), scanFilePattrn)).ToArray();
+                        {
+                            files = Directory.GetFiles(scanPath);
+                            files = files.Where(x => Regex.IsMatch(Path.GetFileName(x), scanFilePattrn)).ToArray();
 
-                                                                lastAddedFilePath = files.OrderByDescending(x => Path.GetFileName(x)).First();
+                            lastAddedFilePath = files.OrderByDescending(x => Path.GetFileName(x)).First();
 
-                                                                if (string.IsNullOrEmpty(lastAddedFilePath))
-                                                                {
-                                                                    throw new Exception("Scanned file not found!");
-                                                                }
+                            if (string.IsNullOrEmpty(lastAddedFilePath))
+                            {
+                                throw new Exception("Scanned file not found!");
+                            }
 
-                                                                image = new Image<Bgr, byte>(lastAddedFilePath);
-                                                                return image;
-                                                            } break;
+                            image = new Image<Bgr, byte>(lastAddedFilePath);
+                            return image;
+                        } break;
                     case ExitCodes.ExitCode.ERROR_CANCELLED:
-                                                            { return null; } break;
-                    default:                                {throw new Exception(exCode.ToString()); }break;
+                        { return null; } break;
+                    default:
+                        { throw new Exception(exCode.ToString()); }break;
                 } 
             }
             catch (Exception ex)

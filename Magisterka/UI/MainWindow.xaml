@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:UI"
         mc:Ignorable="d"
        Title="MainWindow"
-    Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" TextOptions.TextFormattingMode="Display" FontFamily="{DynamicResource {x:Static SystemFonts.MenuFontFamilyKey}}">   
+    Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" TextOptions.TextFormattingMode="Display" FontFamily="{DynamicResource {x:Static SystemFonts.MenuFontFamilyKey}}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
@@ -20,7 +20,7 @@
                 <MenuItem Header="Folder skanowania" Name="scanPath" Click="scanPath_Click">
                     <MenuItem Header="{Binding ScanningPath, ElementName=window}"/>
                 </MenuItem>
-            <Separator/>                
+                <Separator/>
                 <MenuItem Header="Zapisz" Name="_savePhoto" Click="savePhoto_Click"/>
                 <MenuItem Header="Zapisz jako..." Name="savePhotoAs" Click="savePhotoAs_Click"/>
             </MenuItem>
@@ -38,5 +38,6 @@
             <Separator/>
         </Menu>
         <Image Grid.Row="1" Source="{Binding CleanedImage, ElementName=window}" OpacityMask="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
+        <local:FileControls HorizontalAlignment="Right" Grid.Row="1" Width="100" Height="Auto"/>
     </Grid>
 </Window>

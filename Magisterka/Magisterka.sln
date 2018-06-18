@@ -7,13 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI", "UI\UI.csproj", "{B2FF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{54DA3E80-0D57-4C19-8E2E-6C686FB64669}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dll", "Dll", "{30B7858D-1702-43D2-B502-09EF7E880760}"
-	ProjectSection(SolutionItems) = preProject
-		Dll\Saraff.IoC.dll = Dll\Saraff.IoC.dll
-		Dll\Saraff.Tiff.dll = Dll\Saraff.Tiff.dll
-		Dll\Saraff.Twain.dll = Dll\Saraff.Twain.dll
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScannerManager", "ScannerManager\ScannerManager.csproj", "{CBC6C390-4E60-4667-BA6C-9E5A663FAEB3}"
 EndProject
 Global

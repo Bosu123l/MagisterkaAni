@@ -48,36 +48,35 @@ namespace ScannerManager
         private Twain32 _twain32;
         private List<string> _scanners;
         private string _destinationPath;
+        private string _filePath;
 
         private void LoadParametes()
         {
             try
             {
                 _twain32 = new Twain32();
-
                 _twain32.ShowUI = true;
                 _twain32.IsTwain2Enable = true;
                 _twain32.OpenDSM();
 
-                #region Get scanners
+                #region GetScanners
 
                 for (int i = 0; i < _twain32.SourcesCount; i++)
                 {
                     _scanners.Add(_twain32.GetSourceProductName(i));
                 }
-                #endregion  
+                #endregion GetScanners
 
                 if (Scanners.Count > 0)
-                    SelectedScanner = Scanners.FirstOrDefault();
-
-                _twain32?.CloseDSM();
-                _twain32?.CloseDataSource();
+                    SelectedScanner = Scanners.FirstOrDefault();                
             }
             catch (Exception ex)
             {
                 var messagebox = CustomMessageBox.Show(ex.Message, "Error!", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Error);
                 if (messagebox == System.Windows.Forms.DialogResult.Yes)
                 {
+                    _twain32?.CloseDSM();
+                    _twain32?.CloseDataSource();
                     _twain32.Dispose();
                     Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_DEVICE_UNREACHABLE;
                     this.Close();
@@ -89,14 +88,14 @@ namespace ScannerManager
 
         private void _twain32_AcquireError(object sender, Twain32.AcquireErrorEventArgs e)
         {
-            //    throw e.Exception;
-            //if (MessageBox.Show(e.Exception.Message, "Error!", MessageBoxButton.YesNo, MessageBoxImage.Error)==MessageBoxResult.Yes)
-            //{
-            //    _twain32.Dispose();
-            //    Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_NOT_ENOUGH_MEMORY;
-            //    //this.Close();
-            //}           
-            CustomMessageBox.Show("test", "test", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+            if (MessageBox.Show(e.Exception.Message, "Error!", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
+            {
+                _twain32?.CloseDSM();
+                _twain32?.CloseDataSource();
+                _twain32.Dispose();
+                Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_NOT_ENOUGH_MEMORY;
+                this.Close();
+            }
         }
 
         private void _twain32_EndXfer(object sender, Twain32.EndXferEventArgs e)
@@ -122,29 +121,19 @@ namespace ScannerManager
 
                 fileName += seqence.ToString("D4");
 
-                var _file = Path.Combine(_destinationPath, fileName + ".Tiff");
-                e.Image.Save(_file, ImageFormat.Tiff);
+                _filePath = Path.Combine(_destinationPath, fileName + ".Tiff");
+                e.Image.Save(_filePath, ImageFormat.Tiff);               
 
-                var messagebox = CustomMessageBox.Show($"Zapisano obraz{fileName}.Tiff\n{_destinationPath}", "Sukces", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
-
-
-                if (messagebox == System.Windows.Forms.DialogResult.OK)
-                {
-                    e.Image.Dispose();
-                    _twain32.Dispose();
-                    Environment.ExitCode = (int)ExitCodes.ExitCode.SUCCESS;
-                    this.Close();
-                }
+                e.Image.Dispose();
+                
+                Environment.ExitCode = (int)ExitCodes.ExitCode.SUCCESS;               
             }
             catch (Exception ex)
             {
-
                 var messagebox = CustomMessageBox.Show(ex.Message, "Error!", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 if (messagebox == System.Windows.Forms.DialogResult.OK)
-                {
-                    _twain32.Dispose();
-                    Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_DEVICE_UNREACHABLE;
-                    this.Close();
+                {                   
+                    Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_DEVICE_UNREACHABLE;                   
                 }
             }
         }
@@ -177,6 +166,7 @@ namespace ScannerManager
         {
             _scanners = new List<string>();
             _destinationPath = desinationPath;
+            Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_FILE_NOT_FOUND;
 
             InitializeComponent();
             LoadParametes();
@@ -198,20 +188,26 @@ namespace ScannerManager
 
                 _twain32.EndXfer += _twain32_EndXfer;
                 _twain32.AcquireCompleted += _twain32_AcquireCompleted;
-               _twain32.AcquireError += _twain32_AcquireError;
+                _twain32.AcquireError += _twain32_AcquireError;
                 _twain32.MemXferEvent += _twain32_MemXferEvent;
 
                 _twain32.Acquire();
+
+                CustomMessageBox.Show($"Save photo: {Path.GetFileName(_filePath)}.Tiff\n{_destinationPath}", "Succes", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);               
             }
             catch (Exception ex)
             {
-                var messagebox = CustomMessageBox.Show("jzues", "Maryja", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Error);
+                var messagebox = CustomMessageBox.Show(ex.Message, "Eror!", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Error);
                 if (messagebox == System.Windows.Forms.DialogResult.Yes)
                 {
-                    Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_DEVICE_UNREACHABLE;
-                    _twain32.Dispose();
-                    this.Close();
+                    Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_DEVICE_UNREACHABLE;                   
                 }
+            }finally
+            {
+                _twain32?.CloseDSM();
+                _twain32?.CloseDataSource();
+                _twain32.Dispose();
+                this.Close();
             }
         }
 

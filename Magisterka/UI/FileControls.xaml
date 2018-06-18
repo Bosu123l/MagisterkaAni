@@ -1,0 +1,54 @@
+﻿<UserControl x:Class="UI.FileControls"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:UI"
+             mc:Ignorable="d" d:DesignWidth="70" Height="500">
+    <UserControl.Background>
+        <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+            <LinearGradientBrush.RelativeTransform>
+                <TransformGroup>
+                    <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                    <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                    <RotateTransform Angle="270" CenterY="0.5" CenterX="0.5"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </LinearGradientBrush.RelativeTransform>
+            <GradientStop Color="#FF6B95BF" Offset="0.614"/>
+            <GradientStop Color="#0099B4D1"/>
+        </LinearGradientBrush>
+    </UserControl.Background>    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Width="50" Height="500" VerticalAlignment="Top">
+            <Button x:Name="_openFromFile"  Width="50" Height="50" ToolTip="Open from scanner" BorderBrush="{x:Null}" Foreground="#FF575757" Background="White"  >
+                <Button.OpacityMask>
+                    <ImageBrush ImageSource="Icons/icons8-scanner-96.png"/>
+                </Button.OpacityMask>
+            </Button>
+            <Button x:Name="_openFromFile_Copy" Width="50" Height="50" ToolTip="Open from file" Background="White" BorderBrush="{x:Null}" Foreground="#FF575757">
+                <Button.OpacityMask>
+                    <ImageBrush ImageSource="Icons/icons8-pictures-folder-100.png"/>
+                </Button.OpacityMask>
+            </Button>
+            <Button x:Name="_openFromFile_Copy3" Width="50" Height="50" ToolTip="Set scan path" Background="White" BorderBrush="{x:Null}" Foreground="#FF575757">
+                <Button.OpacityMask>
+                    <ImageBrush ImageSource="Icons/icons8-open-100.png"/>
+                </Button.OpacityMask>
+            </Button>
+            <Button x:Name="_openFromFile_Copy2" Width="50" Height="50" ToolTip="Save" Background="White" BorderBrush="{x:Null}" Foreground="#FF575757">
+                <Button.OpacityMask>
+                    <ImageBrush ImageSource="Icons/icons8-save-96.png"/>
+                </Button.OpacityMask>
+            </Button>
+            <Button x:Name="_openFromFile_Copy1" Width="50" Height="50" ToolTip="Save as..." Background="White" BorderBrush="{x:Null}" Foreground="#FF575757">
+                <Button.OpacityMask>
+                    <ImageBrush ImageSource="Icons/icons8-save-as-96.png"/>
+                </Button.OpacityMask>
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>
