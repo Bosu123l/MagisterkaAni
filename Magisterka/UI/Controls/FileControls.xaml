@@ -36,7 +36,7 @@
                         ToolTip="Open photo from file" 
                         Command="{Binding GetPhotoFromFolderClickedCommand, ElementName=userControl, Mode=OneWay}">
                     <Button.OpacityMask>
-                        <ImageBrush ImageSource="/UI;component/Icons/icons8-pictures-folder-100.png"/>
+                        <ImageBrush ImageSource="/UI;component/Icons/PhotoFolder.png"/>
                     </Button.OpacityMask>
                 </Button>
                 <Button x:Name="_changeScanDestynationFolder" 
@@ -44,7 +44,7 @@
                         Command="{Binding ChangeScanDestynationFolderClickedCommand, ElementName=userControl, Mode=OneWay}"
                         >
                     <Button.OpacityMask>
-                        <ImageBrush ImageSource="/UI;component/Icons/icons8-open-100.png"/>
+                        <ImageBrush ImageSource="/UI;component/Icons/ScannerFolder.png"/>
                     </Button.OpacityMask>
                 </Button>
                 <Button x:Name="_saveFile" 
@@ -57,7 +57,7 @@
                 </Button>
                 <Button x:Name="_saveFileAs" 
                         ToolTip="Save as..."
-                          Command="{Binding SavePhotoAsClickedCommand, ElementName=userControl, Mode=OneWay}">                    
+                          Command="{Binding SavePhotoAsClickedCommand, ElementName=userControl, Mode=OneWay}">
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/icons8-save-as-96.png"/>
                     </Button.OpacityMask>

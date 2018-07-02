@@ -12,11 +12,11 @@ namespace Domain
     public class FileOperations
     {
         #region ConstPatameters
-        private static string _readFileExtensions  = "TIFF |*.tif;*.tiff";
+        private static string _readFileExtensions = "TIFF |*.tif;*.tiff";
         private static string _writeOtherFileExtensions = "TIFF |*.tif;*.tiff|" +
                                                           "PNG  |*.png| " +
                                                           "JPEG |*.jpg;*jpeg;";
-        private static string _writeTiffFileExtensions =  "TIFF |*.tiff;";
+        private static string _writeTiffFileExtensions = "TIFF |*.tiff;";
         private static string _defaultDestinationDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "OldPhotos");
         private static string _defaultSourcDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "OldPhotos");
         private static string _defaultScanDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "OldPhotos");
@@ -24,14 +24,38 @@ namespace Domain
 
         #region privateParameters
         private static string _destinationDirectory;
-        private static string _scanPath;
+        private static string _sourceDirectory;
+        private static string _scanDirectory;
+       
         private static string _filePath;
+        private static string _fileName
+        {
+            get
+            {
+                return string.IsNullOrEmpty(FilePath) ? string.Empty : Path.GetFileName(FilePath);
+            }
+        }
+        private static string _fileDirectory
+        {
+            get
+            {
+                return string.IsNullOrEmpty(FilePath) ? string.Empty : Path.GetDirectoryName(FilePath);
+            }
+        }
+        private static string _fileExtension
+        {
+            get
+            {
+                return string.IsNullOrEmpty(FilePath) ? "tiff" : Path.GetExtension(_filePath).Replace(".", string.Empty);
+            }
+        }
         #endregion privateParameters
 
         #region publicParameters       
         public static string DestinationPath
         {
-            get {
+            get
+            {
 
                 if (!Directory.Exists(_destinationDirectory) || string.IsNullOrEmpty(_destinationDirectory))
                 {
@@ -42,60 +66,77 @@ namespace Domain
                     return _destinationDirectory;
                 }
             }
-            set {
+            set
+            {
 
-                if(value!=_destinationDirectory && string.IsNullOrEmpty(value)==false)
+                if (value != _destinationDirectory && string.IsNullOrEmpty(value) == false)
                 {
                     _destinationDirectory = value;
                 }
             }
         }
-        public static string ScanPath
+        public static string ScanDirectory
         {
-            get {
+            get
+            {
 
-                if (!Directory.Exists(_scanPath) || string.IsNullOrEmpty(_scanPath))
+                if (!Directory.Exists(_scanDirectory) || string.IsNullOrEmpty(_scanDirectory))
                 {
                     return _defaultScanDirectory;
                 }
                 else
                 {
-                    return _defaultScanDirectory;
+                    return _scanDirectory;
                 }
             }
-            set {
+            set
+            {
 
-                if(value!=_destinationDirectory && string.IsNullOrEmpty(value)==false)
+                if (value != _scanDirectory && string.IsNullOrEmpty(value) == false)
                 {
-                    _scanPath = value;
+                    _scanDirectory = value;
+                }
+            }
+        }
+        public static string SourceDirectory
+        {
+            get
+            {
+
+                if (!Directory.Exists(_sourceDirectory) || string.IsNullOrEmpty(_sourceDirectory))
+                {
+                    return _defaultSourcDirectory;
+                }
+                else
+                {
+                    return _sourceDirectory;
+                }
+            }
+            set
+            {
+
+                if (value != _sourceDirectory && string.IsNullOrEmpty(value) == false)
+                {
+                    _sourceDirectory = value;
                 }
             }
         }
         public static string FilePath
         {
-            get{
+            get
+            {
                 return _filePath;
-            } 
+            }
             set
             {
-                if(value!=null)
+                if (value != null)
                 {
                     _filePath = value;
+                    SourceDirectory = _fileDirectory;
                 }
             }
         }
-        public static string FileName
-        {
-            get {
-                if (string.IsNullOrEmpty(FilePath))
-                {
-                    return Path.GetFileName(FilePath);
-                }else
-                {
-                    return string.Empty;
-                }
-            }
-        }
+
         #endregion publicParameters
 
         public static void SaveImageFileAs(Image<Bgr, byte> image)
@@ -103,11 +144,11 @@ namespace Domain
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.AddExtension = true;
             saveFileDialog.Filter = _writeOtherFileExtensions;
-            saveFileDialog.FileName = Path.GetFileNameWithoutExtension(FileName);
+            saveFileDialog.FileName = Path.GetFileNameWithoutExtension(_fileName);
 
-            if (Directory.Exists(_defaultDestinationDirectory))
+            if (Directory.Exists(DestinationPath))
             {
-                saveFileDialog.InitialDirectory = _defaultDestinationDirectory;
+                saveFileDialog.InitialDirectory = DestinationPath;
             }
             else
             {
@@ -116,18 +157,22 @@ namespace Domain
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
+                DestinationPath = Path.GetDirectoryName(saveFileDialog.FileName);
                 image.Save(saveFileDialog.FileName);
                 _defaultDestinationDirectory = Path.GetDirectoryName(saveFileDialog.FileName);
             }
         }
 
-        public static void SaveAsTiffImageFile(Image<Bgr, byte> image)
+        public static void SaveImageFile(Image<Bgr, byte> image)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.AddExtension = false;
-            if (Directory.Exists(_defaultDestinationDirectory))
+            saveFileDialog.AddExtension = true;
+            saveFileDialog.Filter = $"{_fileExtension.ToUpper()} |*.{_fileExtension}";
+            saveFileDialog.FileName = _fileName;
+
+            if (Directory.Exists(DestinationPath))
             {
-                saveFileDialog.InitialDirectory = _defaultDestinationDirectory;
+                saveFileDialog.InitialDirectory = DestinationPath;
             }
             else
             {
@@ -136,64 +181,60 @@ namespace Domain
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                var path = Path.Combine(Path.GetDirectoryName(_filePath),FileName);
+                var path = Path.Combine(_fileDirectory, saveFileDialog.FileName);
+                DestinationPath = _fileDirectory;
                 image.Save(path);
                 _defaultDestinationDirectory = Path.GetDirectoryName(saveFileDialog.FileName);
             }
-        }      
+        }
 
         public static Image<Bgr, byte> GetImageFromDirectory()
         {
-            string filename;
-            Image<Bgr, byte> image;
-
             try
             {
-                OpenFileDialog dlg = new OpenFileDialog()
+                OpenFileDialog openFileDialog = new OpenFileDialog()
                 {
                     Filter = _readFileExtensions
                 };
 
-                if (dlg.ShowDialog() == DialogResult.OK)
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    filename = dlg.FileName;
-                    image = new Image<Bgr, byte>(filename);
-                    return image;
+                    FilePath = openFileDialog.FileName;                    
+                    return new Image<Bgr, byte>(FilePath);
                 }
                 return null;
             }
             catch (Exception ex)
             {
                 throw ex;
-            }            
+            }
         }
 
         public static Image<Bgr, byte> GetImageFromScanner()
         {
-            Process sm = new Process();
+            Process scannerManager = new Process();
             string scanFilePattrn = @"^\d{8}_SC\d{4}";
-            Image<Bgr, byte> image;
             string[] files;
             string lastAddedFilePath;
-            ExitCodes.ExitCode exCode=ExitCodes.ExitCode.ERROR_FILE_NOT_FOUND;
+            ExitCodes.ExitCode exCode = ExitCodes.ExitCode.ERROR_FILE_NOT_FOUND;
 
             try
             {
-                sm.StartInfo.Arguments = ScanPath;
+                scannerManager.StartInfo.Arguments = ScanDirectory;
 
-                sm.StartInfo.FileName = @"C:\Users\annaj\Documents\GitHub\MagisterkaAni\Magisterka\ScannerManager\bin\Debug\ScannerManager.exe";
-                sm.EnableRaisingEvents = true;
+                scannerManager.StartInfo.FileName = @"C:\Users\annaj\Documents\GitHub\MagisterkaAni\Magisterka\ScannerManager\bin\Debug\ScannerManager.exe";
+                scannerManager.EnableRaisingEvents = true;
 
-                sm.Start();
+                scannerManager.Start();
 
-                sm.WaitForExit();
-                exCode=(ExitCodes.ExitCode)sm.ExitCode;
+                scannerManager.WaitForExit();
+                exCode = (ExitCodes.ExitCode)scannerManager.ExitCode;
 
                 switch (exCode)
                 {
                     case ExitCodes.ExitCode.SUCCESS:
                         {
-                            files = Directory.GetFiles(ScanPath);
+                            files = Directory.GetFiles(ScanDirectory);
                             files = files.Where(x => Regex.IsMatch(Path.GetFileName(x), scanFilePattrn)).ToArray();
 
                             lastAddedFilePath = files.OrderByDescending(x => Path.GetFileName(x)).First();
@@ -202,37 +243,37 @@ namespace Domain
                             {
                                 throw new Exception("Scanned file not found!");
                             }
-
-                            image = new Image<Bgr, byte>(lastAddedFilePath);
-                            return image;
-                        } break;
+                            FilePath = lastAddedFilePath;
+                            return new Image<Bgr, byte>(FilePath);
+                        }
+                        break;
                     case ExitCodes.ExitCode.ERROR_CANCELLED:
-                        { return null; } break;
+                        { return null; }
+                        break;
                     default:
-                        { throw new Exception(exCode.ToString()); }break;
-                } 
+                        { throw new Exception(exCode.ToString()); }
+                        break;
+                }
             }
             catch (Exception ex)
             {
                 throw ex;
-            }         
+            }
         }
 
-        public static string SetScanPath()
+        public static void SetScanPath()
         {
             var dialog = new FolderBrowserDialog();
 
-            if (Directory.Exists(ScanPath))
+            if (Directory.Exists(ScanDirectory))
             {
-                dialog.SelectedPath = ScanPath;
-            }
-            
-            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                ScanPath = dialog.SelectedPath;
+                dialog.SelectedPath = ScanDirectory;
             }
 
-            return ScanPath;
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                ScanDirectory = dialog.SelectedPath;
+            }
         }
     }
 }

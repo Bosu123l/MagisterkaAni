@@ -231,6 +231,10 @@
     <Resource Include="Icons\edit-image.png" />
     <Resource Include="Icons\open-in-window.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\PhotoFolder.png" />
+    <Resource Include="Icons\ScannerFolder.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.3.3.0.2824\build\Emgu.CV.targets" Condition="Exists('..\packages\EMGU.CV.3.3.0.2824\build\Emgu.CV.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

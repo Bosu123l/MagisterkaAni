@@ -34,7 +34,7 @@ namespace UI
         {
             get
             {
-                return Domain.FileOperations.ScanPath;
+                return Domain.FileOperations.ScanDirectory;
             }
             set
             {                
@@ -147,7 +147,7 @@ namespace UI
         {
             try
             {
-                FileOperations.SaveAsTiffImageFile(_imageAfter);
+                FileOperations.SaveImageFile(_imageAfter);
             }
             catch (Exception ex)
             {
@@ -169,7 +169,8 @@ namespace UI
         {
             try
             {
-                ScanningPath=FileOperations.SetScanPath();
+                FileOperations.SetScanPath();
+                OnPropertyChanged(nameof(ScanningPath));
             }
             catch (Exception ex)
             {

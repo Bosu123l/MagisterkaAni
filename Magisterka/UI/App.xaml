@@ -5,12 +5,20 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <Style TargetType="Button" x:Key="OpacityMenuButton">
-            <Setter Property="Width" Value="50" />
-            <Setter Property="Height" Value="50"/>
+            <Setter Property="Width" Value="70" />
+            <Setter Property="Height" Value="70"/>
             <Setter Property="BorderBrush" Value="{x:Null}"/>
-            <Setter Property="Foreground" Value="#FF575757"/>
             <Setter Property="Background" Value="White"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="DarkBlue"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="Red"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
         <Style TargetType="LinearGradientBrush" x:Key="LinearOpacityGradientBrush">
             <Setter Property="EndPoint" Value="0.5,1" />
