@@ -57,12 +57,12 @@ namespace Domain
             Image<Gray, float>patchImage=grayImage.Mul(dilatedImage2.Convert<Gray, float>());
 
             //Image<Bgr, byte> imout = new Image<Bgr, byte>(grayImage.Convert<Bgr,byte>());
-            Image<Gray, byte> imageOutput = dilatedImage2.Convert<Gray, byte>().ThresholdBinary(new Gray(100), new Gray(255));
-            Emgu.CV.Util.VectorOfVectorOfPoint counturs = new Emgu.CV.Util.VectorOfVectorOfPoint();
+            Image<Gray, byte> imageOutput = dilatedImage1.Convert<Gray, byte>().ThresholdBinary(new Gray(100), new Gray(255));
+            Emgu.CV.Util.VectorOfVectorOfPoint contours = new Emgu.CV.Util.VectorOfVectorOfPoint();
             Mat hier = new Mat();
 
-            CvInvoke.FindContours(imageOutput, counturs, hier, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
-            CvInvoke.DrawContours(image, counturs, -1, new MCvScalar(0, 255, 255));
+            CvInvoke.FindContours(imageOutput, contours, hier, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
+            CvInvoke.DrawContours(image, contours, -1, new MCvScalar(0, 255, 255));
             
 
 

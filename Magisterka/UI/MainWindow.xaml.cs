@@ -30,23 +30,17 @@ namespace UI
                 }
             }
         }
-
         public string ScanningPath
         {
             get
             {
-                return _scanningPath;
+                return Domain.FileOperations.ScanPath;
             }
             set
-            {
-                if (value != _scanningPath)
-                {
-                    _scanningPath = value;
-                    OnPropertyChanged(nameof(ScanningPath));
-                }
+            {                
+                OnPropertyChanged(nameof(ScanningPath));
             }
         }
-
         public string BlockControls
         {
             get
@@ -54,7 +48,6 @@ namespace UI
                 return EnableControl ? "True" : "False";
             }
         }
-
         public bool EnableControl
         {
             get
@@ -74,7 +67,6 @@ namespace UI
         private BitmapImage _cleanedImage;
         private Image<Bgr, byte> _imageBefor;
         private Image<Bgr, byte> _imageAfter;
-        private string _scanningPath;
         private bool _enableControl;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -84,11 +76,16 @@ namespace UI
             InitializeComponent();
             EnableControl = true;
             ScanningPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Scanner");
-        }
+            
+            #region InitializeButtonsEvents
+            this.FileControl.GetPhotoFromScannerClicked += GetPhotoFromScanner;
+            this.FileControl.GetPhotoFromFolderClicked += GetPhotoFromFile;
+            this.FileControl.ChangeScanDestynationFolderClicked += SetScanPath;
+            this.FileControl.SavePhotoAsClicked += SavePhotoAs;
+            this.FileControl.SavePhotoClicked += SavePhoto;
 
-        private void PS_ImageReceiver(object sender, System.Drawing.Image e)
-        {
-            int i = 0;
+
+            #endregion InitializeButtonsEvents
         }
 
         [NotifyPropertyChangedInvocator]
@@ -96,23 +93,9 @@ namespace UI
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        private static BitmapImage BitmapToImageSource(Bitmap bitmap)
-        {
-            using (MemoryStream memory = new MemoryStream())
-            {
-                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-                memory.Position = 0;
-                BitmapImage bitmapimage = new BitmapImage();
-                bitmapimage.BeginInit();
-                bitmapimage.StreamSource = memory;
-                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapimage.EndInit();
-                return bitmapimage;
-            }
-        }
-
-        private void openFromFile_Click(object sender, RoutedEventArgs e)
+      
+        #region GetPhotoToEdit
+        private void GetPhotoFromFile(object sender, EventArgs e)
         {
             try
             {
@@ -123,7 +106,7 @@ namespace UI
                 {
                     _imageBefor = image;
                     _imageAfter = image;
-                    CleanedImage = BitmapToImageSource(_imageBefor.ToBitmap());
+                    CleanedImage = Domain.ImageProcessing.BitmapToImageSource(_imageBefor.ToBitmap());
                 }
             }
             catch (Exception ex)
@@ -135,18 +118,17 @@ namespace UI
                 EnableControl = true;
             }
         }
-
-        private void scanPhoto_Click(object sender, RoutedEventArgs e)
+        private void GetPhotoFromScanner(object sender, EventArgs e)
         {
             try
             {
                 EnableControl = false;
-                Image<Bgr, byte> image = FileOperations.GetImageFromScanner(ScanningPath);
+                Image<Bgr, byte> image = FileOperations.GetImageFromScanner();
                 if (image != null)
                 {
                     _imageBefor = image;
                     _imageAfter = image;
-                    CleanedImage = BitmapToImageSource(_imageBefor.ToBitmap());
+                    CleanedImage = Domain.ImageProcessing.BitmapToImageSource(_imageBefor.ToBitmap());
                 }
             }
             catch (Exception ex)
@@ -158,20 +140,53 @@ namespace UI
                 EnableControl = true;
             }
         }
+        #endregion GetPhotoToEdit
 
-        private void savePhoto_Click(object sender, RoutedEventArgs e)
+        #region FileOperation
+        private void SavePhoto(object sender, EventArgs e)
         {
-            FileOperations.SaveImageFileAs(_imageAfter);
+            try
+            {
+                FileOperations.SaveAsTiffImageFile(_imageAfter);
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
+        private void SavePhotoAs(object sender, EventArgs e)
+        {
+            try
+            {
+                FileOperations.SaveImageFileAs(_imageAfter);
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        private void SetScanPath(object sender, EventArgs e)
+        {
+            try
+            {
+                ScanningPath=FileOperations.SetScanPath();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }            
+        }
+        #endregion FileOperation
 
-        private void dustReduction_Click(object sender, RoutedEventArgs e)
+        #region OperationsOnPhoto
+        private void DustReduction(object sender, EventArgs e)
         {
             try
             {
                 EnableControl = false;
                 DustRemoval dr = new DustRemoval(_imageBefor);
                 _imageAfter = dr.RemoveDust();
-                CleanedImage = BitmapToImageSource(_imageAfter.ToBitmap());
+                CleanedImage = Domain.ImageProcessing.BitmapToImageSource(_imageAfter.ToBitmap());
             }
             catch (Exception ex)
             {
@@ -182,13 +197,7 @@ namespace UI
                 EnableControl = true;
             }
         }
-
-        private void savePhotoAs_Click(object sender, RoutedEventArgs e)
-        {
-            FileOperations.SaveImageFileAs(_imageAfter);
-        }
-
-        private void cutPhoto_Click(object sender, RoutedEventArgs e)
+        private void CutPhotoBorder(object sender, EventArgs e)
         {
             try
             {
@@ -199,7 +208,7 @@ namespace UI
                 //_imageAfter = cp.Cut(_imageAfter);
                 //_imageBefor = cp.Cut(_imageBefor);
 
-                CleanedImage = BitmapToImageSource(_imageAfter.ToBitmap());
+                CleanedImage = Domain.ImageProcessing.BitmapToImageSource(_imageAfter.ToBitmap());
             }
             catch (Exception ex)
             {
@@ -211,15 +220,14 @@ namespace UI
             }
 
         }
-
-        private void smudgeCleaner_Click(object sender, RoutedEventArgs e)
+        private void smudgeCleaner_Click(object sender, EventArgs e)
         {
             try
             {
                 EnableControl = false;
                 SmudgeCleaner sc = new SmudgeCleaner(_imageAfter);
                 _imageAfter = sc.OtherColorDetector();
-                CleanedImage = BitmapToImageSource(_imageAfter.ToBitmap());
+                CleanedImage = Domain.ImageProcessing.BitmapToImageSource(_imageAfter.ToBitmap());
             }
             catch (Exception ex)
             {
@@ -231,27 +239,19 @@ namespace UI
             }
 
         }
+        #endregion OperationsOnPhoto
 
-        private void preview_Click(object sender, RoutedEventArgs e)
+        #region ViewOperations
+        private void PreviewEditPhoto(object sender, EventArgs e)
         {
             PreviewWindow PW = new PreviewWindow(CleanedImage);
             PW.Show();
         }
-
-        private void showOryginal_Click(object sender, RoutedEventArgs e)
+        private void PreviewOrginalPhoto(object sender, EventArgs e)
         {
 
         }
-
-        private void scanPath_Click(object sender, RoutedEventArgs e)
-        {
-            var dialog = new FolderBrowserDialog();
-
-
-            if (dialog.ShowDialog()  == System.Windows.Forms.DialogResult.OK)
-            {
-                ScanningPath = dialog.SelectedPath;
-            }
-        }
+        #endregion ViewOperations
+       
     }
 }

@@ -6,38 +6,17 @@
         xmlns:local="clr-namespace:UI"
         mc:Ignorable="d"
        Title="MainWindow"
-    Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" TextOptions.TextFormattingMode="Display" FontFamily="{DynamicResource {x:Static SystemFonts.MenuFontFamilyKey}}">
+    Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" TextOptions.TextFormattingMode="Display" FontFamily="{DynamicResource {x:Static SystemFonts.MenuFontFamilyKey}}" d:DesignHeight="679.2">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="20"/>
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <Menu Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" VerticalContentAlignment="Top" FontSize="14" IsEnabled="{Binding BlockControls,  ElementName=window}">
-            <MenuItem Header="Plik">
-                <MenuItem Header="Otwórz z pliku" Name="_openFromFile" Click="openFromFile_Click"/>
-                <Separator/>
-                <MenuItem Header="Pobierz ze skanera" Name="scanPhoto" Click="scanPhoto_Click"/>
-                <MenuItem Header="Folder skanowania" Name="scanPath" Click="scanPath_Click">
-                    <MenuItem Header="{Binding ScanningPath, ElementName=window}"/>
-                </MenuItem>
-                <Separator/>
-                <MenuItem Header="Zapisz" Name="_savePhoto" Click="savePhoto_Click"/>
-                <MenuItem Header="Zapisz jako..." Name="savePhotoAs" Click="savePhotoAs_Click"/>
-            </MenuItem>
-            <Separator/>
-            <MenuItem Header="Edycja">
-                <MenuItem Header="Usuń kurz" Name="dustReduction" Click="dustReduction_Click"/>
-                <MenuItem Header="Wykrywanie krawędzi" Name="cutPhoto" Click="cutPhoto_Click"/>
-                <MenuItem Header="Plamy" Name="smudgeCleaner" Click="smudgeCleaner_Click"/>
-            </MenuItem>
-            <Separator/>
-            <MenuItem Header="Widok">
-                <MenuItem Header="Podgląd" Name="preview" Click="preview_Click"/>
-                <MenuItem Header="Pokaż oryginał" Name="showOryginal" Click="showOryginal_Click"/>
-            </MenuItem>
-            <Separator/>
-        </Menu>
-        <Image Grid.Row="1" Source="{Binding CleanedImage, ElementName=window}" OpacityMask="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
-        <local:FileControls HorizontalAlignment="Right" Grid.Row="1" Width="100" Height="Auto"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Image   Source="{Binding CleanedImage, ElementName=window}" OpacityMask="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
+        <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
+            <local:FileControls x:Name="FileControl"/>
+            <local:PhotoEditionControls x:Name="PhotoEditionControl"/>
+            <local:ViewControls x:Name="ViewControl"/>
+        </StackPanel>
     </Grid>
 </Window>

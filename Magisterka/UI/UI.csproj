@@ -75,6 +75,9 @@
     <StartupObject>UI.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommonServiceLocator, Version=2.0.2.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommonServiceLocator.2.0.2\lib\net45\CommonServiceLocator.dll</HintPath>
+    </Reference>
     <Reference Include="Emgu.CV.UI, Version=3.3.0.2824, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.3.3.0.2824\lib\net35\Emgu.CV.UI.dll</HintPath>
     </Reference>
@@ -109,7 +112,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="FileControls.xaml">
+    <Compile Include="Controls\PhotoEditionControls.xaml.cs">
+      <DependentUpon>PhotoEditionControls.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RelayCommand.cs" />
+    <Compile Include="Controls\ViewControls.xaml.cs">
+      <DependentUpon>ViewControls.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Controls\FileControls.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -121,14 +131,14 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FileControls.xaml.cs">
+    <Compile Include="Controls\FileControls.xaml.cs">
       <DependentUpon>FileControls.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="PhotoScanner.xaml">
+    <Page Include="Controls\PhotoEditionControls.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -136,11 +146,12 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\ViewControls.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PhotoScanner.xaml.cs">
-      <DependentUpon>PhotoScanner.xaml</DependentUpon>
-    </Compile>
     <Compile Include="PreviewWindow.xaml.cs">
       <DependentUpon>PreviewWindow.xaml</DependentUpon>
     </Compile>
@@ -198,6 +209,27 @@
     <Resource Include="Icons\icons8-save-96.png" />
     <Resource Include="Icons\icons8-save-as-96.png" />
     <Resource Include="Icons\icons8-scanner-96.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\blur.png" />
+    <Resource Include="Icons\collapse.png" />
+    <Resource Include="Icons\erase.png" />
+    <Resource Include="Icons\expand.png" />
+    <Resource Include="Icons\housekeeping.png" />
+    <Resource Include="Icons\open-in-popup.png" />
+    <Resource Include="Icons\restart.png" />
+    <Resource Include="Icons\rotate-left.png" />
+    <Resource Include="Icons\rotate-right.png" />
+    <Resource Include="Icons\search.png" />
+    <Resource Include="Icons\vacuum-cleaner.png" />
+    <Resource Include="Icons\zoom-in.png" />
+    <Resource Include="Icons\zoom-out.png" />
+    <Resource Include="Icons\zoom-to-actual-size.png" />
+    <Resource Include="Icons\zoom-to-extents.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\edit-image.png" />
+    <Resource Include="Icons\open-in-window.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.3.3.0.2824\build\Emgu.CV.targets" Condition="Exists('..\packages\EMGU.CV.3.3.0.2824\build\Emgu.CV.targets')" />

@@ -170,6 +170,8 @@ namespace ScannerManager
 
             InitializeComponent();
             LoadParametes();
+
+           
         }
 
         private void _scannersListPreview_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)

@@ -16,13 +16,13 @@ using System.Windows.Shapes;
 namespace UI
 {
     /// <summary>
-    /// Interaction logic for FileControls.xaml
+    /// Interaction logic for PhotoEditionControls.xaml
     /// </summary>
-    public partial class FileControls : UserControl
+    public partial class PhotoEditionControls : UserControl
     {
-        public FileControls()
+        public PhotoEditionControls()
         {
             InitializeComponent();
-        }        
+        }
     }
 }
