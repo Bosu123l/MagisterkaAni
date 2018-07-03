@@ -216,25 +216,7 @@ namespace ScannerManager
         private void _twain32_MemXferEvent(object sender, Twain32.MemXferEventArgs e)
         {
             CustomMessageBox.Show("test", "test", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
-        }
-
-        private void bOK_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                _twain32.Dispose();
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            finally
-            {
-                Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_FILE_NOT_FOUND;
-                this.Close();
-            }
-
-        }
+        }      
 
         private void bCancel_Click(object sender, RoutedEventArgs e)
         {

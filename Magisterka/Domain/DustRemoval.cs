@@ -134,11 +134,12 @@ namespace Domain
             //cleaned._SmoothGaussian(3);
 
             //cleaned.Sobel(2, 0, 5);
+        }
 
-
-
-
-
+        public Image<Bgr, byte> Morpho()
+        {
+            Mat kernel = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Rectangle, new Size(5, 5), new Point(-1, -1));
+            return image.MorphologyEx(Emgu.CV.CvEnum.MorphOp.Erode,kernel, new Point(-1, -1), 1, Emgu.CV.CvEnum.BorderType.Default, new MCvScalar(1.0));
         }
     }
 }

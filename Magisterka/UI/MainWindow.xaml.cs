@@ -1,15 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using Domain;
-using System.Diagnostics;
-using System.Windows.Forms;
 
 namespace UI
 {
@@ -84,7 +80,14 @@ namespace UI
             this.FileControl.SavePhotoAsClicked += SavePhotoAs;
             this.FileControl.SavePhotoClicked += SavePhoto;
 
+            this.PhotoEditionControl.DustReductionClicked += DustReduction;
+            this.PhotoEditionControl.SmudgeReductionClick += SmudgeCleaner;
+            this.PhotoEditionControl.CutPhotoClick += CutPhotoBorder;
+            this.PhotoEditionControl.RotateImageLeftClick += RotateImageLeft;
+            this.PhotoEditionControl.RotateImageRightClick += RotateImageRight;
 
+            this.ViewControl.OpenOldPhotoInNewWindowClicked += PreviewOrginalPhoto;
+            this.ViewControl.OpenPhotoInNewWindowClicked += PreviewEditPhoto;
             #endregion InitializeButtonsEvents
         }
 
@@ -221,7 +224,7 @@ namespace UI
             }
 
         }
-        private void smudgeCleaner_Click(object sender, EventArgs e)
+        private void SmudgeCleaner(object sender, EventArgs e)
         {
             try
             {
@@ -240,6 +243,10 @@ namespace UI
             }
 
         }
+        private void RotateImageLeft(object sender, EventArgs e)
+        { }
+        private void RotateImageRight(object sender, EventArgs e)
+        { }
         #endregion OperationsOnPhoto
 
         #region ViewOperations

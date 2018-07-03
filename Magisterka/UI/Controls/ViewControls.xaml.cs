@@ -20,6 +20,30 @@ namespace UI
     /// </summary>
     public partial class ViewControls : UserControl
     {
+        #region OpenPhotoInNewWindow
+        public event EventHandler OpenPhotoInNewWindowClicked;
+        public ICommand OpenPhotoInNewWindowClickedCommand
+        {
+            get { return new RelayCommand(OpenPhotoInNewWindowClickedCommandExecute); }
+        }
+        private void OpenPhotoInNewWindowClickedCommandExecute(object obj)
+        {
+            OpenPhotoInNewWindowClicked.Invoke(this, EventArgs.Empty);
+        }
+        #endregion OpenPhotoInNewWindow
+
+        #region OpenOldPhotoInNewWindow
+        public event EventHandler OpenOldPhotoInNewWindowClicked;
+        public ICommand OpenOldPhotoInNewWindowClickedCommand
+        {
+            get { return new RelayCommand(OpenOldPhotoInNewWindowClickedCommandExecute); }
+        }
+        private void OpenOldPhotoInNewWindowClickedCommandExecute(object obj)
+        {
+            OpenOldPhotoInNewWindowClicked.Invoke(this, EventArgs.Empty);
+        }
+        #endregion OpenOldPhotoInNewWindow
+
         public ViewControls()
         {
             InitializeComponent();

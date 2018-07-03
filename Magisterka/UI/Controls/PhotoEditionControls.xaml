@@ -1,11 +1,10 @@
-﻿<UserControl x:Class="UI.PhotoEditionControls"
+﻿<UserControl x:Name="userControl" x:Class="UI.PhotoEditionControls"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:UI"
-             mc:Ignorable="d" 
-             d:DesignWidth="70">
+             mc:Ignorable="d">
     <UserControl.Resources>
         <Style TargetType="Button" BasedOn="{StaticResource OpacityMenuButton}"/>
     </UserControl.Resources>
@@ -26,44 +25,43 @@
     <StackPanel>
         <Expander Header="Edit" FontSize="14" FontWeight="SemiBold" IsExpanded="True">
             <StackPanel Orientation="Vertical">
-                <Button Command="{Binding GetPhotoFromScannerClickedCommand, ElementName=userControl, Mode=OneWay}" 
-                x:Name="_dustReduction"  
-                ToolTip="Dust reduction">
+                <Button x:Name="_dustReduction"  
+                        ToolTip="Dust reduction"
+                        Command="{Binding DustReductionClickedCommand, ElementName=userControl, Mode=OneWay}">
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/icons8-mop-100.png"/>
                     </Button.OpacityMask>
                 </Button>
-                <Button Command="{Binding GetPhotoFromScannerClickedCommand, ElementName=userControl, Mode=OneWay}" 
-                x:Name="_smudgeCleaner"                
-                ToolTip="Clear smudges">
+                <Button x:Name="_smudgeCleaner"                
+                        ToolTip="Clear smudges"
+                        Command="{Binding SmudgeReductionClickCommand, ElementName=userControl, Mode=OneWay}" >
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/erase.png"/>
                     </Button.OpacityMask>
                 </Button>
-                <Button Command="{Binding GetPhotoFromScannerClickedCommand, ElementName=userControl, Mode=OneWay}" 
+                <Button Command="{Binding CutPhotoClickCommand, ElementName=userControl, Mode=OneWay}" 
                 x:Name="_cutPhoto"                 
                 ToolTip="Cut photo">
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/icons8-crop-96.png"/>
                     </Button.OpacityMask>
                 </Button>
-                <Button 
-            Margin="5"
-            Command="{Binding GetPhotoFromScannerClickedCommand, ElementName=userControl, Mode=OneWay}" 
-            x:Name="_cutPhoto_Copy"
-            ToolTip="Cut photo">
+                <Button x:Name="_rotateImageLeft"
+                        ToolTip="Rotate image left"
+                        Command="{Binding RotateImageLeftClickCommand, ElementName=userControl, Mode=OneWay}" >
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/rotate-left.png"/>
                     </Button.OpacityMask>
                 </Button>
-                <Button Command="{Binding GetPhotoFromScannerClickedCommand, ElementName=userControl, Mode=OneWay}" 
-                x:Name="_cutPhoto_Copy1"
-                ToolTip="Cut photo">
+                <Button 
+                    x:Name="_rotateImageRight"
+                    ToolTip="Rotate image right"
+                    Command="{Binding RotateImageRightClickCommand, ElementName=userControl, Mode=OneWay}" >
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/rotate-right.png"/>
                     </Button.OpacityMask>
                 </Button>
             </StackPanel>
         </Expander>
-    </StackPanel>    
+    </StackPanel>
 </UserControl>

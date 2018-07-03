@@ -16,7 +16,6 @@ namespace Domain
         private static string _writeOtherFileExtensions = "TIFF |*.tif;*.tiff|" +
                                                           "PNG  |*.png| " +
                                                           "JPEG |*.jpg;*jpeg;";
-        private static string _writeTiffFileExtensions = "TIFF |*.tiff;";
         private static string _defaultDestinationDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "OldPhotos");
         private static string _defaultSourcDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "OldPhotos");
         private static string _defaultScanDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "OldPhotos");
@@ -246,13 +245,10 @@ namespace Domain
                             FilePath = lastAddedFilePath;
                             return new Image<Bgr, byte>(FilePath);
                         }
-                        break;
                     case ExitCodes.ExitCode.ERROR_CANCELLED:
                         { return null; }
-                        break;
                     default:
                         { throw new Exception(exCode.ToString()); }
-                        break;
                 }
             }
             catch (Exception ex)
