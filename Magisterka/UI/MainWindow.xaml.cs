@@ -81,7 +81,7 @@ namespace UI
             this.FileControl.SavePhotoClicked += SavePhoto;
 
             this.PhotoEditionControl.DustReductionClicked += DustReduction;
-            this.PhotoEditionControl.SmudgeReductionClick += SmudgeCleaner;
+            this.PhotoEditionControl.SmudgeReductionClick += Morpho;//SmudgeCleaner;
             this.PhotoEditionControl.CutPhotoClick += CutPhotoBorder;
             this.PhotoEditionControl.RotateImageLeftClick += RotateImageLeft;
             this.PhotoEditionControl.RotateImageRightClick += RotateImageRight;
@@ -188,8 +188,10 @@ namespace UI
             try
             {
                 EnableControl = false;
-                DustRemoval dr = new DustRemoval(_imageBefor);
-                _imageAfter = dr.RemoveDust();
+                //DustRemoval dr = new DustRemoval(_imageBefor);
+                //_imageAfter = dr.RemoveDust();
+                DefectsFinder df = new DefectsFinder(_imageBefor);
+                _imageAfter = df.SearchDefects();
                 CleanedImage = Domain.ImageProcessing.BitmapToImageSource(_imageAfter.ToBitmap());
             }
             catch (Exception ex)
@@ -229,7 +231,7 @@ namespace UI
             try
             {
                 EnableControl = false;
-                SmudgeCleaner sc = new SmudgeCleaner(_imageAfter);
+                SmudgeCleaner sc = new SmudgeCleaner(_imageBefor);
                 _imageAfter = sc.OtherColorDetector();
                 CleanedImage = Domain.ImageProcessing.BitmapToImageSource(_imageAfter.ToBitmap());
             }
@@ -247,6 +249,26 @@ namespace UI
         { }
         private void RotateImageRight(object sender, EventArgs e)
         { }
+
+        private void Morpho(object sender, EventArgs e)
+        {
+            try
+            {
+                EnableControl = false;
+                DustRemoval dr = new DustRemoval(_imageAfter);
+                _imageAfter = dr.Erode();
+                _imageBefor = new Image<Bgr, byte>(_imageAfter.ToBitmap());
+                CleanedImage = Domain.ImageProcessing.BitmapToImageSource(_imageAfter.ToBitmap());
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                EnableControl = true;
+            }
+        }
         #endregion OperationsOnPhoto
 
         #region ViewOperations
@@ -260,6 +282,8 @@ namespace UI
 
         }
         #endregion ViewOperations
+
+       
        
     }
 }

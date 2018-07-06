@@ -106,6 +106,7 @@
     <Compile Include="Annotations.cs" />
     <Compile Include="CustomMessageBox.cs" />
     <Compile Include="CutPhoto.cs" />
+    <Compile Include="DefectsFinder.cs" />
     <Compile Include="DustRemoval.cs" />
     <Compile Include="ExitCodes.cs" />
     <Compile Include="FileOperations.cs" />
