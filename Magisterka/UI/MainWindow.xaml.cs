@@ -11,32 +11,21 @@ namespace UI
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        public BitmapImage CleanedImage
+        public BitmapImage ViewedImage
         {
             get
             {
-                return _cleanedImage;
+                return _viewedImage;
             }
             set
             {
-                if (value != _cleanedImage)
+                if (value != _viewedImage)
                 {
-                    _cleanedImage = value;
-                    OnPropertyChanged(nameof(CleanedImage));
+                    _viewedImage = value;
+                    OnPropertyChanged(nameof(ViewedImage));
                 }
             }
-        }
-        public string ScanningPath
-        {
-            get
-            {
-                return Domain.FileOperations.ScanDirectory;
-            }
-            set
-            {                
-                OnPropertyChanged(nameof(ScanningPath));
-            }
-        }
+        }     
         public string BlockControls
         {
             get
@@ -60,9 +49,8 @@ namespace UI
             }
         }
 
-        private BitmapImage _cleanedImage;
-        private Image<Bgr, byte> _imageBefor;
-        private Image<Bgr, byte> _imageAfter;
+        private BitmapImage _viewedImage;
+        private ImageProcessing _imageProcessing;
         private bool _enableControl;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -71,7 +59,8 @@ namespace UI
         {
             InitializeComponent();
             EnableControl = true;
-            ScanningPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Scanner");
+
+            _imageProcessing = new ImageProcessing();
             
             #region InitializeButtonsEvents
             this.FileControl.GetPhotoFromScannerClicked += GetPhotoFromScanner;
@@ -103,18 +92,16 @@ namespace UI
             try
             {
                 EnableControl = false;
-
-                Image<Bgr, byte> image = FileOperations.GetImageFromDirectory();
-                if (image != null)
+                if (_imageProcessing != null)
                 {
-                    _imageBefor = image;
-                    _imageAfter = image;
-                    CleanedImage = Domain.ImageProcessing.BitmapToImageSource(_imageBefor.ToBitmap());
+                    _imageProcessing.Dispose();
                 }
+                _imageProcessing = new ImageProcessing(FileOperations.GetImageFromDirectory());
+                ViewedImage = _imageProcessing.BitmapImageAfter;
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -126,13 +113,12 @@ namespace UI
             try
             {
                 EnableControl = false;
-                Image<Bgr, byte> image = FileOperations.GetImageFromScanner();
-                if (image != null)
+                if (_imageProcessing != null)
                 {
-                    _imageBefor = image;
-                    _imageAfter = image;
-                    CleanedImage = Domain.ImageProcessing.BitmapToImageSource(_imageBefor.ToBitmap());
+                    _imageProcessing.Dispose();
                 }
+                _imageProcessing = new ImageProcessing(FileOperations.GetImageFromScanner());
+                ViewedImage = _imageProcessing.BitmapImageAfter;               
             }
             catch (Exception ex)
             {
@@ -150,22 +136,22 @@ namespace UI
         {
             try
             {
-                FileOperations.SaveImageFile(_imageAfter);
+                FileOperations.SaveImageFile(_imageProcessing.ImageAfter);
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         private void SavePhotoAs(object sender, EventArgs e)
         {
             try
             {
-                FileOperations.SaveImageFileAs(_imageAfter);
+                FileOperations.SaveImageFileAs(_imageProcessing.ImageAfter);
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         private void SetScanPath(object sender, EventArgs e)
@@ -173,11 +159,10 @@ namespace UI
             try
             {
                 FileOperations.SetScanPath();
-                OnPropertyChanged(nameof(ScanningPath));
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }            
         }
         #endregion FileOperation
@@ -188,15 +173,13 @@ namespace UI
             try
             {
                 EnableControl = false;
-                //DustRemoval dr = new DustRemoval(_imageBefor);
-                //_imageAfter = dr.RemoveDust();
-                DefectsFinder df = new DefectsFinder(_imageBefor);
-                _imageAfter = df.SearchDefects();
-                CleanedImage = Domain.ImageProcessing.BitmapToImageSource(_imageAfter.ToBitmap());
+                _imageProcessing.ReduceDust();
+                ViewedImage = _imageProcessing.BitmapImageAfter;
+
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -208,13 +191,8 @@ namespace UI
             try
             {
                 EnableControl = false;
-                CutPhoto cp = new CutPhoto(_imageAfter);
-                _imageAfter = cp.AlignPhoto(_imageBefor);
-                //_imageAfter = cp.SetLines();
-                //_imageAfter = cp.Cut(_imageAfter);
-                //_imageBefor = cp.Cut(_imageBefor);
-
-                CleanedImage = Domain.ImageProcessing.BitmapToImageSource(_imageAfter.ToBitmap());
+                _imageProcessing.CutImage();
+                ViewedImage = _imageProcessing.BitmapImageAfter;
             }
             catch (Exception ex)
             {
@@ -231,9 +209,8 @@ namespace UI
             try
             {
                 EnableControl = false;
-                SmudgeCleaner sc = new SmudgeCleaner(_imageBefor);
-                _imageAfter = sc.OtherColorDetector();
-                CleanedImage = Domain.ImageProcessing.BitmapToImageSource(_imageAfter.ToBitmap());
+
+                ViewedImage = _imageProcessing.BitmapImageAfter;
             }
             catch (Exception ex)
             {
@@ -255,10 +232,8 @@ namespace UI
             try
             {
                 EnableControl = false;
-                DustRemoval dr = new DustRemoval(_imageAfter);
-                _imageAfter = dr.Erode();
-                _imageBefor = new Image<Bgr, byte>(_imageAfter.ToBitmap());
-                CleanedImage = Domain.ImageProcessing.BitmapToImageSource(_imageAfter.ToBitmap());
+                _imageProcessing.ReduceDust();
+                ViewedImage = _imageProcessing.BitmapImageAfter;
             }
             catch (Exception ex)
             {
@@ -274,7 +249,7 @@ namespace UI
         #region ViewOperations
         private void PreviewEditPhoto(object sender, EventArgs e)
         {
-            PreviewWindow PW = new PreviewWindow(CleanedImage);
+            PreviewWindow PW = new PreviewWindow(ViewedImage);
             PW.Show();
         }
         private void PreviewOrginalPhoto(object sender, EventArgs e)

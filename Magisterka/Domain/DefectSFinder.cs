@@ -142,7 +142,7 @@ namespace Domain
             GetThresholds(out a1,out a2,out b1,out b2, laplaceImge);
 
             _patchMask = GetMaskOfDefects(a1, a2, b1, b2, laplaceImge);
-            _maskOfDefects = Dilate(_patchMask.Convert<Bgr,byte>(), new Size(3, 3), 2).Convert<Gray,byte>();
+            _maskOfDefects = MorphologicalProcessing.Dilate(_patchMask.Convert<Bgr,byte>(), new Size(3, 3), 2).Convert<Gray,byte>();
 
             Image<Gray, byte> imageOutput = _maskOfDefects.Convert<Gray, byte>().ThresholdBinary(new Gray(100), new Gray(255));
             VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
@@ -150,7 +150,7 @@ namespace Domain
 
             CvInvoke.FindContours(_maskOfDefects, contours, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
           
-            _inputImage = Dilate(_inputImage, new Size(5, 5), 5);
+            _inputImage = MorphologicalProcessing.Dilate(_inputImage, new Size(5, 5), 5);
 
             CvInvoke.DrawContours(_inputImage, contours, -1, new MCvScalar(255, 0, 255));
 
@@ -177,26 +177,15 @@ namespace Domain
             Image<Gray, byte> cannyImg1 = sourceImage.Convert<Gray,byte>().Canny(a1, a2);
             Image<Gray, byte> cannyImg2 = sourceImage.Convert<Gray,byte>().Canny(b1, b2);
             Image<Gray, byte> cannyImg = cannyImg1.Add(cannyImg2);
-            Image<Gray, byte> dilatedImage = Dilate(cannyImg.Convert<Bgr,byte>(), new Size(5, 5), 5).Convert<Gray,byte>();
+            Image<Gray, byte> dilatedImage = MorphologicalProcessing.Dilate(cannyImg.Convert<Bgr,byte>(), new Size(5, 5), 5).Convert<Gray,byte>();
 
             cannyImg1.Dispose();
             cannyImg2.Dispose();
             cannyImg.Dispose();
 
             return dilatedImage;
-        }
-                                  
-        public Image<Bgr, byte> Dilate(Image<Bgr, byte> input, Size ksize, int iterations=1)
-        {
-            Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Rectangle, ksize, new Point(-1, -1));
-            return input.MorphologyEx(MorphOp.Dilate, kernel, new Point(-1, -1), iterations, BorderType.Default, new MCvScalar(1.0));
-        }
-
-        public Image<Bgr, byte> Erode(Image<Bgr, byte> input, Size ksize, int iterations = 1)
-        {
-            Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Rectangle, ksize, new Point(-1, -1));
-            return input.MorphologyEx(MorphOp.Erode, kernel, new Point(-1, -1), iterations, BorderType.Default, new MCvScalar(1.0));
-        }
+        }                                  
+       
 
         private void SplitDefectContoursBySize()
         {           
