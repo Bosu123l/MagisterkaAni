@@ -18,5 +18,15 @@ namespace Domain
             Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Rectangle, ksize, new Point(-1, -1));
             return input.MorphologyEx(MorphOp.Erode, kernel, new Point(-1, -1), iterations, BorderType.Default, new MCvScalar(1.0));
         }
+
+        public static Image<Gray,byte> CreateBinaryImage(Image<Bgr, byte> image, int threashold)
+        {
+            return image.Convert<Gray, byte>().ThresholdBinary(new Gray(threashold), new Gray(255));
+        }
+
+        public static Image<Gray,byte> GreateBinaryImageNegative(Image<Gray, byte> image)
+        {
+            return image.Not();
+        }
     }
 }

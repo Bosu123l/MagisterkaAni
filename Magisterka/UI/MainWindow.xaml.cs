@@ -70,7 +70,7 @@ namespace UI
             this.FileControl.SavePhotoClicked += SavePhoto;
 
             this.PhotoEditionControl.DustReductionClicked += DustReduction;
-            this.PhotoEditionControl.SmudgeReductionClick += Morpho;//SmudgeCleaner;
+            this.PhotoEditionControl.SmudgeReductionClick += SmudgeCleaner;
             this.PhotoEditionControl.CutPhotoClick += CutPhotoBorder;
             this.PhotoEditionControl.RotateImageLeftClick += RotateImageLeft;
             this.PhotoEditionControl.RotateImageRightClick += RotateImageRight;

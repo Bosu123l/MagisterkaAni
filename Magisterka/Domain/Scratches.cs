@@ -4,42 +4,26 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Domain
 {
-    public class DustRemoval
+    public class Scratches
     {
-        private Point[][] _conturMatrix;
-
-        public DustRemoval()
-        {}
-
-        public Image<Bgr, byte> RemoveDust(Image<Bgr, byte> image, Point[][] conturMatrix)
+        private void RemoveDustParticles()
         {
-            return image;
-        }
-
-        public Image<Gray, byte> Morpho(Image<Gray, byte> input)
-        {
-            Mat kernel = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Rectangle, new Size(5, 5), new Point(-1, -1));
-            return input.MorphologyEx(Emgu.CV.CvEnum.MorphOp.Dilate, kernel, new Point(-1, -1), 2, Emgu.CV.CvEnum.BorderType.Default, new MCvScalar(1.0));
-        }
-       
-        private void RemoveDustParticles(Emgu.CV.Util.VectorOfVectorOfPoint defectsContours, Image<Bgr, byte> orgImage, Image<Gray, byte> dustMask)
-        {
-            var defects = defectsContours.ToArrayOfArray().OrderByDescending(item => item.Count()).ToArray();         
-
-            for(int i = 0; i < defects.Count(); i++)
-            {
-                RemoveSpeckOfDust(defects[i], orgImage, dustMask);
-            }
+            //for (int i = 0; i < defects.Count(); i++)
+            //{
+            //    RemoveSpeckOfDust(defects[i], orgImage, dustMask);
+            //}
         }
         private void RemoveSpeckOfDust(Point[] defectContour, Image<Bgr, byte> orgImage, Image<Gray, byte> dustMask)
         {
             Rectangle roi;
             Image<Gray, byte> dustMaskNegative;
             Image<Bgr, byte> temp;
-            Image<Bgr, byte> tempMask=new Image<Bgr, byte>(dustMask.Bitmap);
+            Image<Bgr, byte> tempMask = new Image<Bgr, byte>(dustMask.Bitmap);
 
             roi = GetRectangleFromContour(defectContour, orgImage.Width, orgImage.Height);
             orgImage.ROI = roi;
@@ -53,7 +37,7 @@ namespace Domain
 
             temp.CopyTo(orgImage);
             CvInvoke.cvCopy(temp, orgImage, IntPtr.Zero);
-           
+
             orgImage.ROI = Rectangle.Empty;
             dustMask.ROI = Rectangle.Empty;
 

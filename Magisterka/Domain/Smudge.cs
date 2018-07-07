@@ -6,11 +6,11 @@ using System.Linq;
 
 namespace Domain
 {
-    public class SmudgeCleaner
+    public class Smudge
     {
         private Image<Bgr, byte> _image;
 
-        public SmudgeCleaner(Image<Bgr, byte> image)
+        public Smudge(Image<Bgr, byte> image)
         {
             _image = image;
         }

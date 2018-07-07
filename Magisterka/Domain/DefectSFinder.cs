@@ -145,14 +145,14 @@ namespace Domain
             _maskOfDefects = MorphologicalProcessing.Dilate(_patchMask.Convert<Bgr,byte>(), new Size(3, 3), 2).Convert<Gray,byte>();
 
             Image<Gray, byte> imageOutput = _maskOfDefects.Convert<Gray, byte>().ThresholdBinary(new Gray(100), new Gray(255));
-            VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
+            _defectsContoursMatrix = new VectorOfVectorOfPoint();
             Mat hier = new Mat();
 
-            CvInvoke.FindContours(_maskOfDefects, contours, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+            CvInvoke.FindContours(_maskOfDefects, _defectsContoursMatrix, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
           
             _inputImage = MorphologicalProcessing.Dilate(_inputImage, new Size(5, 5), 5);
 
-            CvInvoke.DrawContours(_inputImage, contours, -1, new MCvScalar(255, 0, 255));
+            CvInvoke.DrawContours(_inputImage, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
 
             return _inputImage.Convert<Bgr, byte>();
         }

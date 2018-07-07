@@ -80,8 +80,8 @@ namespace Domain
                 _defectsFinder = new DefectsFinder(ImageBefor);
             }
 
-            DustRemoval dustRemoval = new DustRemoval();
-            dustRemoval.RemoveDust(ImageAfter, _defectsFinder.SmallDefectsContoursMatrix);
+            Dust dustRemoval = new Dust(ImageAfter, _defectsFinder.MaskOfDefects, _defectsFinder.SmallDefectsContoursMatrix);
+            _imageAfter=dustRemoval.RemoveDust();
         }
 
         public void CutImage() { }
