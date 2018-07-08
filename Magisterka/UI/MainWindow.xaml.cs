@@ -70,7 +70,7 @@ namespace UI
             this.FileControl.SavePhotoClicked += SavePhoto;
 
             this.PhotoEditionControl.DustReductionClicked += DustReduction;
-            this.PhotoEditionControl.SmudgeReductionClick += SmudgeCleaner;
+            this.PhotoEditionControl.SmudgeReductionClick += Morpho;
             this.PhotoEditionControl.CutPhotoClick += CutPhotoBorder;
             this.PhotoEditionControl.RotateImageLeftClick += RotateImageLeft;
             this.PhotoEditionControl.RotateImageRightClick += RotateImageRight;
@@ -232,7 +232,7 @@ namespace UI
             try
             {
                 EnableControl = false;
-                _imageProcessing.ReduceDust();
+                _imageProcessing.Test();
                 ViewedImage = _imageProcessing.BitmapImageAfter;
             }
             catch (Exception ex)

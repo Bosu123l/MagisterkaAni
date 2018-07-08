@@ -52,17 +52,21 @@ namespace Domain
         
         private void RemoveBrigtherDefects()
         {
-            Image<Bgr, float> patchImage;
-            Image<Bgr, float> brigtherMask;
+            Image<Bgr, byte> patchImage;
+            Image<Gray, byte> brigtherMask;
 
             #region WhiteOnBlack
-            brigtherMask = MorphologicalProcessing.CreateBinaryImage(_orgImage, 100).Convert<Bgr,float>().Mul(_dustMask.Convert<Bgr,float>());
-            patchImage = MorphologicalProcessing.Erode(_orgImage, new Size(5, 5), 5).Convert<Bgr, float>();
-            _cleanedImage = patchImage.Convert<Bgr,float>().Mul(brigtherMask).Convert<Bgr,byte>().Add(MorphologicalProcessing.GreateBinaryImageNegative(brigtherMask.Convert<Gray,byte>()).Convert<Bgr,float>().Mul(_orgImage.Convert<Bgr,float>()).Convert<Bgr,byte>());
+            brigtherMask = MorphologicalProcessing.MultipleImages(MorphologicalProcessing.CreateBinaryImage(_orgImage, 100), _dustMask).Convert<Gray,byte>();
+            patchImage = MorphologicalProcessing.Erode(_orgImage, new Size(3, 3), 10);
+            _cleanedImage = MorphologicalProcessing.CombineTwoImages(_orgImage, patchImage, brigtherMask);
+            _cleanedImage =_cleanedImage.SmoothBlur(10, 10);
             #endregion WhiteOnBlack
 
             #region WhiteOnWhite
+
             #endregion WhiteOnWhite
+            brigtherMask.Dispose();
+            patchImage.Dispose();
         }
 
         private void RemoveDarkerDefects()

@@ -87,6 +87,15 @@ namespace Domain
         public void CutImage() { }
         public void ReduceSmudges() { }
 
+        public void Test()
+        {
+            if (_defectsFinder == null)
+            {
+                _defectsFinder = new DefectsFinder(ImageBefor);
+            }
+            //_imageAfter = _defectsFinder.SearchDefects();//MorphologicalProcessing.Erode(_imageAfter, new Size(2,2), 1);
+        }
+
         public void Dispose()
         {
             if(_imageBefor!=null)
