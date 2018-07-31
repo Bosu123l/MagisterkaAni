@@ -18,6 +18,13 @@ namespace Domain
             {
                 return _imageBefor;
             }
+            set
+            {
+                if (_imageBefor != value)
+                {
+                    _imageBefor = value;
+                }
+            }
         }
         public Image<Bgr, byte> ImageAfter
         {
@@ -25,20 +32,27 @@ namespace Domain
             {
                 return _imageAfter;
             }
+            set
+            {
+                if(_imageAfter!=value)
+                {
+                    _imageAfter = value;
+                }
+            }
         }
 
         public BitmapImage BitmapImageBefor
         {
             get
             {
-                return BitmapToImageSource(_imageBefor.Bitmap);
+                return BitmapToImageSource(ImageBefor.Bitmap);
             }
         }
         public BitmapImage BitmapImageAfter
         {
             get
             {
-                return BitmapToImageSource(_imageAfter.Bitmap);
+                return BitmapToImageSource(ImageAfter.Bitmap);
             }
         }
 
@@ -50,11 +64,8 @@ namespace Domain
         {            
             if (image != null)
             {
-                _imageBefor = image;
-                _imageAfter = image;
-            }else
-            {                
-                throw new ArgumentNullException();
+                ImageBefor = image;
+                ImageAfter = image;
             }
         }
 
@@ -81,31 +92,27 @@ namespace Domain
             }
 
             Dust dustRemoval = new Dust(ImageAfter, _defectsFinder.MaskOfDefects, _defectsFinder.SmallDefectsContoursMatrix);
-            _imageAfter=dustRemoval.RemoveDust();
+            _imageAfter=dustRemoval.RemoveDust();            
+           // CvInvoke.DrawContours(ImageAfter, _defectsFinder.DefectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
         }
 
         public void CutImage() { }
         public void ReduceSmudges() { }
 
         public void Test()
-        {
-            if (_defectsFinder == null)
-            {
-                _defectsFinder = new DefectsFinder(ImageBefor);
-            }
+        {           
+            _defectsFinder = new DefectsFinder(ImageBefor);
+            _defectsFinder.SearchDefects();
+            ImageAfter = _defectsFinder.ReturnTmpImg;
+            CvInvoke.DrawContours(ImageAfter, _defectsFinder.DefectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
+            //_imageAfter = MorphologicalProcessing.CreateBinaryImage(_imageAfter, 192).Convert<Bgr,byte>();
             //_imageAfter = _defectsFinder.SearchDefects();//MorphologicalProcessing.Erode(_imageAfter, new Size(2,2), 1);
         }
 
         public void Dispose()
         {
-            if(_imageBefor!=null)
-            {
-                _imageBefor.Dispose();
-            }
-            if(_imageAfter!=null)
-            {
-                _imageAfter.Dispose();
-            }
+            if(_imageBefor!=null) _imageBefor.Dispose();
+            if(_imageAfter!=null) _imageAfter.Dispose();
         }
     }
 }

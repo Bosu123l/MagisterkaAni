@@ -9,13 +9,13 @@ namespace Domain
     {
         public static Image<Bgr, byte> Dilate(Image<Bgr, byte> input, Size ksize, int iterations = 1)
         {
-            Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Rectangle, ksize, new Point(-1, -1));
+            Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, ksize, new Point(-1, -1));
             return input.MorphologyEx(MorphOp.Dilate, kernel, new Point(-1, -1), iterations, BorderType.Default, new MCvScalar(1.0));
         }
 
         public static Image<Gray, byte> Dilate(Image<Gray, byte> input, Size ksize, int iterations = 1)
         {
-            Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Rectangle, ksize, new Point(-1, -1));
+            Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, ksize, new Point(-1, -1));
             return input.MorphologyEx(MorphOp.Dilate, kernel, new Point(-1, -1), iterations, BorderType.Default, new MCvScalar(1.0));
         }
 
@@ -45,9 +45,9 @@ namespace Domain
             return image1.Convert<Bgr, float>().Mul(image2.Convert<Bgr, float>()).Convert<Bgr, byte>();
         }
 
-        public static Image<Bgr, byte> MultipleImages(Image<Gray, byte> image1, Image<Gray, byte> image2)
+        public static Image<Gray, byte> MultipleImages(Image<Gray, byte> image1, Image<Gray, byte> image2)
         {
-            return image1.Convert<Bgr, float>().Mul(image2.Convert<Bgr, float>()).Convert<Bgr, byte>();
+            return image1.Convert<Gray, float>().Mul(image2.Convert<Gray, float>()).Convert<Gray, byte>();
         }
 
         public static Image<Bgr, byte> CombineTwoImages(Image<Bgr, byte> image, Image<Bgr, byte> imagePattern, Image<Gray, byte> mask)

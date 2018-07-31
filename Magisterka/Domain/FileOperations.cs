@@ -12,8 +12,8 @@ namespace Domain
     public class FileOperations
     {
         #region ConstPatameters
-        private static string _readFileExtensions = "TIFF |*.tif;*.tiff";
-        private static string _writeOtherFileExtensions = "TIFF |*.tif;*.tiff|" +
+        private const string _readFileExtensions = "TIFF |*.tif;*.tiff";
+        private const string _writeOtherFileExtensions = "TIFF |*.tif;*.tiff|" +
                                                           "PNG  |*.png| " +
                                                           "JPEG |*.jpg;*jpeg;";
         private static string _defaultDestinationDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "OldPhotos");
@@ -248,7 +248,7 @@ namespace Domain
                     case ExitCodes.ExitCode.ERROR_CANCELLED:
                         { return null; }
                     default:
-                        { throw new Exception(exCode.ToString()); }
+                        { throw new Exception(ExitCodes.ExitMessage(exCode)); }
                 }
             }
             catch (Exception ex)

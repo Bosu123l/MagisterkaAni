@@ -57,12 +57,14 @@ namespace UI
 
         public MainWindow()
         {
-            InitializeComponent();
             EnableControl = true;
-
             _imageProcessing = new ImageProcessing();
-            
-            #region InitializeButtonsEvents
+            InitializeComponent();            
+            InitializeButtonsEvents();
+        }
+
+        private void InitializeButtonsEvents()
+        {
             this.FileControl.GetPhotoFromScannerClicked += GetPhotoFromScanner;
             this.FileControl.GetPhotoFromFolderClicked += GetPhotoFromFile;
             this.FileControl.ChangeScanDestynationFolderClicked += SetScanPath;
@@ -77,7 +79,6 @@ namespace UI
 
             this.ViewControl.OpenOldPhotoInNewWindowClicked += PreviewOrginalPhoto;
             this.ViewControl.OpenPhotoInNewWindowClicked += PreviewEditPhoto;
-            #endregion InitializeButtonsEvents
         }
 
         [NotifyPropertyChangedInvocator]
@@ -96,8 +97,12 @@ namespace UI
                 {
                     _imageProcessing.Dispose();
                 }
-                _imageProcessing = new ImageProcessing(FileOperations.GetImageFromDirectory());
-                ViewedImage = _imageProcessing.BitmapImageAfter;
+                var image = FileOperations.GetImageFromDirectory();
+                if (image != null)
+                {
+                    _imageProcessing = new ImageProcessing(image);
+                    ViewedImage = _imageProcessing.BitmapImageAfter;
+                }
             }
             catch (Exception ex)
             {
@@ -179,7 +184,7 @@ namespace UI
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message+ex.StackTrace, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -256,9 +261,8 @@ namespace UI
         {
 
         }
-        #endregion ViewOperations
 
-       
-       
+
+        #endregion ViewOperations       
     }
 }
