@@ -89,7 +89,7 @@ namespace UI
                 {
                     if (image != null)
                     {
-                        ImageProcessing.SetImage(image.Image);
+                        ImageProcessing.SetImage(image);
                         OnPropertyChanged(nameof(ViewedImage));
                     }
                 }                    

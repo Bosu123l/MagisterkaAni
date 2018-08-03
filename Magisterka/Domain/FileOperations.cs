@@ -138,7 +138,7 @@ namespace Domain
 
         #endregion publicParameters
 
-        public static void SaveImageFileAs(Image<Bgr, byte> image)
+        public static void SaveImageFileAs(ImageWrapper<Bgr, byte> image)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.AddExtension = true;
@@ -162,7 +162,7 @@ namespace Domain
             }
         }
 
-        public static void SaveImageFile(Image<Bgr, byte> image)
+        public static void SaveImageFile(ImageWrapper<Bgr, byte> image)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.AddExtension = true;
@@ -209,7 +209,7 @@ namespace Domain
             }
         }
 
-        public static Image<Bgr, byte> GetImageFromScanner()
+        public static ImageWrapper<Bgr, byte> GetImageFromScanner()
         {
             Process scannerManager = new Process();
             string scanFilePattrn = @"^\d{8}_SC\d{4}";
@@ -243,7 +243,7 @@ namespace Domain
                                 throw new Exception("Scanned file not found!");
                             }
                             FilePath = lastAddedFilePath;
-                            return new Image<Bgr, byte>(FilePath);
+                            return new ImageWrapper<Bgr, byte>(FilePath);
                         }
                     case ExitCodes.ExitCode.ERROR_CANCELLED:
                         { return null; }

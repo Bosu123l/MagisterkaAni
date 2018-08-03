@@ -9,10 +9,10 @@ namespace Domain
 {
     public static class ImageProcessing
     {
-        private static Image<Bgr, byte> _imageBefor;
-        private static Image<Bgr, byte> _imageAfter;
+        private static ImageWrapper<Bgr, byte> _imageBefor;
+        private static ImageWrapper<Bgr, byte> _imageAfter;
 
-        public static Image<Bgr, byte> ImageBefor
+        public static ImageWrapper<Bgr, byte> ImageBefor
         {
             get
             {
@@ -26,7 +26,7 @@ namespace Domain
                 }
             }
         }
-        public static Image<Bgr, byte> ImageAfter
+        public static ImageWrapper<Bgr, byte> ImageAfter
         {
             get
             {
@@ -56,7 +56,7 @@ namespace Domain
             }
         }
            
-        public static void SetImage(Image<Bgr, byte> image)
+        public static void SetImage(ImageWrapper<Bgr, byte> image)
         {            
             if (image != null)
             {
@@ -65,7 +65,7 @@ namespace Domain
             }
         }
 
-        public static BitmapImage BitmapToImageSource(Image<Bgr, byte> image)
+        public static BitmapImage BitmapToImageSource(ImageWrapper<Bgr, byte> image)
         {
             if (image == null)
                 return null;

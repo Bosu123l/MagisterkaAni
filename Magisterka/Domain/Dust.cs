@@ -10,10 +10,10 @@ namespace Domain
     public class Dust: IDisposable
     {
         private Point[][] _conturMatrix;
-        private Image<Bgr, byte> _orgImage;
-        private Image<Gray, byte> _dustMask;   
+        private ImageWrapper<Bgr, byte> _orgImage;
+        private ImageWrapper<Gray, byte> _dustMask;   
 
-        public Dust(Image<Bgr, byte> orgImage, Image<Gray, byte> dustMask, Point[][] conturMatrix)
+        public Dust(ImageWrapper<Bgr, byte> orgImage, ImageWrapper<Gray, byte> dustMask, Point[][] conturMatrix)
         {
             if (orgImage != null) 
             {
@@ -41,13 +41,13 @@ namespace Domain
             }
         }        
 
-        public Image<Bgr, byte> RemoveDust()
+        public ImageWrapper<Bgr, byte> RemoveDust()
         {
-            Image<Bgr, byte> brightSpotsPatchImage;
-            Image<Gray, byte> brigtherSpotsMask;  
-            
-            Image<Bgr, byte> patchImage = _orgImage.CopyBlank();
-            Image<Gray, byte> binaryOrgImage = MorphologicalProcessing.CreateBinaryImage(_orgImage, 100);
+            ImageWrapper<Bgr, byte> brightSpotsPatchImage;
+            ImageWrapper<Gray, byte> brigtherSpotsMask;
+
+            ImageWrapper<Bgr, byte> patchImage = _orgImage.CopyBlank();
+            ImageWrapper<Gray, byte> binaryOrgImage = MorphologicalProcessing.CreateBinaryImage(_orgImage, 100);
 
             #region WhiteOnBlack
             brigtherSpotsMask = MorphologicalProcessing.MultipleImages(binaryOrgImage, _dustMask);
@@ -75,7 +75,7 @@ namespace Domain
 
             binaryOrgImage.Dispose();
 
-            Image<Bgr, byte> _cleanedImage = _orgImage.CopyBlank();
+            ImageWrapper<Bgr, byte> _cleanedImage = _orgImage.CopyBlank();
             _cleanedImage = MorphologicalProcessing.CombineTwoImages(_orgImage, patchImage, _dustMask);
             patchImage.Dispose();
             _cleanedImage = _cleanedImage.SmoothBlur(10, 10);

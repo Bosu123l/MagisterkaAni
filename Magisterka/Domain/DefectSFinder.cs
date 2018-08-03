@@ -15,13 +15,13 @@ namespace Domain
     {
         private const float _minFactor = 0.0000002f;
         private const float _maxFactor = 0.0002f;
-        private Image<Bgr, byte> _inputImage;
+        private ImageWrapper<Bgr, byte> _inputImage;
         private int _maxThreasholdOfDustContourSize = 100;
         private VectorOfVectorOfPoint _defectsContoursMatrix;
         private Point[][] _smallDefectsContoursMatrix;
         private Point[][] _largeDefectsContoursMatrix;
-        private Image<Gray, byte> _patchMask;
-        private Image<Gray, byte> _maskOfDefects;
+        private ImageWrapper<Gray, byte> _patchMask;
+        private ImageWrapper<Gray, byte> _maskOfDefects;
         //public Image<Bgr, byte> ReturnTmpImg;
 
         public VectorOfVectorOfPoint DefectsContoursMatrix
@@ -105,7 +105,7 @@ namespace Domain
             }
         }
 
-        public Image<Gray, byte> PatchMask
+        public ImageWrapper<Gray, byte> PatchMask
         {
             get
             {
@@ -116,7 +116,7 @@ namespace Domain
                 return _patchMask;
             }
         }
-        public Image<Gray, byte> MaskOfDefects
+        public ImageWrapper<Gray, byte> MaskOfDefects
         {
             get
             {
@@ -128,78 +128,71 @@ namespace Domain
             }
         }
 
-        public DefectsFinder(Image<Bgr, byte> image)
+        public DefectsFinder(ImageWrapper<Bgr, byte> image)
         {
-            if (image == null || image.Data == null)
-                throw new ArgumentNullException(nameof(image));
-
             _inputImage = image.Copy();
         }
 
         public void SearchDefects()
         {
             if (_inputImage == null)
-                throw new ArgumentNullException(nameof(_inputImage));            
-
-            Image<Gray, float> grayImage = _inputImage.Convert<Gray, float>();
-            Image<Gray, float> laplaceImge = grayImage.Laplace(9);
+                throw new ArgumentNullException(nameof(_inputImage));
 
             int a1 = 0, a2 = 0, b1 = 0, b2 = 0;
-            GetThresholds(out a1, out a2, out b1, out b2, laplaceImge);
 
-            _patchMask = GetMaskOfDefects(a1, a2, b1, b2, laplaceImge);
-            _maskOfDefects = MorphologicalProcessing.Dilate(_patchMask.Convert<Bgr, byte>(), new Size(3, 3), 2).Convert<Gray, byte>();
+            using (ImageWrapper<Gray, float> grayImage = _inputImage.Convert<Gray, float>())
+            {
+                using (ImageWrapper<Gray, float> laplaceImge = grayImage.Laplace(9))
+                {
+                    GetThresholds(out a1, out a2, out b1, out b2, laplaceImge);
+                    _patchMask = GetMaskOfDefects(a1, a2, b1, b2, laplaceImge);
+                }
+                    _maskOfDefects = MorphologicalProcessing.Dilate(_patchMask.Convert<Bgr, byte>(), new Size(3, 3), 2).Convert<Gray, byte>();
 
-            Image<Gray, byte> imageOutput = _maskOfDefects.Convert<Gray, byte>().ThresholdBinary(new Gray(100), new Gray(255));
-            _defectsContoursMatrix = new VectorOfVectorOfPoint();
-            Mat hier = new Mat();
-
-            CvInvoke.FindContours(_maskOfDefects, _defectsContoursMatrix, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+                    //ImageWrapper<Gray, byte> imageOutput = _maskOfDefects.Convert<Gray, byte>().ThresholdBinary(new Gray(100), new Gray(255));
+                    _defectsContoursMatrix = new VectorOfVectorOfPoint();
+                    using (Mat hier = new Mat())
+                    {
+                    CvInvoke.FindContours(_maskOfDefects.Image, _defectsContoursMatrix, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+                    }       
+            }                
 
             //ReturnTmpImg = MorphologicalProcessing.CreateMaskFromPoints(imageOutput, SmallDefectsContoursMatrix).Convert<Bgr,byte>();
-
-            hier.Dispose();
-            imageOutput.Dispose();
-            grayImage.Dispose();
-            laplaceImge.Dispose();
-
-            GC.Collect(0);
-            GC.WaitForPendingFinalizers(); 
             //CvInvoke.DrawContours(_inputImage, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
             //_inputImage = MorphologicalProcessing.Erode(_inputImage, new Size(3, 3), 3);           
         }
 
-        private void GetThresholds(out int a1, out int a2, out int b1, out int b2, Image<Gray, float> sourceImage)
+        private void GetThresholds(out int a1, out int a2, out int b1, out int b2, ImageWrapper<Gray, float> sourceImage)
         {
-            DenseHistogram histogram = new DenseHistogram(256, new RangeF(0.0f, 255.0f));
-            histogram.Calculate(new Image<Gray, byte>[] { sourceImage.Convert<Gray, byte>() }, false, null);
+            using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0.0f, 255.0f)))
+            {
+                histogram.Calculate(new Image<Gray, byte>[] { sourceImage.Convert<Gray, byte>().Image }, false, null);
 
-            List<float> hist = new List<float>(histogram.GetBinValues());
-            int pixelsSum = (int)hist.Sum(x => x);
+                List<float> hist = new List<float>(histogram.GetBinValues());
+                int pixelsSum = (int)hist.Sum(x => x);
 
-            a1 = hist.IndexOf(hist.FirstOrDefault(x => x > pixelsSum * _minFactor));
-            a2 = hist.IndexOf(hist.FirstOrDefault(x => x > pixelsSum * _maxFactor));
+                a1 = hist.IndexOf(hist.FirstOrDefault(x => x > pixelsSum * _minFactor));
+                a2 = hist.IndexOf(hist.FirstOrDefault(x => x > pixelsSum * _maxFactor));
 
-            b1 = hist.LastIndexOf(hist.LastOrDefault(x => x > pixelsSum * _minFactor));
-            b2 = hist.LastIndexOf(hist.LastOrDefault(x => x > pixelsSum * _maxFactor));
-
-            histogram.Dispose();
+                b1 = hist.LastIndexOf(hist.LastOrDefault(x => x > pixelsSum * _minFactor));
+                b2 = hist.LastIndexOf(hist.LastOrDefault(x => x > pixelsSum * _maxFactor));                
+            }                
         }
-        private Image<Gray, byte> GetMaskOfDefects(int a1, int a2, int b1, int b2, Image<Gray, float> sourceImage)
+        private ImageWrapper<Gray, byte> GetMaskOfDefects(int a1, int a2, int b1, int b2, ImageWrapper<Gray, float> sourceImage)
         {
-            Image<Gray, byte> cannyImg1 = sourceImage.Convert<Gray, byte>().Canny(a1, a2);
-            Image<Gray, byte> cannyImg2 = sourceImage.Convert<Gray, byte>().Canny(b1, b2);
-            Image<Gray, byte> cannyImg = cannyImg1.Add(cannyImg2);
-            Image<Gray, byte> dilatedImage = MorphologicalProcessing.Dilate(cannyImg.Convert<Bgr, byte>(), new Size(3, 3), 3).Convert<Gray, byte>();
-
-            cannyImg1.Dispose();
-            cannyImg2.Dispose();
-            cannyImg.Dispose();
-
-            GC.Collect(0);
-            GC.WaitForPendingFinalizers();
-
-            return dilatedImage;
+            using (ImageWrapper<Gray, byte> cannyImg1 = sourceImage.Convert<Gray, byte>().Canny(a1, a2))
+            {
+                using (ImageWrapper<Gray, byte> cannyImg2 = sourceImage.Convert<Gray, byte>().Canny(b1, b2))
+                {
+                    using (ImageWrapper<Gray, byte> cannyImg = cannyImg1.Add(cannyImg2))
+                    {
+                        using (ImageWrapper<Gray, byte> dilatedImage = MorphologicalProcessing.Dilate(cannyImg.Convert<Bgr, byte>(), new Size(3, 3), 3).Convert<Gray, byte>())
+                        {
+                            return dilatedImage;
+                        }
+                    }
+                }                   
+            } 
         }
         private void SplitDefectContoursBySize()
         {
