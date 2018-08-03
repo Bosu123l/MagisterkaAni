@@ -1,9 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
-using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using Emgu.CV;
 using Emgu.CV.Structure;
 using Domain;
 
@@ -15,17 +13,14 @@ namespace UI
         {
             get
             {
-                return _viewedImage;
+                return ImageProcessing.BitmapImageAfter;
             }
             set
             {
-                if (value != _viewedImage)
-                {
-                    _viewedImage = value;
-                    OnPropertyChanged(nameof(ViewedImage));
-                }
+               OnPropertyChanged(nameof(ViewedImage));                
             }
-        }     
+        }
+        
         public string BlockControls
         {
             get
@@ -49,8 +44,6 @@ namespace UI
             }
         }
 
-        private BitmapImage _viewedImage;
-        private ImageProcessing _imageProcessing;
         private bool _enableControl;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -58,8 +51,7 @@ namespace UI
         public MainWindow()
         {
             EnableControl = true;
-            _imageProcessing = new ImageProcessing();
-            InitializeComponent();            
+            InitializeComponent();
             InitializeButtonsEvents();
         }
 
@@ -86,23 +78,21 @@ namespace UI
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-      
+
         #region GetPhotoToEdit
         private void GetPhotoFromFile(object sender, EventArgs e)
         {
             try
             {
                 EnableControl = false;
-                if (_imageProcessing != null)
+                using (ImageWrapper<Bgr, byte> image = new ImageWrapper<Bgr, byte>(FileOperations.GetImageFromDirectory()))
                 {
-                    _imageProcessing.Dispose();
-                }
-                var image = FileOperations.GetImageFromDirectory();
-                if (image != null)
-                {
-                    _imageProcessing = new ImageProcessing(image);
-                    ViewedImage = _imageProcessing.BitmapImageAfter;
-                }
+                    if (image != null)
+                    {
+                        ImageProcessing.SetImage(image.Image);
+                        OnPropertyChanged(nameof(ViewedImage));
+                    }
+                }                    
             }
             catch (Exception ex)
             {
@@ -113,17 +103,20 @@ namespace UI
                 EnableControl = true;
             }
         }
+
         private void GetPhotoFromScanner(object sender, EventArgs e)
         {
             try
             {
                 EnableControl = false;
-                if (_imageProcessing != null)
+                using (var image = FileOperations.GetImageFromScanner())
                 {
-                    _imageProcessing.Dispose();
+                    if (image != null)
+                    {
+                        ImageProcessing.SetImage(image);
+                        OnPropertyChanged(nameof(ViewedImage));
+                    }
                 }
-                _imageProcessing = new ImageProcessing(FileOperations.GetImageFromScanner());
-                ViewedImage = _imageProcessing.BitmapImageAfter;               
             }
             catch (Exception ex)
             {
@@ -141,7 +134,7 @@ namespace UI
         {
             try
             {
-                FileOperations.SaveImageFile(_imageProcessing.ImageAfter);
+                FileOperations.SaveImageFile(ImageProcessing.ImageAfter);
             }
             catch (Exception ex)
             {
@@ -152,7 +145,7 @@ namespace UI
         {
             try
             {
-                FileOperations.SaveImageFileAs(_imageProcessing.ImageAfter);
+                FileOperations.SaveImageFileAs(ImageProcessing.ImageAfter);
             }
             catch (Exception ex)
             {
@@ -168,7 +161,7 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-            }            
+            }
         }
         #endregion FileOperation
 
@@ -178,13 +171,12 @@ namespace UI
             try
             {
                 EnableControl = false;
-                _imageProcessing.ReduceDust();
-                ViewedImage = _imageProcessing.BitmapImageAfter;
-
+                ImageProcessing.ReduceDust();
+                OnPropertyChanged(nameof(ViewedImage));
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message+ex.StackTrace, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message + ex.StackTrace, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -196,8 +188,8 @@ namespace UI
             try
             {
                 EnableControl = false;
-                _imageProcessing.CutImage();
-                ViewedImage = _imageProcessing.BitmapImageAfter;
+                ImageProcessing.CutImage();
+                OnPropertyChanged(nameof(ViewedImage));
             }
             catch (Exception ex)
             {
@@ -214,8 +206,7 @@ namespace UI
             try
             {
                 EnableControl = false;
-
-                ViewedImage = _imageProcessing.BitmapImageAfter;
+                OnPropertyChanged(nameof(ViewedImage));
             }
             catch (Exception ex)
             {
@@ -237,8 +228,8 @@ namespace UI
             try
             {
                 EnableControl = false;
-                _imageProcessing.Test();
-                ViewedImage = _imageProcessing.BitmapImageAfter;
+                ImageProcessing.Test();
+                ViewedImage = ImageProcessing.BitmapImageAfter;
             }
             catch (Exception ex)
             {
@@ -254,14 +245,14 @@ namespace UI
         #region ViewOperations
         private void PreviewEditPhoto(object sender, EventArgs e)
         {
-            PreviewWindow PW = new PreviewWindow(ViewedImage);
+            PreviewWindow PW = new PreviewWindow(ImageProcessing.BitmapImageAfter);
             PW.Show();
         }
         private void PreviewOrginalPhoto(object sender, EventArgs e)
         {
-
+            PreviewWindow PW = new PreviewWindow(ImageProcessing.BitmapImageBefor);
+            PW.Show();
         }
-
 
         #endregion ViewOperations       
     }

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Domain
 {
-    public class FileOperations
+    public static class FileOperations
     {
         #region ConstPatameters
         private const string _readFileExtensions = "TIFF |*.tif;*.tiff";
@@ -221,7 +221,7 @@ namespace Domain
             {
                 scannerManager.StartInfo.Arguments = ScanDirectory;
 
-                scannerManager.StartInfo.FileName = @"C:\Users\annaj\Documents\GitHub\MagisterkaAni\Magisterka\ScannerManager\bin\Debug\ScannerManager.exe";
+                scannerManager.StartInfo.FileName = Path.Combine(Environment.CurrentDirectory, @"..\..\..\ScannerManager\bin\Debug\ScannerManager.exe"); 
                 scannerManager.EnableRaisingEvents = true;
 
                 scannerManager.Start();

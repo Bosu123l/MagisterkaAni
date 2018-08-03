@@ -7,18 +7,17 @@ using System.Linq;
 
 namespace Domain
 {
-    public class Dust
+    public class Dust: IDisposable
     {
-        //private Point[][] _conturMatrix;
+        private Point[][] _conturMatrix;
         private Image<Bgr, byte> _orgImage;
-        private Image<Gray, byte> _dustMask;      
-        
+        private Image<Gray, byte> _dustMask;   
 
         public Dust(Image<Bgr, byte> orgImage, Image<Gray, byte> dustMask, Point[][] conturMatrix)
         {
             if (orgImage != null) 
             {
-                _orgImage = orgImage;
+                _orgImage = orgImage.Copy();
             }
             else
             {
@@ -26,43 +25,44 @@ namespace Domain
             }
             if (dustMask != null)
             {
-                _dustMask = dustMask;
+                _dustMask = dustMask.Copy();
             }
             else
             {
                 throw new ArgumentNullException(nameof(dustMask));
             }
-            //if (conturMatrix != null)
-            //{
-            //    _conturMatrix = conturMatrix;
-            //}
-            //else
-            //{
-            //    throw new ArgumentNullException(nameof(conturMatrix));
-            //}
-        }
+            if (conturMatrix != null)
+            {
+                _conturMatrix = conturMatrix;
+            }
+            else
+            {
+                throw new ArgumentNullException(nameof(conturMatrix));
+            }
+        }        
 
         public Image<Bgr, byte> RemoveDust()
         {
             Image<Bgr, byte> brightSpotsPatchImage;
-            Image<Gray, byte> brigtherSpotsMask;
-
-            Image<Bgr, byte> darkSpotsPatchImage;
-            Image<Gray, byte> darkSpotsMask;
-
-            Image<Bgr, byte> _cleanedImage = _orgImage.CopyBlank(); 
+            Image<Gray, byte> brigtherSpotsMask;  
+            
             Image<Bgr, byte> patchImage = _orgImage.CopyBlank();
             Image<Gray, byte> binaryOrgImage = MorphologicalProcessing.CreateBinaryImage(_orgImage, 100);
 
             #region WhiteOnBlack
             brigtherSpotsMask = MorphologicalProcessing.MultipleImages(binaryOrgImage, _dustMask);
             brightSpotsPatchImage = MorphologicalProcessing.Erode(_orgImage, new Size(3, 3), 10);
-            patchImage = MorphologicalProcessing.CombineTwoImages(patchImage, brightSpotsPatchImage, _dustMask /*brigtherSpotsMask*/);            
-            brightSpotsPatchImage.Dispose();
+            patchImage = MorphologicalProcessing.CombineTwoImages(patchImage, brightSpotsPatchImage, _dustMask /*brigtherSpotsMask*/);
+            brightSpotsPatchImage.Dispose();            
             brigtherSpotsMask.Dispose();
             #endregion WhiteOnBlack
 
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
             //#region BlackOnWhite
+            //Image<Bgr, byte> darkSpotsPatchImage;
+            //Image<Gray, byte> darkSpotsMask;
             //binaryOrgImage = MorphologicalProcessing.GenerateBinaryImageNegative(binaryOrgImage);
             //darkSpotsMask = MorphologicalProcessing.MultipleImages(binaryOrgImage, _dustMask);
             //darkSpotsPatchImage = MorphologicalProcessing.Dilate(_orgImage, new Size(3, 3), 10);
@@ -74,18 +74,24 @@ namespace Domain
             //#endregion BlackOnWhite
 
             binaryOrgImage.Dispose();
+
+            Image<Bgr, byte> _cleanedImage = _orgImage.CopyBlank();
             _cleanedImage = MorphologicalProcessing.CombineTwoImages(_orgImage, patchImage, _dustMask);
             patchImage.Dispose();
             _cleanedImage = _cleanedImage.SmoothBlur(10, 10);
             _dustMask = MorphologicalProcessing.Dilate(_dustMask, new Size(3, 3), 2);
-            _cleanedImage = MorphologicalProcessing.CombineTwoImages(_orgImage, _cleanedImage, _dustMask);          
-            
-            #region DisposeRegion           
+            _cleanedImage = MorphologicalProcessing.CombineTwoImages(_orgImage, _cleanedImage, _dustMask);
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            return _cleanedImage;
+        }
+
+        public void Dispose()
+        {
+            _conturMatrix = null;
             _orgImage.Dispose();
             _dustMask.Dispose();
-            #endregion DisposeRegion
-
-            return _cleanedImage;
-        } 
+        }
     }
 }

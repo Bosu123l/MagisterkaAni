@@ -13,7 +13,6 @@ namespace Domain
 {
     public class DefectsFinder : IDisposable
     {
-
         private const float _minFactor = 0.0000002f;
         private const float _maxFactor = 0.0002f;
         private Image<Bgr, byte> _inputImage;
@@ -23,8 +22,7 @@ namespace Domain
         private Point[][] _largeDefectsContoursMatrix;
         private Image<Gray, byte> _patchMask;
         private Image<Gray, byte> _maskOfDefects;
-
-        public Image<Bgr, byte> ReturnTmpImg;
+        //public Image<Bgr, byte> ReturnTmpImg;
 
         public VectorOfVectorOfPoint DefectsContoursMatrix
         {
@@ -115,7 +113,6 @@ namespace Domain
                 {
                     SearchDefects();
                 }
-
                 return _patchMask;
             }
         }
@@ -127,7 +124,6 @@ namespace Domain
                 {
                     SearchDefects();
                 }
-
                 return _maskOfDefects;
             }
         }
@@ -143,15 +139,13 @@ namespace Domain
         public void SearchDefects()
         {
             if (_inputImage == null)
-                return;
+                throw new ArgumentNullException(nameof(_inputImage));            
 
             Image<Gray, float> grayImage = _inputImage.Convert<Gray, float>();
             Image<Gray, float> laplaceImge = grayImage.Laplace(9);
 
             int a1 = 0, a2 = 0, b1 = 0, b2 = 0;
             GetThresholds(out a1, out a2, out b1, out b2, laplaceImge);
-
-            //ReturnTmpImg = laplaceImge.Copy().Convert<Bgr, byte>();
 
             _patchMask = GetMaskOfDefects(a1, a2, b1, b2, laplaceImge);
             _maskOfDefects = MorphologicalProcessing.Dilate(_patchMask.Convert<Bgr, byte>(), new Size(3, 3), 2).Convert<Gray, byte>();
@@ -162,19 +156,15 @@ namespace Domain
 
             CvInvoke.FindContours(_maskOfDefects, _defectsContoursMatrix, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
 
-            //VectorOfVectorOfPoint tmp = new VectorOfVectorOfPoint(SmallDefectsContoursMatrix);
-
-            //CvInvoke.FillPoly(ReturnTmpImg, tmp, new MCvScalar(255, 0, 0), Emgu.CV.CvEnum.LineType.AntiAlias);
-
-            //tmp = new VectorOfVectorOfPoint(LargeDefectsContoursMatrix);
-
-            //CvInvoke.FillPoly(ReturnTmpImg, tmp, new MCvScalar(0, 255, 0), Emgu.CV.CvEnum.LineType.AntiAlias);
+            //ReturnTmpImg = MorphologicalProcessing.CreateMaskFromPoints(imageOutput, SmallDefectsContoursMatrix).Convert<Bgr,byte>();
 
             hier.Dispose();
             imageOutput.Dispose();
             grayImage.Dispose();
-            laplaceImge.Dispose();           
+            laplaceImge.Dispose();
 
+            GC.Collect(0);
+            GC.WaitForPendingFinalizers(); 
             //CvInvoke.DrawContours(_inputImage, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
             //_inputImage = MorphologicalProcessing.Erode(_inputImage, new Size(3, 3), 3);           
         }
@@ -206,6 +196,9 @@ namespace Domain
             cannyImg2.Dispose();
             cannyImg.Dispose();
 
+            GC.Collect(0);
+            GC.WaitForPendingFinalizers();
+
             return dilatedImage;
         }
         private void SplitDefectContoursBySize()
@@ -220,6 +213,8 @@ namespace Domain
             if (_defectsContoursMatrix != null) _defectsContoursMatrix.Dispose();
             if (_patchMask != null) _patchMask.Dispose();
             if (_maskOfDefects != null) _maskOfDefects.Dispose();
+            _largeDefectsContoursMatrix = null;
+            _smallDefectsContoursMatrix = null;
         }
     }
 }
