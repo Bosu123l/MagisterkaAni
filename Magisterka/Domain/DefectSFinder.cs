@@ -140,21 +140,29 @@ namespace Domain
 
             int a1 = 0, a2 = 0, b1 = 0, b2 = 0;
 
+            ProgressManager.AddSteps(6);
+
             using (ImageWrapper<Gray, float> grayImage = _inputImage.Convert<Gray, float>())
             {
+                ProgressManager.DoStep();
                 using (ImageWrapper<Gray, float> laplaceImge = grayImage.Laplace(9))
                 {
-                    GetThresholds(out a1, out a2, out b1, out b2, laplaceImge);
-                    _patchMask = GetMaskOfDefects(a1, a2, b1, b2, laplaceImge);
-                }
-                    _maskOfDefects = MorphologicalProcessing.Dilate(_patchMask.Convert<Bgr, byte>(), new Size(3, 3), 2).Convert<Gray, byte>();
+                    ProgressManager.DoStep();
+
+                    GetThresholds(out a1, out a2, out b1, out b2, laplaceImge); //ProgressManager.DoneStep();
+                    _patchMask = GetMaskOfDefects(a1, a2, b1, b2, laplaceImge); //ProgressManager.DoneStep();
+                    
+                    _maskOfDefects = MorphologicalProcessing.Dilate(_patchMask, new Size(3, 3), 2).Copy();
+                    ProgressManager.DoStep();
 
                     //ImageWrapper<Gray, byte> imageOutput = _maskOfDefects.Convert<Gray, byte>().ThresholdBinary(new Gray(100), new Gray(255));
                     _defectsContoursMatrix = new VectorOfVectorOfPoint();
                     using (Mat hier = new Mat())
                     {
-                    CvInvoke.FindContours(_maskOfDefects.Image, _defectsContoursMatrix, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
-                    }       
+                        CvInvoke.FindContours(_maskOfDefects.Image, _defectsContoursMatrix, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+                    }
+                    ProgressManager.DoStep();
+                }                     
             }                
 
             //ReturnTmpImg = MorphologicalProcessing.CreateMaskFromPoints(imageOutput, SmallDefectsContoursMatrix).Convert<Bgr,byte>();
@@ -164,32 +172,39 @@ namespace Domain
 
         private void GetThresholds(out int a1, out int a2, out int b1, out int b2, ImageWrapper<Gray, float> sourceImage)
         {
+            ProgressManager.AddSteps(5);
             using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0.0f, 255.0f)))
             {
+                ProgressManager.DoStep();
                 histogram.Calculate(new Image<Gray, byte>[] { sourceImage.Convert<Gray, byte>().Image }, false, null);
 
+                ProgressManager.DoStep();
                 List<float> hist = new List<float>(histogram.GetBinValues());
                 int pixelsSum = (int)hist.Sum(x => x);
+                ProgressManager.DoStep();
 
                 a1 = hist.IndexOf(hist.FirstOrDefault(x => x > pixelsSum * _minFactor));
                 a2 = hist.IndexOf(hist.FirstOrDefault(x => x > pixelsSum * _maxFactor));
+                ProgressManager.DoStep();
 
                 b1 = hist.LastIndexOf(hist.LastOrDefault(x => x > pixelsSum * _minFactor));
-                b2 = hist.LastIndexOf(hist.LastOrDefault(x => x > pixelsSum * _maxFactor));                
+                b2 = hist.LastIndexOf(hist.LastOrDefault(x => x > pixelsSum * _maxFactor));
+                ProgressManager.DoStep();
             }                
         }
         private ImageWrapper<Gray, byte> GetMaskOfDefects(int a1, int a2, int b1, int b2, ImageWrapper<Gray, float> sourceImage)
         {
+            ProgressManager.AddSteps(3);
             using (ImageWrapper<Gray, byte> cannyImg1 = sourceImage.Convert<Gray, byte>().Canny(a1, a2))
             {
+                ProgressManager.DoStep();
                 using (ImageWrapper<Gray, byte> cannyImg2 = sourceImage.Convert<Gray, byte>().Canny(b1, b2))
                 {
+                    ProgressManager.DoStep();
                     using (ImageWrapper<Gray, byte> cannyImg = cannyImg1.Add(cannyImg2))
                     {
-                        using (ImageWrapper<Gray, byte> dilatedImage = MorphologicalProcessing.Dilate(cannyImg.Convert<Bgr, byte>(), new Size(3, 3), 3).Convert<Gray, byte>())
-                        {
-                            return dilatedImage;
-                        }
+                        ProgressManager.DoStep();
+                        return MorphologicalProcessing.Dilate(cannyImg, new Size(3, 3), 3); 
                     }
                 }                   
             } 

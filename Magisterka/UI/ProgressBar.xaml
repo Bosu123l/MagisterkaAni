@@ -1,0 +1,14 @@
+﻿<Window x:Name="progressBarWindow" 
+        x:Class="UI.ProgressBar"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UI"
+        mc:Ignorable="d"
+        Title="ProgressBar" WindowStyle="None" Height="50" Width="550" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" HorizontalContentAlignment="Center">
+    <Grid>
+        <ProgressBar Name="tmp" Height="20" Width="500" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Minimum="0" Maximum="{Binding MaxValueProgressBar, ElementName=progressBarWindow}" Value="{Binding OperationProgress, ElementName=progressBarWindow}" IsIndeterminate="{Binding IsIndeterminate, ElementName=progressBarWindow}"/>
+        <TextBox TextWrapping="Wrap" HorizontalContentAlignment="Center" Background="{x:Null}" BorderBrush="{x:Null}" Text="{Binding OperationProgressPercent, ElementName=progressBarWindow, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" />
+    </Grid>
+</Window>

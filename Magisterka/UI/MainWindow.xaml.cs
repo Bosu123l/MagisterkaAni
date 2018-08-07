@@ -4,6 +4,9 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using Emgu.CV.Structure;
 using Domain;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace UI
 {
@@ -17,10 +20,10 @@ namespace UI
             }
             set
             {
-               OnPropertyChanged(nameof(ViewedImage));                
+                OnPropertyChanged(nameof(ViewedImage));
             }
         }
-        
+
         public string BlockControls
         {
             get
@@ -92,7 +95,7 @@ namespace UI
                         ImageProcessing.SetImage(image);
                         OnPropertyChanged(nameof(ViewedImage));
                     }
-                }                    
+                }
             }
             catch (Exception ex)
             {
@@ -223,20 +226,30 @@ namespace UI
         private void RotateImageRight(object sender, EventArgs e)
         { }
 
-        private void Morpho(object sender, EventArgs e)
+        private async void Morpho(object sender, EventArgs e)
         {
+            ProgressBar progressBar = new ProgressBar();
+
             try
             {
                 EnableControl = false;
-                ImageProcessing.Test();
-                ViewedImage = ImageProcessing.BitmapImageAfter;
+                progressBar.Show();
+                await Task.Run(() =>
+                 {
+                     ImageProcessing.Test();
+                     ViewedImage = ImageProcessing.BitmapImageAfter;
+                 });
+
+
             }
             catch (Exception ex)
             {
+                ProgressManager.FinallySteps();
                 System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
+                progressBar.Close();
                 EnableControl = true;
             }
         }
@@ -254,6 +267,11 @@ namespace UI
             PW.Show();
         }
 
-        #endregion ViewOperations       
+        #endregion ViewOperations     
+
+        private void ShowProgressBar()
+        {
+            ProgressBar progressBar = new ProgressBar();
+        }
     }
 }

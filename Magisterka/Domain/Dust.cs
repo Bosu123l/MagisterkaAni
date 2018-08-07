@@ -57,8 +57,6 @@ namespace Domain
             brigtherSpotsMask.Dispose();
             #endregion WhiteOnBlack
 
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
 
             //#region BlackOnWhite
             //Image<Bgr, byte> darkSpotsPatchImage;
@@ -82,8 +80,7 @@ namespace Domain
             _dustMask = MorphologicalProcessing.Dilate(_dustMask, new Size(3, 3), 2);
             _cleanedImage = MorphologicalProcessing.CombineTwoImages(_orgImage, _cleanedImage, _dustMask);
 
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+           
             return _cleanedImage;
         }
 

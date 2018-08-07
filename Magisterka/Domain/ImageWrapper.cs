@@ -17,7 +17,7 @@ namespace Domain
             {
                 if (value != null && value != _image)
                 {
-                    _image = value;
+                    _image = value.Copy();
                 }
             }
         }
