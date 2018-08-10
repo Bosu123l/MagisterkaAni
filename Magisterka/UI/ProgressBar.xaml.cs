@@ -27,17 +27,9 @@ namespace UI
         }
         public string IsIndeterminate
         {
-            get { return _isIndeterminate ? "True" : "False"; }
+            get { return _isIndeterminate.ToString(); }
             set
             {
-                if (value == bool.TrueString)
-                {
-                    _isIndeterminate = true;
-                }
-                else
-                {
-                    _isIndeterminate = false;
-                }
                 OnPropertyChanged(nameof(IsIndeterminate));
             }
         }
@@ -45,7 +37,14 @@ namespace UI
         {
             get
             {
-                return $"{((int)((OperationProgress * 100) / MaxValueProgressBar)).ToString()}%";
+                if(_isIndeterminate)
+                {
+                    return string.Empty;
+                }else
+                {
+                    return $"{((int)((OperationProgress * 100) / MaxValueProgressBar)).ToString()}%";
+                }
+               
             }
         }
         public int MaxValueProgressBar
@@ -68,8 +67,8 @@ namespace UI
         }
         public ProgressBar(bool isIndeterminate = false)
         {
-            InitializeComponent();
-            IsIndeterminate = isIndeterminate.ToString();
+            _isIndeterminate = isIndeterminate;
+            InitializeComponent();            
             if (isIndeterminate == false)
             {
                 ProgressManager.ProgressStatusChanged += new ProgressManager.RefreshProgress(Refresh);
@@ -78,6 +77,11 @@ namespace UI
         public void Refresh(int progressPercent)
         {
             OperationProgress = progressPercent;
+        }
+
+        private void BeforeClose(object sender, CancelEventArgs e)
+        {
+            ProgressManager.FinallySteps();
         }
     }
 }

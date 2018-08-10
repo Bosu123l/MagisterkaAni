@@ -12,6 +12,9 @@ namespace Domain
         private static ImageWrapper<Bgr, byte> _imageBefor;
         private static ImageWrapper<Bgr, byte> _imageAfter;
 
+        public static DenseHistogram Histogam;
+
+
         public static ImageWrapper<Bgr, byte> ImageBefor
         {
             get
@@ -22,7 +25,7 @@ namespace Domain
             {
                 if (_imageBefor != value)
                 {
-                    _imageBefor = value;
+                    _imageBefor = value.Copy();
                 }
             }
         }
@@ -36,7 +39,7 @@ namespace Domain
             {
                 if (_imageAfter != value)
                 {
-                    _imageAfter = value;
+                    _imageAfter = value.Copy();
                 }
             }
         }       
@@ -60,8 +63,8 @@ namespace Domain
         {            
             if (image != null)
             {
-                ImageBefor = image.Copy();
-                ImageAfter = image.Copy();
+                ImageBefor = image;
+                ImageAfter = image;
             }
         }
 
@@ -85,14 +88,18 @@ namespace Domain
 
         public static void ReduceDust()
         {
+            ProgressManager.AddSteps(3);
             using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
             {
+                ProgressManager.DoStep();
                 using (Dust dust = new Dust(ImageAfter, defectsFinder.MaskOfDefects, defectsFinder.SmallDefectsContoursMatrix))
                 {
+                    ProgressManager.DoStep();
+
                     _imageAfter = dust.RemoveDust();
+                    ProgressManager.DoStep();
                 }
-            }                        
-           // CvInvoke.DrawContours(ImageAfter, _defectsFinder.DefectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
+            }       
         }
 
         public static void CutImage() { }
@@ -102,7 +109,7 @@ namespace Domain
         {           
             var defectsFinder = new DefectsFinder(ImageBefor);
             defectsFinder.SearchDefects();
-            //ImageAfter = _defectsFinder.ReturnTmpImg;
+            ImageAfter = defectsFinder.ReturnTmpImg;
             //CvInvoke.DrawContours(ImageAfter, _defectsFinder.DefectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
             //_imageAfter = MorphologicalProcessing.CreateBinaryImage(_imageAfter, 192).Convert<Bgr,byte>();
             //_imageAfter = _defectsFinder.SearchDefects();//MorphologicalProcessing.Erode(_imageAfter, new Size(2,2), 1);

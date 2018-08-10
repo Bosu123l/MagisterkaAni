@@ -22,7 +22,9 @@ namespace Domain
         private Point[][] _largeDefectsContoursMatrix;
         private ImageWrapper<Gray, byte> _patchMask;
         private ImageWrapper<Gray, byte> _maskOfDefects;
-        //public Image<Bgr, byte> ReturnTmpImg;
+
+        public ImageWrapper<Bgr, byte> ReturnTmpImg;
+        public DenseHistogram Histogram;
 
         public VectorOfVectorOfPoint DefectsContoursMatrix
         {
@@ -149,22 +151,27 @@ namespace Domain
                 {
                     ProgressManager.DoStep();
 
+                    ReturnTmpImg = laplaceImge.Copy().Convert<Bgr, byte>();
+
                     GetThresholds(out a1, out a2, out b1, out b2, laplaceImge); //ProgressManager.DoneStep();
                     _patchMask = GetMaskOfDefects(a1, a2, b1, b2, laplaceImge); //ProgressManager.DoneStep();
                     
                     _maskOfDefects = MorphologicalProcessing.Dilate(_patchMask, new Size(3, 3), 2).Copy();
                     ProgressManager.DoStep();
 
-                    //ImageWrapper<Gray, byte> imageOutput = _maskOfDefects.Convert<Gray, byte>().ThresholdBinary(new Gray(100), new Gray(255));
+                    
                     _defectsContoursMatrix = new VectorOfVectorOfPoint();
                     using (Mat hier = new Mat())
                     {
                         CvInvoke.FindContours(_maskOfDefects.Image, _defectsContoursMatrix, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
                     }
                     ProgressManager.DoStep();
+
+                   // CvInvoke.DrawContours(_inputImage.Image, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
+                    
                 }                     
             }                
-
+            
             //ReturnTmpImg = MorphologicalProcessing.CreateMaskFromPoints(imageOutput, SmallDefectsContoursMatrix).Convert<Bgr,byte>();
             //CvInvoke.DrawContours(_inputImage, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
             //_inputImage = MorphologicalProcessing.Erode(_inputImage, new Size(3, 3), 3);           
@@ -175,6 +182,8 @@ namespace Domain
             ProgressManager.AddSteps(5);
             using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0.0f, 255.0f)))
             {
+                
+
                 ProgressManager.DoStep();
                 histogram.Calculate(new Image<Gray, byte>[] { sourceImage.Convert<Gray, byte>().Image }, false, null);
 

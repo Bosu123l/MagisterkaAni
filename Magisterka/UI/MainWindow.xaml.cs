@@ -83,26 +83,33 @@ namespace UI
         }
 
         #region GetPhotoToEdit
-        private void GetPhotoFromFile(object sender, EventArgs e)
+        private async void GetPhotoFromFile(object sender, EventArgs e)
         {
+            ProgressBar progressBar = new ProgressBar(true);
             try
             {
                 EnableControl = false;
-                using (ImageWrapper<Bgr, byte> image = new ImageWrapper<Bgr, byte>(FileOperations.GetImageFromDirectory()))
+
+                using (var image = (FileOperations.GetImageFromDirectory()))
                 {
                     if (image != null)
                     {
-                        ImageProcessing.SetImage(image);
+                        progressBar.Show();
+                        await Task.Run(() =>
+                        {
+                            ImageProcessing.SetImage(image);                            
+                        });
                         OnPropertyChanged(nameof(ViewedImage));
                     }
                 }
             }
             catch (Exception ex)
-            {
+            {                
                 MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
+                progressBar.Close();
                 EnableControl = true;
             }
         }
@@ -110,14 +117,14 @@ namespace UI
         private void GetPhotoFromScanner(object sender, EventArgs e)
         {
             try
-            {
+            {                
                 EnableControl = false;
                 using (var image = FileOperations.GetImageFromScanner())
                 {
                     if (image != null)
-                    {
-                        ImageProcessing.SetImage(image);
-                        OnPropertyChanged(nameof(ViewedImage));
+                    { 
+                        ImageProcessing.SetImage(image);                       
+                        OnPropertyChanged(nameof(ViewedImage));                                          
                     }
                 }
             }
@@ -126,7 +133,7 @@ namespace UI
                 System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
-            {
+            {               
                 EnableControl = true;
             }
         }
@@ -134,13 +141,13 @@ namespace UI
 
         #region FileOperation
         private void SavePhoto(object sender, EventArgs e)
-        {
+        {           
             try
-            {
-                FileOperations.SaveImageFile(ImageProcessing.ImageAfter);
+            {           
+                FileOperations.SaveImageFile(ImageProcessing.ImageAfter);                            
             }
             catch (Exception ex)
-            {
+            {                
                 MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -171,11 +178,15 @@ namespace UI
         #region OperationsOnPhoto
         private void DustReduction(object sender, EventArgs e)
         {
+            ProgressBar progressBar = new ProgressBar();
             try
             {
                 EnableControl = false;
-                ImageProcessing.ReduceDust();
-                OnPropertyChanged(nameof(ViewedImage));
+                progressBar.Show();
+                Task.Run(() => {
+                    ImageProcessing.ReduceDust();
+                });
+                OnPropertyChanged(nameof(ViewedImage));              
             }
             catch (Exception ex)
             {
@@ -183,16 +194,22 @@ namespace UI
             }
             finally
             {
+                progressBar.Close();
                 EnableControl = true;
             }
         }
         private void CutPhotoBorder(object sender, EventArgs e)
         {
+            ProgressBar progressBar = new ProgressBar();
             try
             {
                 EnableControl = false;
-                ImageProcessing.CutImage();
-                OnPropertyChanged(nameof(ViewedImage));
+                progressBar.Show();
+                Task.Run(() =>
+                {
+                    ImageProcessing.CutImage();
+                });
+                 OnPropertyChanged(nameof(ViewedImage));
             }
             catch (Exception ex)
             {
@@ -200,16 +217,21 @@ namespace UI
             }
             finally
             {
+                progressBar.Close();
                 EnableControl = true;
             }
-
         }
         private void SmudgeCleaner(object sender, EventArgs e)
         {
+            ProgressBar progressBar = new ProgressBar();
             try
             {
                 EnableControl = false;
-                OnPropertyChanged(nameof(ViewedImage));
+                progressBar.Show();
+                Task.Run(() =>
+                {
+                    OnPropertyChanged(nameof(ViewedImage));
+                });
             }
             catch (Exception ex)
             {
@@ -217,6 +239,7 @@ namespace UI
             }
             finally
             {
+                progressBar.Close();
                 EnableControl = true;
             }
 
@@ -229,7 +252,6 @@ namespace UI
         private async void Morpho(object sender, EventArgs e)
         {
             ProgressBar progressBar = new ProgressBar();
-
             try
             {
                 EnableControl = false;
@@ -238,13 +260,11 @@ namespace UI
                  {
                      ImageProcessing.Test();
                      ViewedImage = ImageProcessing.BitmapImageAfter;
+                     new HistogramForm(ImageProcessing.ImageAfter).Show();                     
                  });
-
-
             }
             catch (Exception ex)
-            {
-                ProgressManager.FinallySteps();
+            {                
                 System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally

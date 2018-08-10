@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UI"
         mc:Ignorable="d"
-        Title="ProgressBar" WindowStyle="None" Height="50" Width="550" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" HorizontalContentAlignment="Center">
+        Title="ProgressBar" WindowStyle="None" Height="50" Width="550" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" HorizontalContentAlignment="Center" Closing="BeforeClose">
     <Grid>
         <ProgressBar Name="tmp" Height="20" Width="500" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Minimum="0" Maximum="{Binding MaxValueProgressBar, ElementName=progressBarWindow}" Value="{Binding OperationProgress, ElementName=progressBarWindow}" IsIndeterminate="{Binding IsIndeterminate, ElementName=progressBarWindow}"/>
         <TextBox TextWrapping="Wrap" HorizontalContentAlignment="Center" Background="{x:Null}" BorderBrush="{x:Null}" Text="{Binding OperationProgressPercent, ElementName=progressBarWindow, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" />

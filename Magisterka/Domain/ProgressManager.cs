@@ -44,7 +44,7 @@ namespace Domain
                 if (value != _progress)
                 {
                     _progress = value;
-                    ProgressStatusChanged(Progress);
+                    ProgressStatusChanged?.Invoke(Progress);                
                 }
             }
         }

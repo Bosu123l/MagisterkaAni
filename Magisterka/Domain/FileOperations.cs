@@ -163,7 +163,7 @@ namespace Domain
         }
 
         public static void SaveImageFile(ImageWrapper<Bgr, byte> image)
-        {
+        {            
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.AddExtension = true;
             saveFileDialog.Filter = $"{_fileExtension.ToUpper()} |*.{_fileExtension}";
@@ -182,12 +182,13 @@ namespace Domain
             {
                 var path = Path.Combine(_fileDirectory, saveFileDialog.FileName);
                 DestinationPath = _fileDirectory;
+
                 image.Save(path);
                 _defaultDestinationDirectory = Path.GetDirectoryName(saveFileDialog.FileName);
             }
         }
 
-        public static Image<Bgr, byte> GetImageFromDirectory()
+        public static ImageWrapper<Bgr, byte> GetImageFromDirectory()
         {
             try
             {
@@ -199,7 +200,7 @@ namespace Domain
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     FilePath = openFileDialog.FileName;                    
-                    return new Image<Bgr, byte>(FilePath);
+                    return new ImageWrapper<Bgr, byte>(new Image<Bgr, byte>(FilePath));
                 }
                 return null;
             }
