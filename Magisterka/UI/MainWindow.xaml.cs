@@ -7,20 +7,22 @@ using Domain;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Drawing;
+using Emgu.CV.UI;
 
 namespace UI
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        public BitmapImage ViewedImage
+        public Image ViewedImage
         {
             get
             {
-                return ImageProcessing.BitmapImageAfter;
+                return PhotoZoomBox.Image;
             }
             set
             {
-                OnPropertyChanged(nameof(ViewedImage));
+                PhotoZoomBox.Image=value;
             }
         }
 
@@ -46,14 +48,12 @@ namespace UI
                 }
             }
         }
-
         private bool _enableControl;
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         public MainWindow()
         {
-            EnableControl = true;
+            EnableControl = true;            
             InitializeComponent();
             InitializeButtonsEvents();
         }
@@ -99,7 +99,7 @@ namespace UI
                         {
                             ImageProcessing.SetImage(image);                            
                         });
-                        OnPropertyChanged(nameof(ViewedImage));
+                        ViewedImage = ImageProcessing.ImageAfter.Bitmap;                       
                     }
                 }
             }
@@ -123,8 +123,8 @@ namespace UI
                 {
                     if (image != null)
                     { 
-                        ImageProcessing.SetImage(image);                       
-                        OnPropertyChanged(nameof(ViewedImage));                                          
+                        ImageProcessing.SetImage(image);
+                        ViewedImage = ImageProcessing.ImageAfter.Bitmap;
                     }
                 }
             }
@@ -186,7 +186,7 @@ namespace UI
                 Task.Run(() => {
                     ImageProcessing.ReduceDust();
                 });
-                OnPropertyChanged(nameof(ViewedImage));              
+                ViewedImage = ImageProcessing.ImageAfter.Bitmap;
             }
             catch (Exception ex)
             {
@@ -209,7 +209,7 @@ namespace UI
                 {
                     ImageProcessing.CutImage();
                 });
-                 OnPropertyChanged(nameof(ViewedImage));
+                ViewedImage = ImageProcessing.ImageAfter.Bitmap;
             }
             catch (Exception ex)
             {
@@ -230,7 +230,7 @@ namespace UI
                 progressBar.Show();
                 Task.Run(() =>
                 {
-                    OnPropertyChanged(nameof(ViewedImage));
+                    ViewedImage = ImageProcessing.ImageAfter.Bitmap;
                 });
             }
             catch (Exception ex)
@@ -242,7 +242,6 @@ namespace UI
                 progressBar.Close();
                 EnableControl = true;
             }
-
         }
         private void RotateImageLeft(object sender, EventArgs e)
         { }
@@ -259,8 +258,9 @@ namespace UI
                 await Task.Run(() =>
                  {
                      ImageProcessing.Test();
-                     ViewedImage = ImageProcessing.BitmapImageAfter;
-                     new HistogramForm(ImageProcessing.ImageAfter).Show();                     
+                     //ImageZoomPanel.Image = ImageProcessing.ImageAfter.Bitmap;
+                     //ViewedImage = ImageProcessing.BitmapImageAfter;
+                     //new HistogramForm(ImageProcessing.ImageAfter).Show();                     
                  });
             }
             catch (Exception ex)
@@ -278,12 +278,12 @@ namespace UI
         #region ViewOperations
         private void PreviewEditPhoto(object sender, EventArgs e)
         {
-            PreviewWindow PW = new PreviewWindow(ImageProcessing.BitmapImageAfter);
+            PreviewWindow PW = new PreviewWindow(ImageProcessing.ImageAfter.Bitmap);
             PW.Show();
         }
         private void PreviewOrginalPhoto(object sender, EventArgs e)
         {
-            PreviewWindow PW = new PreviewWindow(ImageProcessing.BitmapImageBefor);
+            PreviewWindow PW = new PreviewWindow(ImageProcessing.ImageBefor.Bitmap);
             PW.Show();
         }
 
@@ -292,6 +292,11 @@ namespace UI
         private void ShowProgressBar()
         {
             ProgressBar progressBar = new ProgressBar();
+        }
+
+        private void PhotoZoomBox_OnZoomScaleChange(object sender, EventArgs e)
+        {
+
         }
     }
 }

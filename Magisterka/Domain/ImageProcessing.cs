@@ -42,22 +42,7 @@ namespace Domain
                     _imageAfter = value.Copy();
                 }
             }
-        }       
-
-        public static BitmapImage BitmapImageBefor
-        {
-            get
-            {
-                return BitmapToImageSource(ImageBefor);
-            }
-        }
-        public static BitmapImage BitmapImageAfter
-        {
-            get
-            {
-                return BitmapToImageSource(ImageAfter);
-            }
-        }
+        }                     
            
         public static void SetImage(ImageWrapper<Bgr, byte> image)
         {            
@@ -66,25 +51,7 @@ namespace Domain
                 ImageBefor = image;
                 ImageAfter = image;
             }
-        }
-
-        public static BitmapImage BitmapToImageSource(ImageWrapper<Bgr, byte> image)
-        {
-            if (image == null)
-                return null;
-
-            using (MemoryStream memory = new MemoryStream())
-            {               
-                image.Bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-                memory.Position = 0;
-                BitmapImage bitmapimage = new BitmapImage();
-                bitmapimage.BeginInit();
-                bitmapimage.StreamSource = memory;
-                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapimage.EndInit();
-                return bitmapimage;
-            }
-        }
+        }       
 
         public static void ReduceDust()
         {

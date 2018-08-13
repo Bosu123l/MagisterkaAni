@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"        
         xmlns:local="clr-namespace:UI"
-        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        xmlns:emgu="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
         mc:Ignorable="d"
        Title="MainWindow"
     Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" TextOptions.TextFormattingMode="Display" FontFamily="{DynamicResource {x:Static SystemFonts.MenuFontFamilyKey}}" d:DesignHeight="1057" d:DesignWidth="1329" WindowStartupLocation="CenterOwner" WindowState="Maximized">
@@ -13,9 +13,8 @@
             <ColumnDefinition />
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <!--<Image Source="{Binding ViewedImage, ElementName=window}" OpacityMask="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>-->
-        <WindowsFormsHost>
-         
+        <WindowsFormsHost Background="Transparent">        
+            <emgu:PanAndZoomPictureBox  x:Name="PhotoZoomBox" Dock="Fill" SizeMode="Zoom" InterpolationMode="Default"/>
         </WindowsFormsHost>
         <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
             <local:FileControls x:Name="FileControl"/>
