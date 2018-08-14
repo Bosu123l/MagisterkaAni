@@ -13,19 +13,14 @@ using Emgu.CV.UI;
 namespace UI
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
-    {
-        public Image ViewedImage
+    {    
+        private ImageWrapper<Bgr,byte> _imgeView
         {
-            get
-            {
-                return PhotoZoomBox.Image;
-            }
             set
             {
-                PhotoZoomBox.Image=value;
+                ImgeView.ViewedImage=value;
             }
         }
-
         public string BlockControls
         {
             get
@@ -99,7 +94,7 @@ namespace UI
                         {
                             ImageProcessing.SetImage(image);                            
                         });
-                        ViewedImage = ImageProcessing.ImageAfter.Bitmap;                       
+                        _imgeView = ImageProcessing.ImageAfter;                       
                     }
                 }
             }
@@ -124,7 +119,7 @@ namespace UI
                     if (image != null)
                     { 
                         ImageProcessing.SetImage(image);
-                        ViewedImage = ImageProcessing.ImageAfter.Bitmap;
+                        //ImageViewerControl.SetImage(ImageProcessing.ImageAfter);
                     }
                 }
             }
@@ -186,7 +181,7 @@ namespace UI
                 Task.Run(() => {
                     ImageProcessing.ReduceDust();
                 });
-                ViewedImage = ImageProcessing.ImageAfter.Bitmap;
+                //ImageViewerControl.SetImage(ImageProcessing.ImageAfter);
             }
             catch (Exception ex)
             {
@@ -209,7 +204,7 @@ namespace UI
                 {
                     ImageProcessing.CutImage();
                 });
-                ViewedImage = ImageProcessing.ImageAfter.Bitmap;
+                //ImageViewerControl.SetImage(ImageProcessing.ImageAfter);
             }
             catch (Exception ex)
             {
@@ -230,7 +225,7 @@ namespace UI
                 progressBar.Show();
                 Task.Run(() =>
                 {
-                    ViewedImage = ImageProcessing.ImageAfter.Bitmap;
+                    //ImageViewerControl.SetImage(ImageProcessing.ImageAfter);
                 });
             }
             catch (Exception ex)

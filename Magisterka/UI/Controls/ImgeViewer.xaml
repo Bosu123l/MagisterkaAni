@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="UI.ImgeViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:emgu="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="311*"/>
+            <RowDefinition Height="30" MaxHeight="30"/>
+            <RowDefinition Height="5" MaxHeight="20"/>
+            <RowDefinition Height="104*" MinHeight="90"/>
+        </Grid.RowDefinitions>
+        <WindowsFormsHost Grid.Row="0">
+            <emgu:PanAndZoomPictureBox  x:Name="PhotoView" Dock="Fill" SizeMode="Zoom"/>
+        </WindowsFormsHost>
+        <Slider Grid.Row="1" HorizontalAlignment="Stretch" Margin="5" Minimum="25" Maximum="100" LargeChange="10" SmallChange="5" Background="#FF0C3D9B" Height="20"/>
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch"/>
+        <TabControl Grid.Row="3" TabStripPlacement="Left">
+            <TabItem x:Name="TabBlack" Header="Black" Height="24" VerticalAlignment="Top">
+                <WindowsFormsHost>
+                    <emgu:HistogramBox x:Name="BlackHistogram" Dock="Fill"/>
+                </WindowsFormsHost>
+            </TabItem>
+            <TabItem x:Name="TabBlue" Header="Blue">
+                <WindowsFormsHost>
+                    <emgu:HistogramBox x:Name="BlueHistogram" Dock="Fill"/>
+                </WindowsFormsHost>
+            </TabItem>
+            <TabItem x:Name="TabRed" Header="Red">
+                <WindowsFormsHost>
+                    <emgu:HistogramBox x:Name="RedHistogram" Dock="Fill"/>
+                </WindowsFormsHost>
+            </TabItem>
+            <TabItem x:Name="TabGreen" Header="Green">
+                <WindowsFormsHost>
+                    <emgu:HistogramBox x:Name="GreenHistogram" Dock="Fill"/>
+                </WindowsFormsHost>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>
