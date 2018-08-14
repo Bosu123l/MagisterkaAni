@@ -23,7 +23,7 @@
         <Style TargetType="Button" BasedOn="{StaticResource OpacityMenuButton}"/>
     </UserControl.Resources>
     <StackPanel>
-        <Expander Header="View" FontSize="14" FontWeight="SemiBold" IsExpanded="True">
+        <GroupBox Header="View" FontSize="14" FontWeight="SemiBold">
             <StackPanel Orientation="Vertical">
                 <Button 
             Command="{Binding OpenPhotoInNewWindowClickedCommand, ElementName=userControl, Mode=OneWay}" 
@@ -42,6 +42,6 @@
                     </Button.OpacityMask>
                 </Button>
             </StackPanel>
-        </Expander>
+        </GroupBox>
     </StackPanel>  
 </UserControl>

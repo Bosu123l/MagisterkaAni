@@ -23,7 +23,7 @@
         </LinearGradientBrush>
     </UserControl.Background>
     <StackPanel>
-        <Expander Header="Edit" FontSize="14" FontWeight="SemiBold" IsExpanded="True">
+        <GroupBox Header="Edit" FontSize="14" FontWeight="SemiBold">
             <StackPanel Orientation="Vertical">
                 <Button x:Name="_dustReduction"  
                         ToolTip="Dust reduction"
@@ -62,6 +62,6 @@
                     </Button.OpacityMask>
                 </Button>
             </StackPanel>
-        </Expander>
+        </GroupBox>
     </StackPanel>
 </UserControl>

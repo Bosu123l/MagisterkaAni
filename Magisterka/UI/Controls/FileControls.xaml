@@ -23,7 +23,7 @@
         </LinearGradientBrush>
     </UserControl.Background>
     <StackPanel>
-        <Expander Header="File" FontSize="14" FontWeight="SemiBold" IsExpanded="True">
+        <GroupBox Header="File" FontSize="14" FontWeight="SemiBold">
             <StackPanel Orientation="Vertical">
                 <Button x:Name="_openFromScanner" 
                         ToolTip="Open from scanner" 
@@ -63,6 +63,6 @@
                     </Button.OpacityMask>
                 </Button>
             </StackPanel>
-        </Expander>
+        </GroupBox>
     </StackPanel>
 </UserControl>

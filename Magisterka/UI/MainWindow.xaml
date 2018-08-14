@@ -13,10 +13,12 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <local:ImgeViewer x:Name="ImgeView"/>
-        <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
-            <local:FileControls x:Name="FileControl"/>
-            <local:PhotoEditionControls x:Name="PhotoEditionControl"/>
-            <local:ViewControls x:Name="ViewControl"/>            
-        </StackPanel>
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Hidden">
+            <StackPanel  Orientation="Vertical" HorizontalAlignment="Right">
+                <local:FileControls x:Name="FileControl"/>
+                <local:PhotoEditionControls x:Name="PhotoEditionControl"/>
+                <local:ViewControls x:Name="ViewControl"/>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>
