@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"        
         xmlns:local="clr-namespace:UI"
         mc:Ignorable="d"
-       Title="MainWindow"
+       Title="Old photo cleaner"
     Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" TextOptions.TextFormattingMode="Display" FontFamily="{DynamicResource {x:Static SystemFonts.MenuFontFamilyKey}}" d:DesignHeight="1057" d:DesignWidth="1329" WindowStartupLocation="CenterOwner" WindowState="Maximized">
     <Grid>
         <Grid.ColumnDefinitions>

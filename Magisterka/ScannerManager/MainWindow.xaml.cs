@@ -7,17 +7,18 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace ScannerManager
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged, IDisposable
     {
         public event EventHandler<Image> ImageReceiver;
         public event PropertyChangedEventHandler PropertyChanged;
+        
+        private Image _scannedImage;
 
         #region Property
 
@@ -68,7 +69,7 @@ namespace ScannerManager
                 #endregion GetScanners
 
                 if (Scanners.Count > 0)
-                    SelectedScanner = Scanners.FirstOrDefault();                
+                    SelectedScanner = Scanners.FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -98,7 +99,7 @@ namespace ScannerManager
             }
         }
 
-        private void _twain32_EndXfer(object sender, Twain32.EndXferEventArgs e)
+        private void SaveImage()
         {
             string fileName = $"{DateTime.Now.ToString("yyyyMMdd")}_SC";//poprawić date w sciezce
             string regex = @"*" + fileName + @"*.Tiff";
@@ -107,34 +108,38 @@ namespace ScannerManager
             string[] files;
 
             files = Directory.EnumerateFiles(_destinationPath, regex).ToArray();
-
-            try
+         
+            if (files.Count() > 0)
             {
-                if (files.Count() > 0)
-                {
-                    max = files.OrderBy(x => x).LastOrDefault();
-                    max = max.Substring(max.Length - 4 - ".Tiff".Length, 4);
+                max = files.OrderBy(x => x).LastOrDefault();
+                max = max.Substring(max.Length - 4 - ".Tiff".Length, 4);
 
-                    int.TryParse(max, out seqence);
-                    seqence = seqence + 1;
-                }
+                int.TryParse(max, out seqence);
+                seqence = seqence + 1;
+            }
 
-                fileName += seqence.ToString("D4");
+            fileName += seqence.ToString("D4");
+            _filePath = Path.Combine(_destinationPath, fileName + ".Tiff");
+                                
+            _scannedImage.Save(_filePath, ImageFormat.Tiff);           
+        }
 
-                _filePath = Path.Combine(_destinationPath, fileName + ".Tiff");
-                e.Image.Save(_filePath, ImageFormat.Tiff);               
+        private void _twain32_EndXfer(object sender, Twain32.EndXferEventArgs e)
+        {
+            try {
 
-                e.Image.Dispose();
-                
-                Environment.ExitCode = (int)ExitCodes.ExitCode.SUCCESS;               
+                _scannedImage = (Image)e.Image.Clone();                           
             }
             catch (Exception ex)
             {
                 var messagebox = CustomMessageBox.Show(ex.Message, "Error!", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 if (messagebox == System.Windows.Forms.DialogResult.OK)
-                {                   
-                    Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_DEVICE_UNREACHABLE;                   
+                {
+                    Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_DEVICE_UNREACHABLE;
                 }
+            }finally
+            {
+                e.Image.Dispose();
             }
         }
 
@@ -170,8 +175,6 @@ namespace ScannerManager
 
             InitializeComponent();
             LoadParametes();
-
-           
         }
 
         private void _scannersListPreview_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -182,7 +185,6 @@ namespace ScannerManager
                 _twain32 = new Twain32();
                 _twain32.ShowUI = true;
                 _twain32.IsTwain2Enable = true;
-
 
                 _twain32.OpenDSM();
                 _twain32.SourceIndex = Scanners.IndexOf(SelectedScanner);
@@ -195,16 +197,24 @@ namespace ScannerManager
 
                 _twain32.Acquire();
 
-                CustomMessageBox.Show($"Save photo: {Path.GetFileName(_filePath)}.Tiff\n{_destinationPath}", "Succes", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);               
+                if(_scannedImage!=null)
+                {
+                    SaveImage();
+                }
+
+                Environment.ExitCode = (int)ExitCodes.ExitCode.SUCCESS;
+
+                CustomMessageBox.Show($"Save photo: {Path.GetFileName(_filePath)}\n{_destinationPath}", "Succes", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);      
             }
             catch (Exception ex)
             {
-                var messagebox = CustomMessageBox.Show(ex.Message, "Eror!", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Error);
+                var messagebox = CustomMessageBox.Show(ex.Message, "Scanner Error!", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Error);
                 if (messagebox == System.Windows.Forms.DialogResult.Yes)
                 {
-                    Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_DEVICE_UNREACHABLE;                   
+                    Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_DEVICE_UNREACHABLE;
                 }
-            }finally
+            }
+            finally
             {
                 _twain32?.CloseDSM();
                 _twain32?.CloseDataSource();
@@ -215,8 +225,8 @@ namespace ScannerManager
 
         private void _twain32_MemXferEvent(object sender, Twain32.MemXferEventArgs e)
         {
-            CustomMessageBox.Show("test", "test", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
-        }      
+            CustomMessageBox.Show("Memory error!", e.ToString(), System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+        }
 
         private void bCancel_Click(object sender, RoutedEventArgs e)
         {

@@ -1,14 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Media.Imaging;
 using Emgu.CV.Structure;
 using Domain;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Drawing;
-using Emgu.CV.UI;
 
 namespace UI
 {
@@ -44,6 +39,7 @@ namespace UI
             }
         }
         private bool _enableControl;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public MainWindow()
@@ -78,9 +74,8 @@ namespace UI
         }
 
         #region GetPhotoToEdit
-        private async void GetPhotoFromFile(object sender, EventArgs e)
-        {
-            ProgressBar progressBar = new ProgressBar(true);
+        private void GetPhotoFromFile(object sender, EventArgs e)
+        {            
             try
             {
                 EnableControl = false;
@@ -88,13 +83,9 @@ namespace UI
                 using (var image = (FileOperations.GetImageFromDirectory()))
                 {
                     if (image != null)
-                    {
-                        progressBar.Show();
-                        await Task.Run(() =>
-                        {
-                            ImageProcessing.SetImage(image);                            
-                        });
-                        _imgeView = ImageProcessing.ImageAfter;                       
+                    {                      
+                       ImageProcessing.SetImage(image);
+                       _imgeView = ImageProcessing.ImageAfter;                       
                     }
                 }
             }
@@ -104,7 +95,6 @@ namespace UI
             }
             finally
             {
-                progressBar.Close();
                 EnableControl = true;
             }
         }
@@ -119,7 +109,7 @@ namespace UI
                     if (image != null)
                     { 
                         ImageProcessing.SetImage(image);
-                        //ImageViewerControl.SetImage(ImageProcessing.ImageAfter);
+                        _imgeView = ImageProcessing.ImageAfter;   
                     }
                 }
             }
@@ -181,7 +171,7 @@ namespace UI
                 Task.Run(() => {
                     ImageProcessing.ReduceDust();
                 });
-                //ImageViewerControl.SetImage(ImageProcessing.ImageAfter);
+                _imgeView = ImageProcessing.ImageAfter;   
             }
             catch (Exception ex)
             {
@@ -204,7 +194,7 @@ namespace UI
                 {
                     ImageProcessing.CutImage();
                 });
-                //ImageViewerControl.SetImage(ImageProcessing.ImageAfter);
+                _imgeView = ImageProcessing.ImageAfter;   
             }
             catch (Exception ex)
             {
@@ -225,7 +215,7 @@ namespace UI
                 progressBar.Show();
                 Task.Run(() =>
                 {
-                    //ImageViewerControl.SetImage(ImageProcessing.ImageAfter);
+                    _imgeView = ImageProcessing.ImageAfter;   
                 });
             }
             catch (Exception ex)

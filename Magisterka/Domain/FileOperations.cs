@@ -17,15 +17,15 @@ namespace Domain
                                                           "PNG  |*.png| " +
                                                           "JPEG |*.jpg;*jpeg;";
         private static string _defaultDestinationDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "OldPhotos");
-        private static string _defaultSourcDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "OldPhotos");
-        private static string _defaultScanDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "OldPhotos");
+        private static string _defaultSourcDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Scanner");
+        private static string _defaultScanDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Scanner");
         #endregion ConstPatameters
 
         #region privateParameters
         private static string _destinationDirectory;
         private static string _sourceDirectory;
         private static string _scanDirectory;
-       
+
         private static string _filePath;
         private static string _fileName
         {
@@ -55,7 +55,6 @@ namespace Domain
         {
             get
             {
-
                 if (!Directory.Exists(_destinationDirectory) || string.IsNullOrEmpty(_destinationDirectory))
                 {
                     return _defaultDestinationDirectory;
@@ -67,7 +66,6 @@ namespace Domain
             }
             set
             {
-
                 if (value != _destinationDirectory && string.IsNullOrEmpty(value) == false)
                 {
                     _destinationDirectory = value;
@@ -78,7 +76,6 @@ namespace Domain
         {
             get
             {
-
                 if (!Directory.Exists(_scanDirectory) || string.IsNullOrEmpty(_scanDirectory))
                 {
                     return _defaultScanDirectory;
@@ -90,7 +87,6 @@ namespace Domain
             }
             set
             {
-
                 if (value != _scanDirectory && string.IsNullOrEmpty(value) == false)
                 {
                     _scanDirectory = value;
@@ -101,7 +97,6 @@ namespace Domain
         {
             get
             {
-
                 if (!Directory.Exists(_sourceDirectory) || string.IsNullOrEmpty(_sourceDirectory))
                 {
                     return _defaultSourcDirectory;
@@ -113,7 +108,6 @@ namespace Domain
             }
             set
             {
-
                 if (value != _sourceDirectory && string.IsNullOrEmpty(value) == false)
                 {
                     _sourceDirectory = value;
@@ -163,7 +157,7 @@ namespace Domain
         }
 
         public static void SaveImageFile(ImageWrapper<Bgr, byte> image)
-        {            
+        {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.AddExtension = true;
             saveFileDialog.Filter = $"{_fileExtension.ToUpper()} |*.{_fileExtension}";
@@ -199,7 +193,7 @@ namespace Domain
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    FilePath = openFileDialog.FileName;                    
+                    FilePath = openFileDialog.FileName;
                     return new ImageWrapper<Bgr, byte>(new Image<Bgr, byte>(FilePath));
                 }
                 return null;
@@ -222,13 +216,13 @@ namespace Domain
             {
                 scannerManager.StartInfo.Arguments = ScanDirectory;
 
-                scannerManager.StartInfo.FileName = Path.Combine(Environment.CurrentDirectory, @"..\..\..\ScannerManager\bin\Debug\ScannerManager.exe"); 
+                scannerManager.StartInfo.FileName = Path.Combine(Environment.CurrentDirectory, @"..\..\..\ScannerManager\bin\Debug\ScannerManager.exe");
                 scannerManager.EnableRaisingEvents = true;
 
                 scannerManager.Start();
-
                 scannerManager.WaitForExit();
-                exCode = (ExitCodes.ExitCode)scannerManager.ExitCode;
+                               
+                exCode = (ExitCodes.ExitCode)scannerManager.ExitCode;               
 
                 switch (exCode)
                 {
