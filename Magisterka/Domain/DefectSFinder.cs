@@ -13,8 +13,8 @@ namespace Domain
 {
     public class DefectsFinder : IDisposable
     {
-        private const float _minFactor = 0.0000002f;
-        private const float _maxFactor = 0.0002f;
+        private const float _minFactor = 0.0000003f;
+        private const float _maxFactor = 0.0003f;
         private ImageWrapper<Bgr, byte> _inputImage;
         private int _maxThreasholdOfDustContourSize = 100;
         private VectorOfVectorOfPoint _defectsContoursMatrix;
@@ -24,7 +24,6 @@ namespace Domain
         private ImageWrapper<Gray, byte> _maskOfDefects;
 
         public ImageWrapper<Bgr, byte> ReturnTmpImg;
-        public DenseHistogram Histogram;
 
         public VectorOfVectorOfPoint DefectsContoursMatrix
         {
@@ -149,9 +148,7 @@ namespace Domain
                 ProgressManager.DoStep();
                 using (ImageWrapper<Gray, float> laplaceImge = grayImage.Laplace(9))
                 {
-                    ProgressManager.DoStep();
-
-                    ReturnTmpImg = laplaceImge.Copy().Convert<Bgr, byte>();
+                    ProgressManager.DoStep();                   
 
                     GetThresholds(out a1, out a2, out b1, out b2, laplaceImge); //ProgressManager.DoneStep();
                     _patchMask = GetMaskOfDefects(a1, a2, b1, b2, laplaceImge); //ProgressManager.DoneStep();
@@ -167,8 +164,9 @@ namespace Domain
                     }
                     ProgressManager.DoStep();
 
-                   // CvInvoke.DrawContours(_inputImage.Image, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
+                    ReturnTmpImg = _inputImage.Copy();
                     
+                    CvInvoke.DrawContours(ReturnTmpImg.Image, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));                    
                 }                     
             }                
             

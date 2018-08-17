@@ -48,20 +48,24 @@ namespace Domain
             ProgressManager.AddSteps(5);
             using(ImageWrapper<Gray, byte> binaryOrgImage = MorphologicalProcessing.CreateBinaryImage(_orgImage, 100))
             {
+                ProgressManager.DoStep();
                 #region WhiteOnBlack
                 using (ImageWrapper<Bgr, byte> brigtherPatchImage = _orgImage.CopyBlank())
                 {
+                    ProgressManager.DoStep();
                     using(ImageWrapper<Gray, byte> brigtherSpotsMask = MorphologicalProcessing.MultipleImages(binaryOrgImage, _dustMask))
                     {
+                        ProgressManager.DoStep();
                         using (ImageWrapper<Bgr, byte> brightSpotsPatchImage = MorphologicalProcessing.Erode(_orgImage, new Size(3, 3), 10))
                         {
-                            patchImage = MorphologicalProcessing.CombineTwoImages(brigtherPatchImage, brightSpotsPatchImage, brigtherSpotsMask);                  
+                            ProgressManager.DoStep();
+                            patchImage = MorphologicalProcessing.CombineTwoImages(brigtherPatchImage, brightSpotsPatchImage, brigtherSpotsMask);
+
+                           
                         }    
                     }
                 }
                 #endregion WhiteOnBlack
-
-
             }
          
 

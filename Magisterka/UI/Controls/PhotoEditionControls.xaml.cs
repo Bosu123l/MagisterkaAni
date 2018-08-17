@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -7,8 +10,62 @@ namespace UI
     /// <summary>
     /// Interaction logic for PhotoEditionControls.xaml
     /// </summary>
-    public partial class PhotoEditionControls : UserControl
+    public partial class PhotoEditionControls : UserControl, INotifyPropertyChanged
     {
+        public string AlignPhotoToggled
+        {
+            get
+            {
+                return _alignPhotoToggled.ToString();
+            }
+            set
+            {
+                if (value != null)
+                {
+                    _alignPhotoToggled = bool.Parse(value);
+                    OnPropertyChanged(nameof(AlignPhotoToggled));
+                    OnPropertyChanged(nameof(AlignPhotoVisibility));
+                }
+            }
+        }
+        public string AlignPhotoVisibility
+        {
+            get {
+                if (_alignPhotoToggled == true)
+                {
+                    return "Visible";
+                }
+                else
+                {
+                    return "Collapsed";
+                }
+            }
+        }
+        public List<double> AlignTicks
+        {
+            get{ 
+                if(_alignTicks ==null)
+                {
+                    _alignTicks  = new List<double>();
+
+                    int value = -45;
+                    do {
+                        _alignTicks.Add(value++);
+                    } while (value < 45);
+                }
+                return _alignTicks ;
+            }
+        }
+        private bool _alignPhotoToggled=false;
+        private List<double> _alignTicks ;
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         #region DustReduction
         public event EventHandler DustReductionClicked;
 
@@ -47,33 +104,30 @@ namespace UI
         }
         #endregion CutPhoto
 
-        #region RotateImageLeft
-        public event EventHandler RotateImageLeftClick;
-        public ICommand RotateImageLeftClickCommand
+        #region RotateImage
+        public event EventHandler RotateImageClick;
+        public ICommand RotateImageClickCommand
         {
-            get { return new RelayCommand(RotateImageLeftClickExecute); }
+            get { return new RelayCommand(RotateImageClickExecute); }
         }
-        private void RotateImageLeftClickExecute(object obj)
+        private void RotateImageClickExecute(object obj)
         {
-            RotateImageLeftClick.Invoke(this, EventArgs.Empty);
+            RotateImageClick.Invoke(this, EventArgs.Empty);
         }
-        #endregion RotateImageLeft
+        #endregion RotateImage
 
-        #region RotateImageRight 
-        public event EventHandler RotateImageRightClick;
-        public ICommand RotateImageRightClickCommand
+        #region AlignImageClick 
+        public event EventHandler AlignImageValueChanged;
+              
+        private void AlignImageValueChangedExecute(object sender, EventArgs e)
         {
-            get { return new RelayCommand(RotateImageRightClickCommandExecute); }
+            AlignImageValueChanged.Invoke(this, e);
         }
-        private void RotateImageRightClickCommandExecute(object obj)
-        {
-            RotateImageRightClick.Invoke(this, EventArgs.Empty);
-        }
-        #endregion RotateImageRight
+        #endregion AlignImageClick
 
         public PhotoEditionControls()
         {
             InitializeComponent();
-        }      
+        }
     }
 }

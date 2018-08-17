@@ -103,6 +103,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Aligning.cs" />
     <Compile Include="Annotations.cs" />
     <Compile Include="CustomMessageBox.cs" />
     <Compile Include="CutPhoto.cs" />

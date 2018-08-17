@@ -57,12 +57,19 @@ namespace Domain
         }
         public static ImageWrapper<Bgr, byte> CombineTwoImages(ImageWrapper<Bgr, byte> image, ImageWrapper<Bgr, byte> imagePattern, ImageWrapper<Gray, byte> mask)
         {
+            ProgressManager.AddSteps(4);
             mask = Dilate(mask, new Size(2, 2), 1);
+
+            ProgressManager.DoStep();
             using (ImageWrapper<Bgr, byte> image1 = MultipleMaskAndImage(imagePattern, mask))
             {
+                ProgressManager.DoStep();
                 using (ImageWrapper<Bgr, byte> image2 = MultipleMaskAndImage(image, GenerateBinaryImageNegative(mask)))
                 {
-                    ImageWrapper<Bgr, byte> outImage = image1.Add(image2);                   
+                    ProgressManager.DoStep();
+                    ImageWrapper<Bgr, byte> outImage = image1.Add(image2);
+
+                    ProgressManager.DoStep();
                     return outImage;                   
                 }
             }

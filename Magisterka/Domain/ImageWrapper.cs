@@ -105,6 +105,11 @@ namespace Domain
         {
             this.Image.Save(fileName);
         }
+
+        public ImageWrapper<TColor, TDepth> Rotate(double angle, TColor background)
+        {           
+            return new ImageWrapper<TColor, TDepth>(this.Image.Rotate(angle, background, false));            
+        }
         #endregion Methods
 
         #region Dispose

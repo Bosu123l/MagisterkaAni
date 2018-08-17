@@ -60,8 +60,10 @@ namespace UI
             this.PhotoEditionControl.DustReductionClicked += DustReduction;
             this.PhotoEditionControl.SmudgeReductionClick += Morpho;
             this.PhotoEditionControl.CutPhotoClick += CutPhotoBorder;
-            this.PhotoEditionControl.RotateImageLeftClick += RotateImageLeft;
-            this.PhotoEditionControl.RotateImageRightClick += RotateImageRight;
+
+            this.PhotoEditionControl.RotateImageClick += RotateImage;
+            this.PhotoEditionControl.AlignImageValueChanged += AlignImageClick;
+
 
             this.ViewControl.OpenOldPhotoInNewWindowClicked += PreviewOrginalPhoto;
             this.ViewControl.OpenPhotoInNewWindowClicked += PreviewEditPhoto;
@@ -161,14 +163,14 @@ namespace UI
         #endregion FileOperation
 
         #region OperationsOnPhoto
-        private void DustReduction(object sender, EventArgs e)
+        private async void DustReduction(object sender, EventArgs e)
         {
             ProgressBar progressBar = new ProgressBar();
             try
             {
                 EnableControl = false;
                 progressBar.Show();
-                Task.Run(() => {
+                await Task.Run(() => {
                     ImageProcessing.ReduceDust();
                 });
                 _imgeView = ImageProcessing.ImageAfter;   
@@ -215,8 +217,9 @@ namespace UI
                 progressBar.Show();
                 Task.Run(() =>
                 {
-                    _imgeView = ImageProcessing.ImageAfter;   
+                    
                 });
+                _imgeView = ImageProcessing.ImageAfter;
             }
             catch (Exception ex)
             {
@@ -228,10 +231,41 @@ namespace UI
                 EnableControl = true;
             }
         }
-        private void RotateImageLeft(object sender, EventArgs e)
-        { }
-        private void RotateImageRight(object sender, EventArgs e)
-        { }
+        private void RotateImage(object sender, EventArgs e)
+        {
+            try
+            {
+                EnableControl = false;
+                ImageProcessing.RotateImage();
+                _imgeView = ImageProcessing.ImageAfter;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                EnableControl = true;
+            }
+        }
+        private void AlignImageClick(object sender, EventArgs e)
+        {
+            try
+            {
+                EnableControl = false;
+                RoutedPropertyChangedEventArgs<double> args = (RoutedPropertyChangedEventArgs<double>)e;               
+                ImageProcessing.AlignImage(args.NewValue);
+                _imgeView = ImageProcessing.ImageAfter;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }    
+            finally
+            {
+                EnableControl = true;
+            }
+        }
 
         private async void Morpho(object sender, EventArgs e)
         {
@@ -242,11 +276,10 @@ namespace UI
                 progressBar.Show();
                 await Task.Run(() =>
                  {
-                     ImageProcessing.Test();
-                     //ImageZoomPanel.Image = ImageProcessing.ImageAfter.Bitmap;
-                     //ViewedImage = ImageProcessing.BitmapImageAfter;
-                     //new HistogramForm(ImageProcessing.ImageAfter).Show();                     
+                     ImageProcessing.Test();                         
                  });
+
+                _imgeView = ImageProcessing.ImageAfter;
             }
             catch (Exception ex)
             {                

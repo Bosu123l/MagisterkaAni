@@ -7,6 +7,7 @@
              mc:Ignorable="d">
     <UserControl.Resources>
         <Style TargetType="Button" BasedOn="{StaticResource OpacityMenuButton}"/>
+        <Style TargetType="ToggleButton" BasedOn="{StaticResource OpacityMenuToggleButton}"/>
     </UserControl.Resources>
     <UserControl.Background>
         <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
@@ -22,8 +23,15 @@
             <GradientStop Color="#0099B4D1"/>
         </LinearGradientBrush>
     </UserControl.Background>
-    <StackPanel>
-        <GroupBox Header="Edit" FontSize="14" FontWeight="SemiBold">
+    <Grid Height="417">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Slider x:Name="_alignSlider" Grid.Column="0" Minimum="-45" Maximum="45" Orientation="Vertical" 
+                SmallChange="0.5" TickFrequency="0.5" Visibility="{Binding AlignPhotoVisibility, ElementName=userControl, Mode=OneWay}" 
+                ValueChanged="AlignImageValueChangedExecute" Ticks="{Binding AlignTicks, ElementName=userControl, Mode=OneWay}"/>
+        <GroupBox Grid.Column="1" Header="Edit" FontSize="14" FontWeight="SemiBold" >
             <StackPanel Orientation="Vertical">
                 <Button x:Name="_dustReduction"  
                         ToolTip="Dust reduction"
@@ -46,22 +54,22 @@
                         <ImageBrush ImageSource="/UI;component/Icons/icons8-crop-96.png"/>
                     </Button.OpacityMask>
                 </Button>
-                <Button x:Name="_rotateImageLeft"
-                        ToolTip="Rotate image left"
-                        Command="{Binding RotateImageLeftClickCommand, ElementName=userControl, Mode=OneWay}" >
-                    <Button.OpacityMask>
-                        <ImageBrush ImageSource="/UI;component/Icons/rotate-left.png"/>
-                    </Button.OpacityMask>
-                </Button>
-                <Button 
-                    x:Name="_rotateImageRight"
-                    ToolTip="Rotate image right"
-                    Command="{Binding RotateImageRightClickCommand, ElementName=userControl, Mode=OneWay}" >
+                <Button x:Name="_rorateImage"
+                        ToolTip="Rotate image"
+                        Command="{Binding RotateImageClickCommand, ElementName=userControl, Mode=OneWay}" >
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/rotate-right.png"/>
                     </Button.OpacityMask>
                 </Button>
+                <ToggleButton 
+                    x:Name="_alignImage"
+                    ToolTip="Align photo"
+                    IsChecked="{Binding AlignPhotoToggled, ElementName=userControl}" Height="65" >
+                    <ToggleButton.OpacityMask>
+                        <ImageBrush ImageSource="/UI;component/Icons/icons8-available-updates-96.png"/>
+                    </ToggleButton.OpacityMask>
+                </ToggleButton>
             </StackPanel>
         </GroupBox>
-    </StackPanel>
+    </Grid>
 </UserControl>
