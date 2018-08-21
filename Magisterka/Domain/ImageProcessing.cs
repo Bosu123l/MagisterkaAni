@@ -1,9 +1,5 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
-using System;
-using System.Drawing;
-using System.IO;
-using System.Windows.Media.Imaging;
 
 namespace Domain
 {
@@ -39,14 +35,27 @@ namespace Domain
                     _imageAfter = value.Copy();
                 }
             }
-        }                     
-           
+        }
+
+        private static double _blueTone;
+        private static double _greenTone;
+        private static double _redTone;       
+
         public static void SetImage(ImageWrapper<Bgr, byte> image)
         {            
             if (image != null)
             {
-                ImageBefor = image;
-                ImageAfter = image;
+                ImageBefor = image.Copy();
+                ImageAfter = image.Copy();
+
+                #region QualifityPhotoTone
+
+                ImageColor imageColor = new ImageColor();
+                imageColor.QualifityPhotoTone(image);
+                _blueTone = imageColor.BlueTone;
+                _greenTone = imageColor.GreenTone;
+                _redTone = imageColor.RedTone;
+                #endregion QualifityPhotoTone
             }
         }       
 
@@ -67,24 +76,39 @@ namespace Domain
         }
 
         public static void CutImage() { }
-        public static void ReduceSmudges() { }
+
+        public static void ReduceSmudges()
+        {
+            using (Smudge smudge = new Smudge(ImageAfter))
+            {
+                ImageAfter = smudge.OtherColorDetector(_blueTone, _greenTone, _redTone);
+            }
+        }
         
         public static void RotateImage()
         {
-            ImageAfter = Aligning.RotateOn90(ImageAfter);
+            ImageAfter = Aligning.RotateOn90(ImageAfter);            
         }
         public static void AlignImage(double angle)
         {
-            ImageAfter = Aligning.Rotate(ImageAfter, angle);
+            ImageAfter = Aligning.Rotate(ImageAfter, angle);            
         }
 
         public static void Test()
         {
-            using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
+            //using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
+            //{
+            //    defectsFinder.SearchDefects();
+            //    ImageAfter = defectsFinder.ReturnTmpImg;
+            //}
+
+            using (ImageWrapper<Gray, byte> gray = ImageBefor.Copy().Convert<Gray, byte>()) 
             {
-                defectsFinder.SearchDefects();
-                ImageAfter = defectsFinder.ReturnTmpImg;
+                //ImageWrapper<Bgr,byte> mask = 
+                ImageAfter.Image = ImageBefor.Image.Sub(gray.Image.Convert<Bgr, byte>());
+                ImageAfter = MorphologicalProcessing.CreateBinaryImage(ImageAfter, 3).Convert<Bgr,byte>();
             }
+
             //CvInvoke.DrawContours(ImageAfter, _defectsFinder.DefectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
             //_imageAfter = MorphologicalProcessing.CreateBinaryImage(_imageAfter, 192).Convert<Bgr,byte>();
             //_imageAfter = _defectsFinder.SearchDefects();//MorphologicalProcessing.Erode(_imageAfter, new Size(2,2), 1);

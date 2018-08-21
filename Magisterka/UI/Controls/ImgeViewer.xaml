@@ -16,7 +16,7 @@
             <emgu:PanAndZoomPictureBox  x:Name="PhotoView" Dock="Fill" SizeMode="Zoom" BackColor="Transparent"/>
         </WindowsFormsHost>        
         <Expander Grid.Row="2" IsExpanded="False" Header="Histograms">
-            <TabControl Grid.Row="3" TabStripPlacement="Left" Height="300">
+            <TabControl Grid.Row="3" TabStripPlacement="Left" >
                 <TabItem x:Name="TabBlack" Header="Gray">
                     <WindowsFormsHost>
                         <emgu:HistogramBox x:Name="BlackHistogram" Dock="Fill"/>
@@ -35,6 +35,11 @@
                 <TabItem x:Name="TabGreen" Header="Green">
                     <WindowsFormsHost>
                         <emgu:HistogramBox x:Name="GreenHistogram" Dock="Fill" BackColor="Transparent"/>
+                    </WindowsFormsHost>
+                </TabItem>
+                <TabItem x:Name="TabSummary" Header="Summary">
+                    <WindowsFormsHost>
+                        <emgu:HistogramBox x:Name="SummaryHistogram" Dock="Fill" BackColor="Transparent"/>
                     </WindowsFormsHost>
                 </TabItem>
             </TabControl>

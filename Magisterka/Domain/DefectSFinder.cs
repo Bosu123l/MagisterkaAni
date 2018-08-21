@@ -13,8 +13,8 @@ namespace Domain
 {
     public class DefectsFinder : IDisposable
     {
-        private const float _minFactor = 0.0000003f;
-        private const float _maxFactor = 0.0003f;
+        private const float _minFactor = 0.0000002f;
+        private const float _maxFactor = 0.0002f;
         private ImageWrapper<Bgr, byte> _inputImage;
         private int _maxThreasholdOfDustContourSize = 100;
         private VectorOfVectorOfPoint _defectsContoursMatrix;
@@ -152,7 +152,9 @@ namespace Domain
 
                     GetThresholds(out a1, out a2, out b1, out b2, laplaceImge); //ProgressManager.DoneStep();
                     _patchMask = GetMaskOfDefects(a1, a2, b1, b2, laplaceImge); //ProgressManager.DoneStep();
-                    
+
+                    ReturnTmpImg = laplaceImge.Copy().Convert<Bgr,byte>();
+
                     _maskOfDefects = MorphologicalProcessing.Dilate(_patchMask, new Size(3, 3), 2).Copy();
                     ProgressManager.DoStep();
 
@@ -164,9 +166,9 @@ namespace Domain
                     }
                     ProgressManager.DoStep();
 
-                    ReturnTmpImg = _inputImage.Copy();
+                    //ReturnTmpImg = _inputImage.Copy();
                     
-                    CvInvoke.DrawContours(ReturnTmpImg.Image, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));                    
+                   // CvInvoke.DrawContours(ReturnTmpImg.Image, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));                    
                 }                     
             }                
             
@@ -180,22 +182,22 @@ namespace Domain
             ProgressManager.AddSteps(5);
             using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0.0f, 255.0f)))
             {
-                
-
                 ProgressManager.DoStep();
                 histogram.Calculate(new Image<Gray, byte>[] { sourceImage.Convert<Gray, byte>().Image }, false, null);
 
                 ProgressManager.DoStep();
                 List<float> hist = new List<float>(histogram.GetBinValues());
                 int pixelsSum = (int)hist.Sum(x => x);
+                double min = pixelsSum * _minFactor;
+                double max = pixelsSum * _maxFactor;
                 ProgressManager.DoStep();
 
-                a1 = hist.IndexOf(hist.FirstOrDefault(x => x > pixelsSum * _minFactor));
-                a2 = hist.IndexOf(hist.FirstOrDefault(x => x > pixelsSum * _maxFactor));
+                a1 = hist.IndexOf(hist.FirstOrDefault(x => x > min));
+                a2 = hist.IndexOf(hist.FirstOrDefault(x => x > max));
                 ProgressManager.DoStep();
 
-                b1 = hist.LastIndexOf(hist.LastOrDefault(x => x > pixelsSum * _minFactor));
-                b2 = hist.LastIndexOf(hist.LastOrDefault(x => x > pixelsSum * _maxFactor));
+                b1 = hist.LastIndexOf(hist.LastOrDefault(x => x > max));
+                b2 = hist.LastIndexOf(hist.LastOrDefault(x => x > min));
                 ProgressManager.DoStep();
             }                
         }

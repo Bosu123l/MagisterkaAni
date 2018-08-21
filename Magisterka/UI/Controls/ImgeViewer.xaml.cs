@@ -53,24 +53,43 @@ namespace UI
             AddHistogram(image, Color.Blue, BlueHistogram);
             AddHistogram(image, Color.Green, GreenHistogram);
             AddHistogram(image, Color.Red, RedHistogram);
+            AddSummaryHistogram();
         }
         private void AddHistogram(ImageWrapper<Bgr, byte> image, Color color, HistogramBox histogramBox)
         {
-            DenseHistogram histogram;
-            histogram = new DenseHistogram(256, new RangeF(0f, 255f));
-            Mat mat = new Mat();
+            using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0f, 256f)))
+            {
+                Mat mat = new Mat();
 
-            if (color == Color.Black) { histogram.Calculate(new Image<Gray, byte>[] { image.Image.Convert<Gray, byte>() }, false, null); }
-            else if (color == Color.Blue) { histogram.Calculate(new Image<Gray, byte>[] { image.Image[0] }, false, null); }
-            else if (color == Color.Red) { histogram.Calculate(new Image<Gray, byte>[] { image.Image[1] }, false, null); }
-            else if (color == Color.Green) { histogram.Calculate(new Image<Gray, byte>[] { image.Image[2] }, false, null); }
-            else { return; }
+                if (color == Color.Black) { histogram.Calculate(new Image<Gray, byte>[] { image.Image.Convert<Gray, byte>() }, false, null); }
+                else if (color == Color.Blue) { histogram.Calculate(new Image<Gray, byte>[] { image.Image[0] }, false, null); }
+                else if (color == Color.Red) { histogram.Calculate(new Image<Gray, byte>[] { image.Image[1] }, false, null); }
+                else if (color == Color.Green) { histogram.Calculate(new Image<Gray, byte>[] { image.Image[2] }, false, null); }
+                else { return; }
 
-            histogram.CopyTo(mat);
+                histogram.CopyTo(mat);
 
-            histogramBox.ClearHistogram();
-            histogramBox.AddHistogram(color.ToString(), color, mat, 256, new float[] { 0f, 256f });
-            histogramBox.Refresh();
+                histogramBox.ClearHistogram();
+                histogramBox.AddHistogram(color.ToString(), color, mat, 256, new float[] { 0f, 256f });
+                histogramBox.Refresh();
+            }               
+        }
+
+        private void AddSummaryHistogram()
+        {
+           using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0f, 256f)))
+           {
+                Mat mat = new Mat();
+                               
+                SummaryHistogram.ClearHistogram();
+                SummaryHistogram.GenerateHistograms(_image.Image, 256);
+
+                histogram.Calculate(new Image<Gray, byte>[] {_image.Image.Convert<Gray,byte>()}, false, null);
+                histogram.CopyTo(mat);
+
+                SummaryHistogram.AddHistogram("", Color.Black, mat, 256, new float[] { 0f, 256f });
+                SummaryHistogram.Refresh();
+            }
         }
 
         private void ResetView()

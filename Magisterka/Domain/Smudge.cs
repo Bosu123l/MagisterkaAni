@@ -3,87 +3,80 @@ using Emgu.CV.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Domain.ImageColor;
 
 namespace Domain
 {
-    public class Smudge
+    public class Smudge: IDisposable
     {
-        private Image<Bgr, byte> _image;
+        private ImageWrapper<Bgr, byte> _image;
 
-        public Smudge(Image<Bgr, byte> image)
+        public Smudge(ImageWrapper<Bgr, byte> image)
         {
-            _image = image;
-        }
+            _image = image.Copy();
+        }      
 
-        public Image<Bgr, byte> OtherColorDetector(int threshold = 40)
-        //prog dla szarosci=22, prog dla polsepii=40, prog dla sepii=50
+        public ImageWrapper<Bgr, byte> OtherColorDetector(double blue, double green, double red)        
         {
-            List<double> data = new List<double>();
+            ImageWrapper<Bgr, byte> mask = _image.Copy();           
 
-            Image<Gray, byte> gray = _image.Convert<Gray, byte>();
-            Image<Bgr, byte> retImage = _image;
-            double max = 0;
-            double avg = 0;
-            double mismatch = 0;
-            int count = 0;
+            double abs = 0.25;
 
-            //for (int i = 2000; i < _image.Height; i++)
-            //{
-            //    for (int j = 2000; j < _image.Width; j++)
-            //    {
-            //        int a, b, c;
+            double blueMin = Math.Round(blue - abs * blue, 2);
+            double blueMax = Math.Round(blue + abs * blue, 2);
 
-            //        a=Math.Abs(_image.Data[i, j, 0]- _image.Data[i, j, 1]);
-            //        b = Math.Abs(_image.Data[i, j, 1] - _image.Data[i, j, 2]);
-            //        c = Math.Abs(_image.Data[i, j, 2] - _image.Data[i, j, 0]);
-            //        double tmp = (double) (a + b + c)/3.0;
-            //        data.Add(tmp);
-            //        if (max < tmp)
-            //            max = tmp;
-            //        avg += tmp;
+            double greenMin = Math.Round(green - abs*green, 2);
+            double greenMax = Math.Round(green + abs * green, 2);
 
-            //        if (tmp > 20.0)
-            //            tmp = max;
-            //    }
-            //}
+            double redMin = Math.Round(red - abs*red, 2);
+            double redMax = Math.Round(red + abs*red, 2);
 
-            //avg = avg/data.Count();
+            double blueCont = 0.0;
+            double greenCont = 0.0;
+            double redCont = 0.0;
+            double sum;
 
-            for (int i = 0; i < _image.Height; i++)
+            int steps = _image.Image.Height / 100;
+            ProgressManager.AddSteps(steps);
+
+            for (int x = 0; x < _image.Image.Height; x++)
             {
-                for (int j = 0; j < _image.Width; j++)
-                {
-                    bool p = false;
-                    for (int k = 0; k < 3; k++)
+                for (int y = 0; y < _image.Image.Width; y++)
+                {                    
+                    blue = _image.Image.Data[x, y, (int)Colors.Blue];
+                    green = _image.Image.Data[x, y, (int)Colors.Green]; 
+                    red = _image.Image.Data[x, y, (int)Colors.Red];
+
+                    sum = blue + green + red;
+
+                    //try
+                    //{
+                    //    blueCont = blue / sum;
+                    //    greenCont =  green/sum;
+                    //    redCont =  red/sum;
+                    //}
+                    //catch (DivideByZeroException)
+                    //{
+                    //    sum = 1;
+                    //    continue;
+                    //}
+
+                    if(greenCont<greenMin || greenCont>greenMax || redCont<redMin || redCont>redMax || blueCont < blueMin || blueCont > blueMax)
                     {
-                        double tmp = Math.Abs(_image.Data[i, j, k] - gray.Data[i, j, 0]);
-
-                        count++;
-                        if (tmp > max)
-                            max = tmp;
-
-                        if (tmp > threshold)
-                        {
-                            p = true;
-                            mismatch++;
-                        }
-
-                        avg += tmp;
-                    }
-
-                    if (p)
-                    {
-                        retImage.Data[i, j, 0] = 0;
-                        retImage.Data[i, j, 1] = 0;
-                        retImage.Data[i, j, 2] = 255;
+                        mask.Image.Data[x, y, (int)Colors.Blue] = 0;
+                        mask.Image.Data[x, y, (int)Colors.Green] = 0;
+                        mask.Image.Data[x, y, (int)Colors.Red] = 255;
                     }
                 }
+                if (x % 100 == 0)
+                    ProgressManager.DoStep();
             }
+            return mask;
+        }
 
-            mismatch = mismatch / (count>0 ? 1 :count);
-            avg = avg / (count > 0 ? 1 : count);
-
-            return retImage;
+        public void Dispose()
+        {
+            _image.Dispose();
         }
     }
 }

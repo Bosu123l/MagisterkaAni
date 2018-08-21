@@ -57,14 +57,27 @@ namespace UI
             }
         }
         private bool _alignPhotoToggled=false;
-        private List<double> _alignTicks ;
-
+        private List<double> _alignTicks;
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        #region DoExperiment
+        public event EventHandler DoExperimenClicked;
+
+        public ICommand DoExperimenClickedCommand
+        {
+            get { return new RelayCommand(DoExperimenClickedCommandExecute); }
+        }
+
+        private void DoExperimenClickedCommandExecute(object obj)
+        {
+            DoExperimenClicked?.Invoke(this, EventArgs.Empty);
+        }
+        #endregion DoExperiment
 
         #region DustReduction
         public event EventHandler DustReductionClicked;
@@ -76,7 +89,7 @@ namespace UI
 
         private void DustReductionClickedCommandExecute(object obj)
         {
-            DustReductionClicked.Invoke(this, EventArgs.Empty);
+            DustReductionClicked?.Invoke(this, EventArgs.Empty);
         }
         #endregion DustReduction
 
@@ -88,7 +101,7 @@ namespace UI
         }
         private void SmudgeReductionClickCommandExecute(object obj)
         {
-            SmudgeReductionClick.Invoke(this, EventArgs.Empty);
+            SmudgeReductionClick?.Invoke(this, EventArgs.Empty);
         }
         #endregion SmudgeReduction
 
@@ -100,7 +113,7 @@ namespace UI
         }
         private void CutPhotoClickCommandExecute(object obj)
         {
-            CutPhotoClick.Invoke(this, EventArgs.Empty);
+            CutPhotoClick?.Invoke(this, EventArgs.Empty);
         }
         #endregion CutPhoto
 
@@ -112,7 +125,7 @@ namespace UI
         }
         private void RotateImageClickExecute(object obj)
         {
-            RotateImageClick.Invoke(this, EventArgs.Empty);
+            RotateImageClick?.Invoke(this, EventArgs.Empty);
         }
         #endregion RotateImage
 
@@ -121,7 +134,7 @@ namespace UI
               
         private void AlignImageValueChangedExecute(object sender, EventArgs e)
         {
-            AlignImageValueChanged.Invoke(this, e);
+            AlignImageValueChanged?.Invoke(this, e);
         }
         #endregion AlignImageClick
 

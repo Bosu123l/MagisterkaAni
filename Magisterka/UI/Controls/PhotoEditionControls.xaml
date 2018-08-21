@@ -23,7 +23,7 @@
             <GradientStop Color="#0099B4D1"/>
         </LinearGradientBrush>
     </UserControl.Background>
-    <Grid Height="417">
+    <Grid Height="Auto">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
@@ -33,6 +33,13 @@
                 ValueChanged="AlignImageValueChangedExecute" Ticks="{Binding AlignTicks, ElementName=userControl, Mode=OneWay}"/>
         <GroupBox Grid.Column="1" Header="Edit" FontSize="14" FontWeight="SemiBold" >
             <StackPanel Orientation="Vertical">
+                <Button x:Name="Experiment"
+                    ToolTip="Experiment"
+                    Command="{Binding DoExperimenClickedCommand, ElementName=userControl, Mode=OneWay}">
+                    <Button.OpacityMask>
+                        <ImageBrush ImageSource="/UI;component/Icons/experiment.png"/>
+                    </Button.OpacityMask>
+                </Button>
                 <Button x:Name="_dustReduction"  
                         ToolTip="Dust reduction"
                         Command="{Binding DustReductionClickedCommand, ElementName=userControl, Mode=OneWay}">
@@ -64,7 +71,7 @@
                 <ToggleButton 
                     x:Name="_alignImage"
                     ToolTip="Align photo"
-                    IsChecked="{Binding AlignPhotoToggled, ElementName=userControl}" Height="65" >
+                    IsChecked="{Binding AlignPhotoToggled, ElementName=userControl}">
                     <ToggleButton.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/icons8-available-updates-96.png"/>
                     </ToggleButton.OpacityMask>

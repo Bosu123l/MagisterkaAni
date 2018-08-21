@@ -57,8 +57,9 @@ namespace UI
             this.FileControl.SavePhotoAsClicked += SavePhotoAs;
             this.FileControl.SavePhotoClicked += SavePhoto;
 
+            this.PhotoEditionControl.DoExperimenClicked += Test;
             this.PhotoEditionControl.DustReductionClicked += DustReduction;
-            this.PhotoEditionControl.SmudgeReductionClick += Morpho;
+            this.PhotoEditionControl.SmudgeReductionClick += SmudgeCleaner;
             this.PhotoEditionControl.CutPhotoClick += CutPhotoBorder;
 
             this.PhotoEditionControl.RotateImageClick += RotateImage;
@@ -100,7 +101,6 @@ namespace UI
                 EnableControl = true;
             }
         }
-
         private void GetPhotoFromScanner(object sender, EventArgs e)
         {
             try
@@ -208,16 +208,16 @@ namespace UI
                 EnableControl = true;
             }
         }
-        private void SmudgeCleaner(object sender, EventArgs e)
+        private async void SmudgeCleaner(object sender, EventArgs e)
         {
             ProgressBar progressBar = new ProgressBar();
             try
             {
                 EnableControl = false;
                 progressBar.Show();
-                Task.Run(() =>
+                await Task.Run(() =>
                 {
-                    
+                    ImageProcessing.ReduceSmudges();
                 });
                 _imgeView = ImageProcessing.ImageAfter;
             }
@@ -231,12 +231,14 @@ namespace UI
                 EnableControl = true;
             }
         }
-        private void RotateImage(object sender, EventArgs e)
+        private async void RotateImage(object sender, EventArgs e)
         {
+            ProgressBar progressBar = new ProgressBar(true);
             try
             {
                 EnableControl = false;
-                ImageProcessing.RotateImage();
+                progressBar.Show();
+                await Task.Run(() => {ImageProcessing.RotateImage();});                
                 _imgeView = ImageProcessing.ImageAfter;
             }
             catch (Exception ex)
@@ -245,29 +247,33 @@ namespace UI
             }
             finally
             {
+                progressBar.Close();
                 EnableControl = true;
             }
         }
-        private void AlignImageClick(object sender, EventArgs e)
+        private async void AlignImageClick(object sender, EventArgs e)
         {
+            ProgressBar progressBar = new ProgressBar(true);
             try
             {
                 EnableControl = false;
-                RoutedPropertyChangedEventArgs<double> args = (RoutedPropertyChangedEventArgs<double>)e;               
-                ImageProcessing.AlignImage(args.NewValue);
+                progressBar.Show();
+                RoutedPropertyChangedEventArgs<double> args = (RoutedPropertyChangedEventArgs<double>)e;
+                await Task.Run(() => {ImageProcessing.AlignImage(args.NewValue);});
                 _imgeView = ImageProcessing.ImageAfter;
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-            }    
+            }
             finally
             {
+                progressBar.Close();
                 EnableControl = true;
             }
         }
 
-        private async void Morpho(object sender, EventArgs e)
+        private async void Test(object sender, EventArgs e)
         {
             ProgressBar progressBar = new ProgressBar();
             try
@@ -306,15 +312,5 @@ namespace UI
         }
 
         #endregion ViewOperations     
-
-        private void ShowProgressBar()
-        {
-            ProgressBar progressBar = new ProgressBar();
-        }
-
-        private void PhotoZoomBox_OnZoomScaleChange(object sender, EventArgs e)
-        {
-
-        }
     }
 }
