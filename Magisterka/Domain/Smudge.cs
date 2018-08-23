@@ -1,82 +1,162 @@
-﻿using Emgu.CV;
-using Emgu.CV.Structure;
+﻿using Emgu.CV.Structure;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Drawing;
 using static Domain.ImageColor;
 
 namespace Domain
 {
     public class Smudge: IDisposable
     {
+        public ImageWrapper<Gray, byte> MaskOfSmudges
+        {
+            get
+            {
+                if(_maskOfSmudges==null)
+                {
+                    SearchSmudges();
+                }
+                return _maskOfSmudges;
+            }
+        }
+
+        public double BlueTone
+        {
+            get
+            {
+                if (_blueTone == 0.0)
+                {
+                    SearchSmudges();
+                }
+                return _blueTone;
+            }
+        }
+        public double GreenTone
+        {
+            get
+            {
+                if (_greenTone == 0.0)
+                {
+                    SearchSmudges();
+                }
+                return _greenTone;
+            }
+        }
+        public double RedTone
+        {
+            get
+            {
+                if (_redTone == 0.0)
+                {
+                    SearchSmudges();
+                }
+                return _redTone;
+            }
+        }
+
         private ImageWrapper<Bgr, byte> _image;
+        private ImageWrapper<Gray, byte> _maskOfSmudges;
+
+        private double _blueTone;
+        private double _greenTone;
+        private double _redTone;
+        private double _margin = 0.10;
 
         public Smudge(ImageWrapper<Bgr, byte> image)
         {
             _image = image.Copy();
         }      
 
-        public ImageWrapper<Bgr, byte> OtherColorDetector(double blue, double green, double red)        
+        public void OtherColorDetector()        
         {
-            ImageWrapper<Bgr, byte> mask = _image.Copy();           
+            _maskOfSmudges = _image.Convert<Gray, byte>().CopyBlank();
 
-            double abs = 0.25;
+            double blueMin = Math.Round(BlueTone - _margin * BlueTone, 2);
+            double blueMax = Math.Round(BlueTone + _margin * BlueTone, 2);
 
-            double blueMin = Math.Round(blue - abs * blue, 2);
-            double blueMax = Math.Round(blue + abs * blue, 2);
+            double greenMin = Math.Round(GreenTone - _margin * GreenTone, 2);
+            double greenMax = Math.Round(GreenTone + _margin * GreenTone, 2);
 
-            double greenMin = Math.Round(green - abs*green, 2);
-            double greenMax = Math.Round(green + abs * green, 2);
-
-            double redMin = Math.Round(red - abs*red, 2);
-            double redMax = Math.Round(red + abs*red, 2);
+            double redMin = Math.Round(RedTone - _margin * RedTone, 2);
+            double redMax = Math.Round(RedTone + _margin * RedTone, 2);
 
             double blueCont = 0.0;
             double greenCont = 0.0;
             double redCont = 0.0;
             double sum;
 
-            int steps = _image.Image.Height / 100;
-            ProgressManager.AddSteps(steps);
+            ProgressManager.AddSteps(_image.Image.Height / 100);
 
             for (int x = 0; x < _image.Image.Height; x++)
             {
                 for (int y = 0; y < _image.Image.Width; y++)
-                {                    
-                    blue = _image.Image.Data[x, y, (int)Colors.Blue];
-                    green = _image.Image.Data[x, y, (int)Colors.Green]; 
-                    red = _image.Image.Data[x, y, (int)Colors.Red];
+                {
+                    int blue = _image.Image.Data[x, y, (int)Colors.Blue];
+                    int green = _image.Image.Data[x, y, (int)Colors.Green];
+                    int red = _image.Image.Data[x, y, (int)Colors.Red];
 
                     sum = blue + green + red;
 
-                    //try
-                    //{
-                    //    blueCont = blue / sum;
-                    //    greenCont =  green/sum;
-                    //    redCont =  red/sum;
-                    //}
-                    //catch (DivideByZeroException)
-                    //{
-                    //    sum = 1;
-                    //    continue;
-                    //}
-
-                    if(greenCont<greenMin || greenCont>greenMax || redCont<redMin || redCont>redMax || blueCont < blueMin || blueCont > blueMax)
+                    try
                     {
-                        mask.Image.Data[x, y, (int)Colors.Blue] = 0;
-                        mask.Image.Data[x, y, (int)Colors.Green] = 0;
-                        mask.Image.Data[x, y, (int)Colors.Red] = 255;
+                        blueCont = blue / sum;
+                        greenCont = green / sum;
+                        redCont = red / sum;
+                    }
+                    catch (DivideByZeroException)
+                    {
+                        sum = 1;
+                        continue;
+                    }
+
+                    if (greenCont < greenMin || greenCont > greenMax ||
+                        redCont < redMin || redCont > redMax ||
+                        blueCont < blueMin || blueCont > blueMax)
+                    {
+                        _maskOfSmudges.Image.Data[x, y, 0] = 255;
                     }
                 }
                 if (x % 100 == 0)
                     ProgressManager.DoStep();
             }
-            return mask;
+        }
+
+        private void SearchSmudges()
+        {
+            using (ImageColor imageColor = new ImageColor(_image))
+            {
+                ProgressManager.AddSteps(3);
+                imageColor.QualifityPhotoTone();                
+                _blueTone = imageColor.BlueTone;
+                _greenTone = imageColor.GreenTone;
+                _redTone = imageColor.RedTone;
+                OtherColorDetector();
+                //_maskOfSmudges = MorphologicalProcessing.Erode(_maskOfSmudges.Convert<Bgr, byte>(), new Size(3, 3), 1).Convert<Gray, byte>();
+                ProgressManager.DoStep();
+            }
+        }
+
+        public ImageWrapper<Bgr, byte>AveragePictureColors()
+        {            
+            ImageWrapper<Bgr, byte> outputImage;
+            ProgressManager.AddSteps(5);
+
+            using (ImageWrapper<Bgr, byte> patternImage = _image.Convert<Gray, byte>().Copy().Convert<Bgr,byte>())
+            {
+                ProgressManager.DoStep();
+                patternImage.Image[(int)Colors.Blue] = patternImage.Image[(int)Colors.Blue].Mul(BlueTone*3);
+                patternImage.Image[(int)Colors.Green] = patternImage.Image[(int)Colors.Green].Mul(GreenTone*3);
+                patternImage.Image[(int)Colors.Red] = patternImage.Image[(int)Colors.Red].Mul(RedTone*3);
+                ProgressManager.DoStep();
+                outputImage = MorphologicalProcessing.CombineTwoImages(_image, patternImage, MaskOfSmudges);
+                ProgressManager.DoStep();
+                return outputImage;
+            }               
         }
 
         public void Dispose()
         {
             _image.Dispose();
+            _maskOfSmudges.Dispose();
         }
     }
 }

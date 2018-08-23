@@ -46,16 +46,7 @@ namespace Domain
             if (image != null)
             {
                 ImageBefor = image.Copy();
-                ImageAfter = image.Copy();
-
-                #region QualifityPhotoTone
-
-                ImageColor imageColor = new ImageColor();
-                imageColor.QualifityPhotoTone(image);
-                _blueTone = imageColor.BlueTone;
-                _greenTone = imageColor.GreenTone;
-                _redTone = imageColor.RedTone;
-                #endregion QualifityPhotoTone
+                ImageAfter = image.Copy();                
             }
         }       
 
@@ -79,19 +70,21 @@ namespace Domain
 
         public static void ReduceSmudges()
         {
-            using (Smudge smudge = new Smudge(ImageAfter))
+            using (Smudge smudge = new Smudge(ImageBefor))
             {
-                ImageAfter = smudge.OtherColorDetector(_blueTone, _greenTone, _redTone);
+                ImageAfter = smudge.AveragePictureColors().Copy();
             }
         }
         
         public static void RotateImage()
         {
-            ImageAfter = Aligning.RotateOn90(ImageAfter);            
+            ImageAfter = Aligning.RotateOn90(ImageAfter);
+            ImageBefor = Aligning.RotateOn90(ImageBefor);
         }
         public static void AlignImage(double angle)
         {
-            ImageAfter = Aligning.Rotate(ImageAfter, angle);            
+            ImageAfter = Aligning.Rotate(ImageAfter, angle);
+            ImageBefor = Aligning.Rotate(ImageBefor, angle);
         }
 
         public static void Test()
@@ -112,6 +105,9 @@ namespace Domain
             //CvInvoke.DrawContours(ImageAfter, _defectsFinder.DefectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
             //_imageAfter = MorphologicalProcessing.CreateBinaryImage(_imageAfter, 192).Convert<Bgr,byte>();
             //_imageAfter = _defectsFinder.SearchDefects();//MorphologicalProcessing.Erode(_imageAfter, new Size(2,2), 1);
+
+
+
         }       
     }
 }

@@ -125,7 +125,6 @@ namespace Domain
                 if (value != null)
                 {
                     _filePath = value;
-                    SourceDirectory = _fileDirectory;
                 }
             }
         }
@@ -188,12 +187,15 @@ namespace Domain
             {
                 OpenFileDialog openFileDialog = new OpenFileDialog()
                 {
-                    Filter = _readFileExtensions
+                    Filter = _readFileExtensions,
+                    InitialDirectory = SourceDirectory
                 };
+
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     FilePath = openFileDialog.FileName;
+                    SourceDirectory = _fileDirectory;
                     return new ImageWrapper<Bgr, byte>(new Image<Bgr, byte>(FilePath));
                 }
                 return null;

@@ -127,7 +127,7 @@ namespace Domain
                 }
                 return _maskOfDefects;
             }
-        }
+        }        
 
         public DefectsFinder(ImageWrapper<Bgr, byte> image)
         {

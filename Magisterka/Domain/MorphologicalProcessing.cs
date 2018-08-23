@@ -38,7 +38,7 @@ namespace Domain
 
             using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint(conturMatrix))
             {
-                CvInvoke.FillPoly(mask.Image, contours, new MCvScalar(255, 255, 255), Emgu.CV.CvEnum.LineType.AntiAlias);
+                CvInvoke.FillPoly(mask.Image, contours, new MCvScalar(255, 255, 255), LineType.AntiAlias);
                 return mask;
             }
         }        
@@ -58,7 +58,7 @@ namespace Domain
         public static ImageWrapper<Bgr, byte> CombineTwoImages(ImageWrapper<Bgr, byte> image, ImageWrapper<Bgr, byte> imagePattern, ImageWrapper<Gray, byte> mask)
         {
             ProgressManager.AddSteps(4);
-            mask = Dilate(mask, new Size(2, 2), 1);
+            mask = Dilate(mask, new Size(2, 2), 2);
 
             ProgressManager.DoStep();
             using (ImageWrapper<Bgr, byte> image1 = MultipleMaskAndImage(imagePattern, mask))
