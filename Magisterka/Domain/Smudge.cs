@@ -1,4 +1,5 @@
-﻿using Emgu.CV.Structure;
+﻿using Emgu.CV;
+using Emgu.CV.Structure;
 using System;
 using System.Drawing;
 using static Domain.ImageColor;
@@ -56,6 +57,10 @@ namespace Domain
         private ImageWrapper<Bgr, byte> _image;
         private ImageWrapper<Gray, byte> _maskOfSmudges;
 
+        private ImageWrapper<Gray, byte> _blueMaskOfSmudges;
+        private ImageWrapper<Gray, byte> _greenMaskOfSmudges;
+        private ImageWrapper<Gray, byte> _redMaskOfSmudges;
+
         private double _blueTone;
         private double _greenTone;
         private double _redTone;
@@ -68,7 +73,9 @@ namespace Domain
 
         public void OtherColorDetector()        
         {
-            _maskOfSmudges = _image.Convert<Gray, byte>().CopyBlank();
+            _blueMaskOfSmudges = _image.Convert<Gray, byte>().CopyBlank();
+            _greenMaskOfSmudges = _image.Convert<Gray, byte>().CopyBlank();
+            _redMaskOfSmudges = _image.Convert<Gray, byte>().CopyBlank();
 
             double blueMin = Math.Round(BlueTone - _margin * BlueTone, 2);
             double blueMax = Math.Round(BlueTone + _margin * BlueTone, 2);
@@ -108,12 +115,28 @@ namespace Domain
                         continue;
                     }
 
-                    if (greenCont < greenMin || greenCont > greenMax ||
-                        redCont < redMin || redCont > redMax ||
-                        blueCont < blueMin || blueCont > blueMax)
+                    //if (greenCont < greenMin || greenCont > greenMax ||
+                    //    redCont < redMin || redCont > redMax ||
+                    //    blueCont < blueMin || blueCont > blueMax)
+                    //{
+                    //    _maskOfSmudges.Image.Data[x, y, 0] = 255;
+                    //}
+
+                    if (blueCont > blueMax)
                     {
-                        _maskOfSmudges.Image.Data[x, y, 0] = 255;
+                        _blueMaskOfSmudges.Image.Data[x, y, 0] = 255;
                     }
+
+                    if (greenCont > greenMax)
+                    {
+                        _greenMaskOfSmudges.Image.Data[x, y, 0] = 255;
+                    }                    
+
+                    if (redCont > redMax)
+                    {
+                        _redMaskOfSmudges.Image.Data[x, y, 0] = 255;
+                    }
+
                 }
                 if (x % 100 == 0)
                     ProgressManager.DoStep();
@@ -133,6 +156,31 @@ namespace Domain
                 //_maskOfSmudges = MorphologicalProcessing.Erode(_maskOfSmudges.Convert<Bgr, byte>(), new Size(3, 3), 1).Convert<Gray, byte>();
                 ProgressManager.DoStep();
             }
+        }
+
+        public ImageWrapper<Bgr, byte> ClearOtherColorsSmudges()
+        {
+            ImageWrapper<Bgr, byte> cleanedImage = _image.Copy();
+            OtherColorDetector();
+            cleanedImage = ClearColor(cleanedImage, _blueMaskOfSmudges, Colors.Blue);
+            cleanedImage = ClearColor(cleanedImage, _greenMaskOfSmudges, Colors.Green);
+            cleanedImage = ClearColor(cleanedImage, _redMaskOfSmudges, Colors.Red);
+            return cleanedImage;
+        }
+
+        private ImageWrapper<Bgr,byte>ClearColor(ImageWrapper<Bgr,byte>image, ImageWrapper<Gray,byte>maskOfSmudges, Colors color)
+        {
+            Image<Gray, byte>[] splitedImages = _image.Image.Split();
+
+            using (ImageWrapper<Bgr, byte> patch = _image.CopyBlank())
+            {
+                patch.Image[(int)Colors.Blue] = splitedImages[(int)color].Mul(BlueTone * 3);
+                patch.Image[(int)Colors.Green] = splitedImages[(int)color].Mul(GreenTone * 3);
+                patch.Image[(int)Colors.Red] = splitedImages[(int)color].Mul(RedTone * 3);
+
+                image = MorphologicalProcessing.CombineTwoImages(image, patch, maskOfSmudges);
+            }              
+            return image;           
         }
 
         public ImageWrapper<Bgr, byte>AveragePictureColors()

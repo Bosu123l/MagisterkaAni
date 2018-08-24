@@ -3,11 +3,8 @@ using Emgu.CV;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Controls;
-using System.Windows.Forms.Integration;
-using System.Windows.Input;
 
 namespace UI
 {    
@@ -57,7 +54,7 @@ namespace UI
         }
         private void AddHistogram(ImageWrapper<Bgr, byte> image, Color color, HistogramBox histogramBox)
         {
-            using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0f, 256f)))
+            using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0f, 255f)))
             {
                 Mat mat = new Mat();
 
@@ -70,14 +67,14 @@ namespace UI
                 histogram.CopyTo(mat);
 
                 histogramBox.ClearHistogram();
-                histogramBox.AddHistogram(color.ToString(), color, mat, 256, new float[] { 0f, 256f });
+                histogramBox.AddHistogram(color.ToString(), color, mat, 256, new float[] { 0f, 255f });
                 histogramBox.Refresh();
             }               
         }
 
         private void AddSummaryHistogram()
         {
-           using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0f, 256f)))
+           using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0f, 255f)))
            {
                 Mat mat = new Mat();
                                
@@ -87,7 +84,7 @@ namespace UI
                 histogram.Calculate(new Image<Gray, byte>[] {_image.Image.Convert<Gray,byte>()}, false, null);
                 histogram.CopyTo(mat);
 
-                SummaryHistogram.AddHistogram("", Color.Black, mat, 256, new float[] { 0f, 256f });
+                SummaryHistogram.AddHistogram("", Color.Black, mat, 256, new float[] { 0f, 255f });
                 SummaryHistogram.Refresh();
             }
         }

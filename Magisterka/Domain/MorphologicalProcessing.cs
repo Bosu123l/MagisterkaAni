@@ -60,6 +60,8 @@ namespace Domain
             ProgressManager.AddSteps(4);
             mask = Dilate(mask, new Size(2, 2), 2);
 
+            //imagePattern.Image = imagePattern.Image.SmoothBlur(3, 3);
+
             ProgressManager.DoStep();
             using (ImageWrapper<Bgr, byte> image1 = MultipleMaskAndImage(imagePattern, mask))
             {

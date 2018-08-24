@@ -95,18 +95,24 @@ namespace Domain
             //    ImageAfter = defectsFinder.ReturnTmpImg;
             //}
 
-            using (ImageWrapper<Gray, byte> gray = ImageBefor.Copy().Convert<Gray, byte>()) 
-            {
-                //ImageWrapper<Bgr,byte> mask = 
-                ImageAfter.Image = ImageBefor.Image.Sub(gray.Image.Convert<Bgr, byte>());
-                ImageAfter = MorphologicalProcessing.CreateBinaryImage(ImageAfter, 3).Convert<Bgr,byte>();
-            }
+            //using (ImageWrapper<Gray, byte> gray = ImageBefor.Copy().Convert<Gray, byte>()) 
+            //{
+            //    //ImageWrapper<Bgr,byte> mask = 
+            //    ImageAfter.Image = ImageBefor.Image.Sub(gray.Image.Convert<Bgr, byte>());
+            //    ImageAfter = MorphologicalProcessing.CreateBinaryImage(ImageAfter, 3).Convert<Bgr,byte>();
+            //}
 
+            //Image<Gray,byte>[]splitedImages=ImageBefor.Image.Split();
+            //ImageAfter = new ImageWrapper<Bgr, byte>(splitedImages[1].Convert<Bgr,byte>());
+            ////ImageAfter =    // MorphologicalProcessing.Dilate(ImageBefor, new System.Drawing.Size(7, 7), 10);
+            //ImageWrapper<Gray, float> Floataowy = ImageAfter.Convert<Gray, float>().Add(ImageBefor.Convert<Gray,float>());
+            //ImageWrapper<Gray, byte> Byte = ImageAfter.Convert<Gray, byte>();
             //CvInvoke.DrawContours(ImageAfter, _defectsFinder.DefectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
             //_imageAfter = MorphologicalProcessing.CreateBinaryImage(_imageAfter, 192).Convert<Bgr,byte>();
             //_imageAfter = _defectsFinder.SearchDefects();//MorphologicalProcessing.Erode(_imageAfter, new Size(2,2), 1);
 
-
+            Smudge smudge = new Smudge(ImageBefor);
+            ImageAfter = smudge.ClearOtherColorsSmudges();
 
         }       
     }

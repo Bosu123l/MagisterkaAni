@@ -289,7 +289,7 @@ namespace UI
             }
             catch (Exception ex)
             {                
-                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show(ex.Message+ex.HelpLink, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {

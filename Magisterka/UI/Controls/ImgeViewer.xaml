@@ -15,8 +15,8 @@
         <WindowsFormsHost Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1" Background="{x:Null}">
             <emgu:PanAndZoomPictureBox  x:Name="PhotoView" Dock="Fill" SizeMode="Zoom" BackColor="Transparent"/>
         </WindowsFormsHost>        
-        <Expander Grid.Row="2" IsExpanded="False" Header="Histograms">
-            <TabControl Grid.Row="3" TabStripPlacement="Left" >
+        <Expander Grid.Row="2" IsExpanded="False" Header="Histograms" >
+            <TabControl Grid.Row="3" TabStripPlacement="Left" MinHeight="800">
                 <TabItem x:Name="TabBlack" Header="Gray">
                     <WindowsFormsHost>
                         <emgu:HistogramBox x:Name="BlackHistogram" Dock="Fill"/>
