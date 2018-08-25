@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 namespace UI
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
-    {    
-        private ImageWrapper<Bgr,byte> _imgeView
+    {
+        private ImageWrapper<Bgr, byte> _imgeView
         {
             set
             {
-                ImgeView.ViewedImage=value;
+                ImgeView.ViewedImage = value;
             }
         }
         public string BlockControls
@@ -44,9 +44,19 @@ namespace UI
 
         public MainWindow()
         {
-            EnableControl = true;            
+            EnableControl = true;
             InitializeComponent();
             InitializeButtonsEvents();
+
+            ImageProcessing.ImageAfterChange += ImageProcessing_ImageAfterChange; ;
+        }
+
+        private void ImageProcessing_ImageAfterChange(object sender, ImageWrapper<Bgr, byte> e)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                _imgeView = e;
+            });
         }
 
         private void InitializeButtonsEvents()
@@ -78,7 +88,7 @@ namespace UI
 
         #region GetPhotoToEdit
         private void GetPhotoFromFile(object sender, EventArgs e)
-        {            
+        {
             try
             {
                 EnableControl = false;
@@ -86,14 +96,14 @@ namespace UI
                 using (var image = (FileOperations.GetImageFromDirectory()))
                 {
                     if (image != null)
-                    {                      
-                       ImageProcessing.SetImage(image);
-                       _imgeView = ImageProcessing.ImageAfter;                       
+                    {
+                        ImageProcessing.SetImage(image);
+                        _imgeView = ImageProcessing.ImageAfter;
                     }
                 }
             }
             catch (Exception ex)
-            {                
+            {
                 MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
@@ -104,14 +114,14 @@ namespace UI
         private void GetPhotoFromScanner(object sender, EventArgs e)
         {
             try
-            {                
+            {
                 EnableControl = false;
                 using (var image = FileOperations.GetImageFromScanner())
                 {
                     if (image != null)
-                    { 
+                    {
                         ImageProcessing.SetImage(image);
-                        _imgeView = ImageProcessing.ImageAfter;   
+                        _imgeView = ImageProcessing.ImageAfter;
                     }
                 }
             }
@@ -120,7 +130,7 @@ namespace UI
                 System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
-            {               
+            {
                 EnableControl = true;
             }
         }
@@ -128,13 +138,13 @@ namespace UI
 
         #region FileOperation
         private void SavePhoto(object sender, EventArgs e)
-        {           
+        {
             try
-            {           
-                FileOperations.SaveImageFile(ImageProcessing.ImageAfter);                            
+            {
+                FileOperations.SaveImageFile(ImageProcessing.ImageAfter);
             }
             catch (Exception ex)
-            {                
+            {
                 MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -170,10 +180,11 @@ namespace UI
             {
                 EnableControl = false;
                 progressBar.Show();
-                await Task.Run(() => {
+                await Task.Run(() =>
+                {
                     ImageProcessing.ReduceDust();
                 });
-                _imgeView = ImageProcessing.ImageAfter;   
+                _imgeView = ImageProcessing.ImageAfter;
             }
             catch (Exception ex)
             {
@@ -196,7 +207,7 @@ namespace UI
                 {
                     ImageProcessing.CutImage();
                 });
-                _imgeView = ImageProcessing.ImageAfter;   
+                _imgeView = ImageProcessing.ImageAfter;
             }
             catch (Exception ex)
             {
@@ -238,7 +249,7 @@ namespace UI
             {
                 EnableControl = false;
                 progressBar.Show();
-                await Task.Run(() => {ImageProcessing.RotateImage();});                
+                await Task.Run(() => { ImageProcessing.RotateImage(); });
                 _imgeView = ImageProcessing.ImageAfter;
             }
             catch (Exception ex)
@@ -259,7 +270,7 @@ namespace UI
                 EnableControl = false;
                 progressBar.Show();
                 RoutedPropertyChangedEventArgs<double> args = (RoutedPropertyChangedEventArgs<double>)e;
-                await Task.Run(() => {ImageProcessing.AlignImage(args.NewValue);});
+                await Task.Run(() => { ImageProcessing.AlignImage(args.NewValue); });
                 _imgeView = ImageProcessing.ImageAfter;
             }
             catch (Exception ex)
@@ -282,14 +293,14 @@ namespace UI
                 progressBar.Show();
                 await Task.Run(() =>
                  {
-                     ImageProcessing.Test();                         
+                     ImageProcessing.Test();
                  });
 
                 _imgeView = ImageProcessing.ImageAfter;
             }
             catch (Exception ex)
-            {                
-                System.Windows.MessageBox.Show(ex.Message+ex.HelpLink, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            {
+                System.Windows.MessageBox.Show(ex.Message + ex.HelpLink, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -297,6 +308,7 @@ namespace UI
                 EnableControl = true;
             }
         }
+
         #endregion OperationsOnPhoto
 
         #region ViewOperations

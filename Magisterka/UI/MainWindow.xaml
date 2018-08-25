@@ -12,7 +12,7 @@
             <ColumnDefinition />
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <local:ImgeViewer x:Name="ImgeView"/>
+        <local:ImgeViewer x:Name="ImgeView" />
         <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Hidden">
             <StackPanel  Orientation="Vertical" HorizontalAlignment="Right">
                 <local:FileControls x:Name="FileControl"/>

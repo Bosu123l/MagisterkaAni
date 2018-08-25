@@ -1,5 +1,8 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Domain
 {
@@ -7,6 +10,14 @@ namespace Domain
     {
         private static ImageWrapper<Bgr, byte> _imageBefor;
         private static ImageWrapper<Bgr, byte> _imageAfter;
+
+
+        public static event EventHandler<ImageWrapper<Bgr, byte>> ImageAfterChange;
+
+        public static void OnImageAfterChange(ImageWrapper<Bgr, byte> image)
+        {
+            ImageAfterChange?.Invoke(null, image);
+        }
 
         public static ImageWrapper<Bgr, byte> ImageBefor
         {
@@ -33,22 +44,19 @@ namespace Domain
                 if (_imageAfter != value)
                 {
                     _imageAfter = value.Copy();
+                    OnImageAfterChange(_imageAfter);
                 }
             }
         }
 
-        private static double _blueTone;
-        private static double _greenTone;
-        private static double _redTone;       
-
         public static void SetImage(ImageWrapper<Bgr, byte> image)
-        {            
+        {
             if (image != null)
             {
                 ImageBefor = image.Copy();
-                ImageAfter = image.Copy();                
+                ImageAfter = image.Copy();
             }
-        }       
+        }
 
         public static void ReduceDust()
         {
@@ -63,7 +71,7 @@ namespace Domain
                     _imageAfter = dust.RemoveDust();
                     ProgressManager.DoStep();
                 }
-            }       
+            }
         }
 
         public static void CutImage() { }
@@ -75,7 +83,7 @@ namespace Domain
                 ImageAfter = smudge.AveragePictureColors().Copy();
             }
         }
-        
+
         public static void RotateImage()
         {
             ImageAfter = Aligning.RotateOn90(ImageAfter);
@@ -87,7 +95,7 @@ namespace Domain
             ImageBefor = Aligning.Rotate(ImageBefor, angle);
         }
 
-        public static void Test()
+        public async static void Test()
         {
             //using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
             //{
@@ -102,18 +110,33 @@ namespace Domain
             //    ImageAfter = MorphologicalProcessing.CreateBinaryImage(ImageAfter, 3).Convert<Bgr,byte>();
             //}
 
-            //Image<Gray,byte>[]splitedImages=ImageBefor.Image.Split();
-            //ImageAfter = new ImageWrapper<Bgr, byte>(splitedImages[1].Convert<Bgr,byte>());
+            Image<Gray, byte>[] splitedImages = ImageBefor.Image.Split();
+            for (int i = 0; i < splitedImages.Length; i++)
+            {
+                ImageAfter = new ImageWrapper<Bgr, byte>(splitedImages[i].Convert<Bgr, byte>());
+                await Task.Run(() =>
+                {
+                    Thread.Sleep(10000);
+                    System.Diagnostics.Debug.WriteLine($"Techno: {i}");
+                });
+            }
+
+            //ImageAfter = new ImageWrapper<Bgr, byte>(splitedImages[1].Convert<Bgr, byte>());
+
+
             ////ImageAfter =    // MorphologicalProcessing.Dilate(ImageBefor, new System.Drawing.Size(7, 7), 10);
             //ImageWrapper<Gray, float> Floataowy = ImageAfter.Convert<Gray, float>().Add(ImageBefor.Convert<Gray,float>());
             //ImageWrapper<Gray, byte> Byte = ImageAfter.Convert<Gray, byte>();
             //CvInvoke.DrawContours(ImageAfter, _defectsFinder.DefectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
             //_imageAfter = MorphologicalProcessing.CreateBinaryImage(_imageAfter, 192).Convert<Bgr,byte>();
             //_imageAfter = _defectsFinder.SearchDefects();//MorphologicalProcessing.Erode(_imageAfter, new Size(2,2), 1);
+            //ImageAfter = new ImageWrapper<Bgr, byte>(ImageBefor.Image.AbsDiff(new Bgr(10, 100, 100)));
 
-            Smudge smudge = new Smudge(ImageBefor);
-            ImageAfter = smudge.ClearOtherColorsSmudges();
-
-        }       
+            //Bgr bgr = new Bgr();
+            //MCvScalar mCvScalar = new MCvScalar();
+            //ImageAfter.Image.AvgSdv(out bgr, out mCvScalar);
+            //Smudge smudge = new Smudge(ImageBefor);
+            //ImageAfter = smudge.ClearOtherColorsSmudges();
+        }
     }
 }
