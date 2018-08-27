@@ -1,6 +1,8 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -63,13 +65,14 @@ namespace Domain
             ProgressManager.AddSteps(3);
             using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
             {
-                ProgressManager.DoStep();
-                using (Dust dust = new Dust(ImageAfter, defectsFinder.MaskOfDefects, defectsFinder.SmallDefectsContoursMatrix))
-                {
-                    ProgressManager.DoStep();
-
-                    _imageAfter = dust.RemoveDust();
-                    ProgressManager.DoStep();
+                ProgressManager.AddSteps(defectsFinder.SmallDefectsContoursMatrix.Length);
+                using (Dust dust = new Dust(ImageBefor, defectsFinder.MaskOfDefects, defectsFinder.SmallDefectsContoursMatrix))
+                {                    
+                    for (int i=0; i< defectsFinder.SmallDefectsContoursMatrix.Length; i++)
+                    {
+                        ImageAfter = dust.RemoveDefect(defectsFinder.SmallDefectsContoursMatrix[i]);
+                        ProgressManager.DoStep();
+                    }                   
                 }
             }
         }
@@ -109,18 +112,27 @@ namespace Domain
             //    ImageAfter.Image = ImageBefor.Image.Sub(gray.Image.Convert<Bgr, byte>());
             //    ImageAfter = MorphologicalProcessing.CreateBinaryImage(ImageAfter, 3).Convert<Bgr,byte>();
             //}
+            ////////////List<ImageWrapper<Bgr, byte>> splitedImages2 = new List<ImageWrapper<Bgr, byte>>();
+            ////////////Image<Gray, byte>[] splitedImages = ImageBefor.Image.Split();
+            ////////////for (int i = 0; i < splitedImages.Length; i++)
+            ////////////{
+            ////////////    //Smudge smudge = new Smudge(new ImageWrapper<Bgr, byte>(splitedImages[i].Convert<Bgr, byte>()));
+            ////////////    //var tempImage = smudge.ClearOtherColorsSmudges();
+            ////////////    var imageTemp = new ImageWrapper<Bgr, byte>(splitedImages[i].Convert<Bgr, byte>());
+            ////////////    ImageAfter = new ImageWrapper<Bgr, byte>(imageTemp);
+            ////////////    splitedImages2.Add(imageTemp);
+            ////////////    System.Diagnostics.Debug.WriteLine($"Techno: {i}");
 
-            Image<Gray, byte>[] splitedImages = ImageBefor.Image.Split();
-            for (int i = 0; i < splitedImages.Length; i++)
-            {
-                ImageAfter = new ImageWrapper<Bgr, byte>(splitedImages[i].Convert<Bgr, byte>());
-                await Task.Run(() =>
-                {
-                    Thread.Sleep(10000);
-                    System.Diagnostics.Debug.WriteLine($"Techno: {i}");
-                });
-            }
+            ////////////    //await Task.Run(() =>
+            ////////////    //{
+            ////////////    //    //Thread.Sleep(10000);
 
+            ////////////    //});
+            ////////////}
+
+            //splitedImages2[0] = new ImageWrapper<Bgr, byte>(splitedImages2[1].Image.AbsDiff(splitedImages2[0].Image.AbsDiff(splitedImages2[2].Image)));
+
+            //ImageAfter = splitedImages2[0];
             //ImageAfter = new ImageWrapper<Bgr, byte>(splitedImages[1].Convert<Bgr, byte>());
 
 
@@ -137,6 +149,26 @@ namespace Domain
             //ImageAfter.Image.AvgSdv(out bgr, out mCvScalar);
             //Smudge smudge = new Smudge(ImageBefor);
             //ImageAfter = smudge.ClearOtherColorsSmudges();
+
+            //using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
+            //{               
+            //    CvInvoke.DrawContours(ImageAfter.Image, defectsFinder.DefectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
+            //}
+
+            //import numpy as np
+            //import cv2 as cv
+            //from matplotlib import pyplot as plt
+            //img = cv.imread('die.png')
+            //dst = cv.fastNlMeansDenoisingColored(img, None, 10, 10, 7, 21)
+            //plt.subplot(121),plt.imshow(img)
+            //plt.subplot(122),plt.imshow(dst)
+            //plt.show()
+
+            ImageAfter = MorphologicalProcessing.CreateBinaryImage(ImageBefor, 1).Convert<Bgr,byte>();
+
+            //CvInvoke.FastNlMeansDenoisingColored(ImageBefor.Image, ImageAfter.Image, 10, 10, 7, 21);
+            //ImageAfter.Image = ImageBefor.Image.AbsDiff(ImageAfter.Image);
+
         }
     }
 }

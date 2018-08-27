@@ -39,6 +39,7 @@ namespace Domain
             using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint(conturMatrix))
             {
                 CvInvoke.FillPoly(mask.Image, contours, new MCvScalar(255, 255, 255), LineType.AntiAlias);
+                mask.Image._Dilate(2);
                 return mask;
             }
         }        

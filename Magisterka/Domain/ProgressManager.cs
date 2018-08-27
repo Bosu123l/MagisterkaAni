@@ -15,7 +15,7 @@ namespace Domain
         {
             public int MaxSteps { get; set; }
             public int DoneSteps { get; set; }
-            public int Percent { get; set; }
+            public double Percent { get; set; }
         }
         #endregion StepStruct
 
@@ -33,7 +33,7 @@ namespace Domain
                 return _steps == null ? 0 : (int)((_progress * 100) / MaxValueProgressBar);
             }
         }
-        public static int Progress
+        public static double Progress
         {
             get
             {
@@ -43,8 +43,11 @@ namespace Domain
             {
                 if (value != _progress)
                 {
-                    _progress = value;
-                    ProgressStatusChanged?.Invoke(Progress);                
+                    if((int)value>(int)_progress)
+                    {
+                        ProgressStatusChanged?.Invoke((int)Progress);
+                    }                   
+                    _progress = value;                            
                 }
             }
         }
@@ -52,7 +55,7 @@ namespace Domain
 
         #region PrivateFields
         private static List<Step> _steps;
-        private static int _progress = 0;
+        private static double _progress = 0.0;
         #endregion PrivateFields
 
         #region Methods
@@ -61,7 +64,7 @@ namespace Domain
             Step step = new Step();
             step.MaxSteps = stepsCount;
             step.DoneSteps = 0;
-            int percent = _steps?.Count() > 0 ? _steps.Last().Percent : MaxValueProgressBar;
+            double percent = _steps?.Count() > 0 ? _steps.Last().Percent : MaxValueProgressBar;
             step.Percent = (int)((percent) / (step.MaxSteps > 0 ? step.MaxSteps : 1));
 
             if (_steps == null) _steps = new List<Step>();

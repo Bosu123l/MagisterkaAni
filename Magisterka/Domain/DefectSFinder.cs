@@ -162,10 +162,10 @@ namespace Domain
                     _defectsContoursMatrix = new VectorOfVectorOfPoint();
                     using (Mat hier = new Mat())
                     {
-                        CvInvoke.FindContours(_maskOfDefects.Image, _defectsContoursMatrix, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+                        CvInvoke.FindContours(_patchMask.Image, _defectsContoursMatrix, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
                     }
                     ProgressManager.DoStep();
-
+                   
                     //ReturnTmpImg = _inputImage.Copy();
                     
                    // CvInvoke.DrawContours(ReturnTmpImg.Image, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));                    
@@ -220,8 +220,8 @@ namespace Domain
         }
         private void SplitDefectContoursBySize()
         {
-            SmallDefectsContoursMatrix = DefectsContoursMatrix.ToArrayOfArray().Where(x => x.Count() <= _maxThreasholdOfDustContourSize).OrderBy(x => x.Count()).ToArray();
-            LargeDefectsContoursMatrix = DefectsContoursMatrix.ToArrayOfArray().Where(x => x.Count() > _maxThreasholdOfDustContourSize).OrderBy(x => x.Count()).ToArray();
+            SmallDefectsContoursMatrix = DefectsContoursMatrix.ToArrayOfArray().Where(x => x.Count() <= _maxThreasholdOfDustContourSize).OrderByDescending(x => x.Count()).ToArray();
+            LargeDefectsContoursMatrix = DefectsContoursMatrix.ToArrayOfArray().Where(x => x.Count() > _maxThreasholdOfDustContourSize).OrderByDescending(x => x.Count()).ToArray();
         }
 
         public void Dispose()

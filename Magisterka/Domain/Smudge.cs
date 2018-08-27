@@ -63,7 +63,7 @@ namespace Domain
         private double _blueTone;
         private double _greenTone;
         private double _redTone;
-        private double _margin = 0.20;
+        private double _margin = 0.50;
 
         public Smudge(ImageWrapper<Bgr, byte> image)
         {
@@ -171,9 +171,12 @@ namespace Domain
         {
             ImageWrapper<Bgr, byte> cleanedImage = _image.Copy();
             OtherColorDetector();
-            cleanedImage = ClearColor(cleanedImage, _blueMaskOfSmudges, BgrColor.Blue);
-            cleanedImage = ClearColor(cleanedImage, _greenMaskOfSmudges, BgrColor.Green);
-            cleanedImage = ClearColor(cleanedImage, _redMaskOfSmudges, BgrColor.Red);
+            //CvInvoke.Inpaint(cleanedImage.Image, _blueMaskOfSmudges.Image, cleanedImage.Image, 20, Emgu.CV.CvEnum.InpaintType.Telea);
+            //CvInvoke.Inpaint(cleanedImage.Image, _greenMaskOfSmudges.Image, cleanedImage.Image, 20, Emgu.CV.CvEnum.InpaintType.Telea);
+            CvInvoke.Inpaint(cleanedImage.Image, _redMaskOfSmudges.Image, cleanedImage.Image, 20, Emgu.CV.CvEnum.InpaintType.Telea);
+            //cleanedImage = ClearColor(cleanedImage, _blueMaskOfSmudges, BgrColor.Blue);
+            //cleanedImage = ClearColor(cleanedImage, _greenMaskOfSmudges, BgrColor.Green);
+            //cleanedImage = ClearColor(cleanedImage, _redMaskOfSmudges, BgrColor.Red);
             return cleanedImage;
         }
 
