@@ -2,6 +2,7 @@
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
+using System;
 using System.Drawing;
 
 namespace Domain
@@ -24,9 +25,29 @@ namespace Domain
             return input.MorphologyEx(MorphOp.Erode, kernel, new Point(-1, -1), iterations, BorderType.Default, new MCvScalar(1.0));
         }
 
-        public static ImageWrapper<Gray, byte> CreateBinaryImage(ImageWrapper<Bgr, byte> image, int threashold)
+        #region Binaryzation
+        public static ImageWrapper<Gray, byte> GeneralImageBinary(ImageWrapper<Bgr,byte>image)
+        {         
+            Gray avg = image.Convert<Gray,byte>().Image.GetAverage();
+
+            using (ImageWrapper<Bgr, byte> bluredImage = image.CopyBlank())
+            {
+                CvInvoke.MedianBlur(image.Image, bluredImage.Image, 31);
+                using (ImageWrapper<Gray, byte> mask = bluredImage.Copy().Convert<Gray, byte>())
+                {
+                    return CreateBinaryImage(mask, (int)avg.Intensity);
+                }
+            }                
+        }
+
+        public static ImageWrapper<Gray, byte> CreateBinaryImage(ImageWrapper<Bgr, byte> image, int threashold=1)
         {
             return image.Convert<Gray, byte>().ThresholdBinary(new Gray(threashold), new Gray(255));
+        }
+
+        public static ImageWrapper<Gray, byte> CreateBinaryImage(ImageWrapper<Gray, byte> image, int threashold = 1)
+        {
+            return image.ThresholdBinary(new Gray(threashold), new Gray(255));
         }
         public static ImageWrapper<Gray, byte> GenerateBinaryImageNegative(ImageWrapper<Gray, byte> image)
         {
@@ -42,8 +63,8 @@ namespace Domain
                 mask.Image._Dilate(2);
                 return mask;
             }
-        }        
-    
+        }
+        #endregion Binaryzation
         public static ImageWrapper<Bgr, byte> MultipleMaskAndImage(ImageWrapper<Bgr, byte> image, ImageWrapper<Gray, byte> mask)
         {
             return image.Convert<Bgr, float>().Mul(mask.Convert<Bgr, float>()).Convert<Bgr, byte>();
@@ -55,11 +76,15 @@ namespace Domain
         public static ImageWrapper<Gray, byte> MultipleImages(ImageWrapper<Gray, byte> image1, ImageWrapper<Gray, byte> image2)
         {
             return image1.Convert<Gray, float>().Mul(image2.Convert<Gray, float>()).Convert<Gray, byte>();
-        }
-        public static ImageWrapper<Bgr, byte> CombineTwoImages(ImageWrapper<Bgr, byte> image, ImageWrapper<Bgr, byte> imagePattern, ImageWrapper<Gray, byte> mask)
+        }       
+
+        public static ImageWrapper<Bgr, byte> CombineTwoImages(ImageWrapper<Bgr, byte> image, ImageWrapper<Bgr, byte> imagePattern, ImageWrapper<Gray, byte> mask, bool dilate=true)
         {
             ProgressManager.AddSteps(4);
-            mask = Dilate(mask, new Size(2, 2), 2);
+            if(dilate)
+            {
+                mask = Dilate(mask, new Size(2, 2), 2);
+            }
 
             //imagePattern.Image = imagePattern.Image.SmoothBlur(3, 3);
 

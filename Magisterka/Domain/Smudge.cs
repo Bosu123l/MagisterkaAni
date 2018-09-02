@@ -1,31 +1,21 @@
 ﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System;
+using System.Drawing;
 
 namespace Domain
 {
-    public class Smudge: IDisposable
+    public class Smudge : IDisposable
     {
-        enum BgrColor { Blue=0, Green=1, Red=2 };
-        public ImageWrapper<Gray, byte> MaskOfSmudges
-        {
-            get
-            {
-                if(_maskOfSmudges==null)
-                {
-                    SearchSmudges();
-                }
-                return _maskOfSmudges;
-            }
-        }
-
+        enum BgrColor { Blue = 0, Green = 1, Red = 2 };       
         public double BlueTone
         {
             get
             {
                 if (_blueTone == 0.0)
                 {
-                    SearchSmudges();
+                    SetColorProportions();
                 }
                 return _blueTone;
             }
@@ -36,7 +26,7 @@ namespace Domain
             {
                 if (_greenTone == 0.0)
                 {
-                    SearchSmudges();
+                    SetColorProportions();
                 }
                 return _greenTone;
             }
@@ -47,23 +37,17 @@ namespace Domain
             {
                 if (_redTone == 0.0)
                 {
-                    SearchSmudges();
+                    SetColorProportions();
                 }
                 return _redTone;
             }
         }
 
         private ImageWrapper<Bgr, byte> _image;
-        private ImageWrapper<Gray, byte> _maskOfSmudges;
-
-        private ImageWrapper<Gray, byte> _blueMaskOfSmudges;
-        private ImageWrapper<Gray, byte> _greenMaskOfSmudges;
-        private ImageWrapper<Gray, byte> _redMaskOfSmudges;
 
         private double _blueTone;
         private double _greenTone;
         private double _redTone;
-        private double _margin = 0.50;
 
         public Smudge(ImageWrapper<Bgr, byte> image)
         {
@@ -84,162 +68,118 @@ namespace Domain
             sum = blue + green + red;
             _blueTone = blue / sum;
             _greenTone = green / sum;
-            _redTone=red / sum;
+            _redTone = red / sum;
         }
 
-        public void OtherColorDetector()        
+        private void RepairColor(ref ImageWrapper<Bgr, byte> cleanedImage, ImageWrapper<Gray, byte> grayImage, ImageWrapper<Gray, byte> generalImageMask, BgrColor bgrColor, double colorTone, CmpType cmpType)
         {
-            _blueMaskOfSmudges = _image.Convert<Gray, byte>().CopyBlank();
-            _greenMaskOfSmudges = _image.Convert<Gray, byte>().CopyBlank();
-            _redMaskOfSmudges = _image.Convert<Gray, byte>().CopyBlank();
-
-            double blueMin = Math.Round(BlueTone - _margin * BlueTone, 2);
-            double blueMax = Math.Round(BlueTone + _margin * BlueTone, 2);
-
-            double greenMin = Math.Round(GreenTone - _margin * GreenTone, 2);
-            double greenMax = Math.Round(GreenTone + _margin * GreenTone, 2);
-
-            double redMin = Math.Round(RedTone - _margin * RedTone, 2);
-            double redMax = Math.Round(RedTone + _margin * RedTone, 2);
-
-            double blueCont = 0.0;
-            double greenCont = 0.0;
-            double redCont = 0.0;
-            double sum;
-
-            ProgressManager.AddSteps(_image.Image.Height / 100);
-
-            for (int x = 0; x < _image.Image.Height; x++)
+            using(ImageWrapper<Gray,byte>defectsMask = CreateMaskOfOverInappropriateColorProportions(grayImage,cleanedImage/*_image*/, colorTone, bgrColor, cmpType))
             {
-                for (int y = 0; y < _image.Image.Width; y++)
-                {
-                    int blue = _image.Image.Data[x, y, (int)BgrColor.Blue];
-                    int green = _image.Image.Data[x, y, (int)BgrColor.Green];
-                    int red = _image.Image.Data[x, y, (int)BgrColor.Red];
+                using (ImageWrapper<Gray, byte> repairMask = generalImageMask.Mul(defectsMask))
+                {                    
+                    ImageWrapper<Bgr, byte> cleanedPatchImage = cleanedImage.CopyBlank();
+                    cleanedPatchImage.Image[0] = cleanedImage.Image[(int)bgrColor].Mul(BlueTone * 3);
+                    cleanedPatchImage.Image[1] = cleanedImage.Image[(int)bgrColor].Mul(GreenTone * 3);
+                    cleanedPatchImage.Image[2] = cleanedImage.Image[(int)bgrColor].Mul(RedTone * 3);
 
-                    sum = blue + green + red;
-
-                    try
-                    {
-                        blueCont = blue / sum;
-                        greenCont = green / sum;
-                        redCont = red / sum;
-                    }
-                    catch (DivideByZeroException)
-                    {
-                        sum = 1;
-                        continue;
-                    }
-
-                    //if (greenCont < greenMin || greenCont > greenMax ||
-                    //    redCont < redMin || redCont > redMax ||
-                    //    blueCont < blueMin || blueCont > blueMax)
-                    //{
-                    //    _maskOfSmudges.Image.Data[x, y, 0] = 255;
-                    //}
-
-                    if (blueCont > blueMax)
-                    {
-                        _blueMaskOfSmudges.Image.Data[x, y, 0] = 255;
-                    }
-
-                    if (greenCont > greenMax)
-                    {
-                        _greenMaskOfSmudges.Image.Data[x, y, 0] = 255;
-                    }                    
-
-                    if (redCont > redMax)
-                    {
-                        _redMaskOfSmudges.Image.Data[x, y, 0] = 255;
-                    }
-
+                    cleanedImage = MorphologicalProcessing.CombineTwoImages(cleanedImage, cleanedPatchImage, repairMask);
                 }
-                if (x % 100 == 0)
-                    ProgressManager.DoStep();
+            }
+        }
+        private ImageWrapper<Gray, byte> CreateMaskOfOverInappropriateColorProportions(ImageWrapper<Gray, byte> grayImage, ImageWrapper<Bgr, byte> image, double tone, BgrColor color, CmpType cmpType, double margin=0.00)
+        {
+            double interval = 0;
+            float count = (image.Image?.CountNonzero()[(int)color]) ?? 1;
+            float nonZeroCount;
+            ImageWrapper<Gray, byte> resultMask = grayImage.CopyBlank();
+
+            switch (cmpType)
+            {
+                case CmpType.LessThan: { interval = Math.Round((1 - margin) * tone, 3); }break;                    
+                case CmpType.GreaterThan: { interval = Math.Round((1 + margin) * tone, 3); } break;
+                default: { interval = tone; }break;
+            }
+
+            using (ImageWrapper<Gray, byte> model = new ImageWrapper<Gray, byte>(grayImage.Image.Mul(interval * 3.0)))
+            {
+                using (ImageWrapper<Gray, byte> cmpImage = new ImageWrapper<Gray, byte>(_image.Image[(int)color].Cmp(model.Image[0], cmpType)))
+                {
+                    using (ImageWrapper<Gray, byte> disColorMask = MorphologicalProcessing.CreateBinaryImage(cmpImage))
+                    {                        
+                        Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(3, 3), new Point(-1, -1));
+                        CvInvoke.MorphologyEx(disColorMask.Image, resultMask.Image, MorphOp.Open, kernel, new Point(-1, -1), 1, BorderType.Replicate, new MCvScalar(1.0));
+
+                        nonZeroCount = resultMask.Image[0]?.CountNonzero()[0] ?? 0;
+                    }                                       
+                }
+            }
+            
+            if (nonZeroCount/count>0.20 && margin < 1.0)
+            {
+                margin += 0.05;
+                return CreateMaskOfOverInappropriateColorProportions(grayImage, image, tone, color, cmpType, margin);
+            }else
+            {
+                return resultMask;
             }
         }
 
-        private void SearchSmudges()
+        public ImageWrapper<Bgr, byte> CleanSmudges()
         {
             SetColorProportions();
-            OtherColorDetector();
-            //_maskOfSmudges = MorphologicalProcessing.Erode(_maskOfSmudges.Convert<Bgr, byte>(), new Size(3, 3), 1).Convert<Gray, byte>();
-            ProgressManager.DoStep();           
-        }
-
-        public ImageWrapper<Bgr, byte> ClearOtherColorsSmudges()
-        {
             ImageWrapper<Bgr, byte> cleanedImage = _image.Copy();
-            OtherColorDetector();
-            //CvInvoke.Inpaint(cleanedImage.Image, _blueMaskOfSmudges.Image, cleanedImage.Image, 20, Emgu.CV.CvEnum.InpaintType.Telea);
-            //CvInvoke.Inpaint(cleanedImage.Image, _greenMaskOfSmudges.Image, cleanedImage.Image, 20, Emgu.CV.CvEnum.InpaintType.Telea);
-            CvInvoke.Inpaint(cleanedImage.Image, _redMaskOfSmudges.Image, cleanedImage.Image, 20, Emgu.CV.CvEnum.InpaintType.Telea);
-            //cleanedImage = ClearColor(cleanedImage, _blueMaskOfSmudges, BgrColor.Blue);
-            //cleanedImage = ClearColor(cleanedImage, _greenMaskOfSmudges, BgrColor.Green);
-            //cleanedImage = ClearColor(cleanedImage, _redMaskOfSmudges, BgrColor.Red);
+
+            using (ImageWrapper<Gray, byte> grayImage = _image.Convert<Gray, byte>().Copy())
+            {
+                #region BritherRegions
+                using (ImageWrapper<Gray, byte> bwGeneralMask = MorphologicalProcessing.GeneralImageBinary(_image))
+                {                   
+                    #region Blue
+                    RepairColor(ref cleanedImage, grayImage, bwGeneralMask, BgrColor.Blue, BlueTone, CmpType.GreaterThan);
+                    #endregion Blue
+                    #region Green
+                    RepairColor(ref cleanedImage, grayImage, bwGeneralMask, BgrColor.Green, GreenTone, CmpType.GreaterThan);
+                    #endregion Green
+                    #region Red
+                    RepairColor(ref cleanedImage, grayImage, bwGeneralMask, BgrColor.Red, RedTone, CmpType.GreaterThan);
+                    #endregion Red
+
+                    using (ImageWrapper<Gray, byte> bwGeneralMaskNegativ = MorphologicalProcessing.GenerateBinaryImageNegative(bwGeneralMask))
+                    {
+                        #region Blue
+                        RepairColor(ref cleanedImage, grayImage, bwGeneralMaskNegativ, BgrColor.Blue, BlueTone, CmpType.LessThan);
+                        #endregion Blue
+                        #region Green
+                        RepairColor(ref cleanedImage, grayImage, bwGeneralMaskNegativ, BgrColor.Green, GreenTone, CmpType.LessThan);
+                        #endregion Green
+                        #region Red
+                        RepairColor(ref cleanedImage, grayImage, bwGeneralMaskNegativ, BgrColor.Red, RedTone, CmpType.LessThan);
+                        #endregion Red
+                    }
+                }
+                #endregion BritherRegions
+            }
+
+            //cleanedImage = AligneColor(cleanedImage);
+            //CvInvoke.MedianBlur(cleanedImage.Image, cleanedImage.Image, 3);
+
             return cleanedImage;
         }
-
-        private ImageWrapper<Bgr,byte>ClearColor(ImageWrapper<Bgr,byte>image, ImageWrapper<Gray,byte>maskOfSmudges, BgrColor color)
+        
+        private ImageWrapper<Bgr, byte> AligneColor(ImageWrapper<Bgr, byte> image)
         {
-            Image<Gray, byte>[] splitedImages = _image.Image.Split();
-
-            using (ImageWrapper<Bgr, byte> patch = _image.CopyBlank())
+            using (ImageWrapper<Gray, byte> grayImage = image.Convert<Gray,byte>().Copy())
             {
-                patch.Image[(int)BgrColor.Blue] = splitedImages[(int)color].Mul(BlueTone * 3);
-                patch.Image[(int)BgrColor.Green] = splitedImages[(int)color].Mul(GreenTone * 3);
-                patch.Image[(int)BgrColor.Red] = splitedImages[(int)color].Mul(RedTone * 3);
-
-                image = MorphologicalProcessing.CombineTwoImages(image, patch, maskOfSmudges);
-            }              
-            return image;           
-        }
-
-        public ImageWrapper<Bgr, byte>AveragePictureColors()
-        {            
-            ImageWrapper<Bgr, byte> outputImage;
-            ProgressManager.AddSteps(5);
-
-            using (ImageWrapper<Bgr, byte> patternImage = _image.Convert<Gray, byte>().Copy().Convert<Bgr,byte>())
-            {
-                ProgressManager.DoStep();
-                patternImage.Image[(int)BgrColor.Blue] = patternImage.Image[(int)BgrColor.Blue].Mul(BlueTone*3);
-                patternImage.Image[(int)BgrColor.Green] = patternImage.Image[(int)BgrColor.Green].Mul(GreenTone*3);
-                patternImage.Image[(int)BgrColor.Red] = patternImage.Image[(int)BgrColor.Red].Mul(RedTone*3);
-                ProgressManager.DoStep();
-                outputImage = MorphologicalProcessing.CombineTwoImages(_image, patternImage, MaskOfSmudges);
-                ProgressManager.DoStep();
-                return outputImage;
-            }               
-        }
-
-        public ImageWrapper<Bgr,byte>Test()
-        {            
-            OtherColorDetector();
-            //return MorphologicalProcessing.MultipleMaskAndImage(_image, _blueMaskOfSmudges);
-
-            Image<Gray, byte>[] splitedImages = _image.Image.Split();
-
-
-            ImageWrapper<Bgr, byte> patch = _image.CopyBlank();
-            patch.Image[(int)BgrColor.Blue] = splitedImages[2].Mul(BlueTone * 3);
-            patch.Image[(int)BgrColor.Green] = splitedImages[2].Mul(GreenTone * 3);
-            patch.Image[(int)BgrColor.Red] = splitedImages[2].Mul(RedTone * 3);
-            return new ImageWrapper<Bgr, byte>(_image.Image.AbsDiff(patch.Image));
-
-            OtherColorDetector();
-            splitedImages = _image.Image.Split();
-            _image.Image[(int)BgrColor.Blue] = splitedImages[2].Mul(BlueTone * 3);
-            _image.Image[(int)BgrColor.Green] = splitedImages[2].Mul(GreenTone * 3);
-            _image.Image[(int)BgrColor.Red] = splitedImages[2].Mul(RedTone * 3);
-
-            return _image;
+                image.Image[(int)BgrColor.Blue] = grayImage.Image.Mul(BlueTone * 3);
+                image.Image[(int)BgrColor.Green] = grayImage.Image.Mul(GreenTone * 3);
+                image.Image[(int)BgrColor.Red] = grayImage.Image.Mul(RedTone * 3);
+            }
+            return image;
         }
 
         public void Dispose()
         {
             _image.Dispose();
-            _maskOfSmudges.Dispose();
         }
     }
 }
