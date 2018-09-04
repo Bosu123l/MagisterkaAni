@@ -166,14 +166,14 @@ namespace Domain
                     }
                     ProgressManager.DoStep();
                    
-                    //ReturnTmpImg = _inputImage.Copy();
+                    ReturnTmpImg = _inputImage.Copy();
                     
-                   // CvInvoke.DrawContours(ReturnTmpImg.Image, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));                    
+                    CvInvoke.DrawContours(ReturnTmpImg.Image, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));                    
                 }                     
-            }                
-            
+            }
+
             //ReturnTmpImg = MorphologicalProcessing.CreateMaskFromPoints(imageOutput, SmallDefectsContoursMatrix).Convert<Bgr,byte>();
-            //CvInvoke.DrawContours(_inputImage, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
+            //ReturnTmpImg.Image = CvInvoke.DrawContours(_inputImage, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
             //_inputImage = MorphologicalProcessing.Erode(_inputImage, new Size(3, 3), 3);           
         }
 

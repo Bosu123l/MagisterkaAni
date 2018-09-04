@@ -68,12 +68,13 @@ namespace Domain
             {
                 ProgressManager.AddSteps(defectsFinder.SmallDefectsContoursMatrix.Length);
                 using (Dust dust = new Dust(ImageBefor, defectsFinder.MaskOfDefects, defectsFinder.SmallDefectsContoursMatrix))
-                {                    
-                    for (int i=0; i< defectsFinder.SmallDefectsContoursMatrix.Length; i++)
-                    {
-                        ImageAfter = dust.RemoveDefect(defectsFinder.SmallDefectsContoursMatrix[i]);
-                        ProgressManager.DoStep();
-                    }                   
+                {
+                    ImageAfter = defectsFinder.ReturnTmpImg;
+                    //for (int i=0; i< defectsFinder.SmallDefectsContoursMatrix.Length; i++)
+                    //{
+                    //    ImageAfter = dust.RemoveDefect(defectsFinder.SmallDefectsContoursMatrix[i]);
+                    //    ProgressManager.DoStep();
+                    //}                   
                 }
             }
         }
@@ -101,7 +102,12 @@ namespace Domain
 
         public async static void Test()
         {
-            CvInvoke.PyrMeanShiftFiltering(ImageBefor.Image, ImageAfter.Image, 40, 60, 3, new  MCvTermCriteria());
+            //CvInvoke.PyrMeanShiftFiltering(ImageBefor.Image, ImageAfter.Image, 40, 60, 3, new  MCvTermCriteria());
+            ImageAfter.Image = ImageBefor.Image.Rotate(17, new Bgr(Color.Black), false);
+            //ImageAfter.Image.Data[1, 1, 0] = 0;
+            //ImageAfter.Image.Data[1, 1, 1] = 0;
+            //ImageAfter.Image.Data[1, 1, 2] = 255;
+
         }
     }
 }
