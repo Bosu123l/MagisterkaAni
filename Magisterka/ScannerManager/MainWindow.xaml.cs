@@ -219,6 +219,8 @@ namespace ScannerManager
                 _twain32?.CloseDSM();
                 _twain32?.CloseDataSource();
                 _twain32.Dispose();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
                 this.Close();
             }
         }

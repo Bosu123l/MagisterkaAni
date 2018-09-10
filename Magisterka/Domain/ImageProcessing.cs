@@ -8,18 +8,18 @@ namespace Domain
 {
     public static class ImageProcessing
     {
-        private static ImageWrapper<Bgr, byte> _imageBefor;
-        private static ImageWrapper<Bgr, byte> _imageAfter;
+        private static Image<Bgr, byte> _imageBefor;
+        private static Image<Bgr, byte> _imageAfter;
 
 
-        public static event EventHandler<ImageWrapper<Bgr, byte>> ImageAfterChange;
+        public static event EventHandler<Image<Bgr, byte>> ImageAfterChange;
 
-        public static void OnImageAfterChange(ImageWrapper<Bgr, byte> image)
+        public static void OnImageAfterChange(Image<Bgr, byte> image)
         {
             ImageAfterChange?.Invoke(null, image);
         }
 
-        public static ImageWrapper<Bgr, byte> ImageBefor
+        public static Image<Bgr, byte> ImageBefor
         {
             get
             {
@@ -33,7 +33,7 @@ namespace Domain
                 }
             }
         }
-        public static ImageWrapper<Bgr, byte> ImageAfter
+        public static Image<Bgr, byte> ImageAfter
         {
             get
             {
@@ -49,7 +49,7 @@ namespace Domain
             }
         }
 
-        public static void SetImage(ImageWrapper<Bgr, byte> image)
+        public static void SetImage(Image<Bgr, byte> image)
         {
             if (image != null)
             {
@@ -100,7 +100,7 @@ namespace Domain
         public async static void Test()
         {
             //CvInvoke.PyrMeanShiftFiltering(ImageBefor.Image, ImageAfter.Image, 40, 60, 3, new  MCvTermCriteria());
-            ImageAfter.Image = ImageBefor.Image.Rotate(17, new Bgr(Color.Black), false);
+            ImageAfter = ImageBefor.Rotate(17, new Bgr(Color.Black), false);
             //ImageAfter.Image.Data[1, 1, 0] = 0;
             //ImageAfter.Image.Data[1, 1, 1] = 0;
             //ImageAfter.Image.Data[1, 1, 2] = 255;

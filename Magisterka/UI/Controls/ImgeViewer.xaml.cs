@@ -10,7 +10,7 @@ namespace UI
 {    
     public partial class ImgeViewer : UserControl
     {
-        public ImageWrapper<Bgr, byte> ViewedImage
+        public Image<Bgr, byte> ViewedImage
         {
             set
             {
@@ -18,7 +18,7 @@ namespace UI
             }
         }   
 
-        private ImageWrapper<Bgr, byte> _image;
+        private Image<Bgr, byte> _image;
 
         public ImgeViewer()
         {
@@ -40,7 +40,7 @@ namespace UI
             }
         }
 
-        public void LoadImage(ImageWrapper<Bgr, byte> image)
+        public void LoadImage(Image<Bgr, byte> image)
         {
             PhotoView.Image = image.Bitmap;           
 
@@ -52,16 +52,16 @@ namespace UI
             AddHistogram(image, Color.Red, RedHistogram);
             AddSummaryHistogram();
         }
-        private void AddHistogram(ImageWrapper<Bgr, byte> image, Color color, HistogramBox histogramBox)
+        private void AddHistogram(Image<Bgr, byte> image, Color color, HistogramBox histogramBox)
         {
             using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0f, 255f)))
             {
                 Mat mat = new Mat();
 
-                if (color == Color.Black) { histogram.Calculate(new Image<Gray, byte>[] { image.Image.Convert<Gray, byte>() }, false, null); }
-                else if (color == Color.Blue) { histogram.Calculate(new Image<Gray, byte>[] { image.Image[0] }, false, null); }
-                else if (color == Color.Red) { histogram.Calculate(new Image<Gray, byte>[] { image.Image[1] }, false, null); }
-                else if (color == Color.Green) { histogram.Calculate(new Image<Gray, byte>[] { image.Image[2] }, false, null); }
+                if (color == Color.Black) { histogram.Calculate(new Image<Gray, byte>[] { image.Convert<Gray, byte>() }, false, null); }
+                else if (color == Color.Blue) { histogram.Calculate(new Image<Gray, byte>[] { image[0] }, false, null); }
+                else if (color == Color.Red) { histogram.Calculate(new Image<Gray, byte>[] { image[1] }, false, null); }
+                else if (color == Color.Green) { histogram.Calculate(new Image<Gray, byte>[] { image[2] }, false, null); }
                 else { return; }
 
                 histogram.CopyTo(mat);
@@ -79,9 +79,9 @@ namespace UI
                 Mat mat = new Mat();
                                
                 SummaryHistogram.ClearHistogram();
-                SummaryHistogram.GenerateHistograms(_image.Image, 256);
+                SummaryHistogram.GenerateHistograms(_image, 256);
 
-                histogram.Calculate(new Image<Gray, byte>[] {_image.Image.Convert<Gray,byte>()}, false, null);
+                histogram.Calculate(new Image<Gray, byte>[] {_image.Convert<Gray,byte>()}, false, null);
                 histogram.CopyTo(mat);
 
                 SummaryHistogram.AddHistogram("", Color.Black, mat, 256, new float[] { 0f, 255f });

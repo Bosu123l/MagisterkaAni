@@ -10,11 +10,11 @@ namespace Domain
     public class Dust: IDisposable
     {
         private Point[][] _conturMatrix;
-        private ImageWrapper<Bgr, byte> _orgImage;
-        private ImageWrapper<Bgr, byte> _cleanedImage;
-        private ImageWrapper<Gray, byte> _dustMask;   
+        private Image<Bgr, byte> _orgImage;
+        private Image<Bgr, byte> _cleanedImage;
+        private Image<Gray, byte> _dustMask;   
 
-        public Dust(ImageWrapper<Bgr, byte> orgImage, ImageWrapper<Gray, byte> dustMask, Point[][] conturMatrix)
+        public Dust(Image<Bgr, byte> orgImage, Image<Gray, byte> dustMask, Point[][] conturMatrix)
         {
             if (orgImage != null) 
             {
@@ -43,21 +43,21 @@ namespace Domain
             }
         }
 
-        public ImageWrapper<Bgr, byte> RemoveDefect(Point[] defectCountour)
+        public Image<Bgr, byte> RemoveDefect(Point[] defectCountour)
         {
-            using (ImageWrapper<Gray, byte> mask = MorphologicalProcessing.CreateMaskFromPoints(_cleanedImage.Convert<Gray, byte>(), new Point[][] { defectCountour }))
+            using (Image<Gray, byte> mask = MorphologicalProcessing.CreateMaskFromPoints(_cleanedImage.Convert<Gray, byte>(), new Point[][] { defectCountour }))
             {
                 //var countur = new Emgu.CV.Util.VectorOfVectorOfPoint(new Point[][] { defectCountour });
-                CvInvoke.Inpaint(_cleanedImage.Image, mask.Image, _cleanedImage.Image, 20, Emgu.CV.CvEnum.InpaintType.Telea);
+                CvInvoke.Inpaint(_cleanedImage, mask, _cleanedImage, 20, Emgu.CV.CvEnum.InpaintType.Telea);
                 //CvInvoke.DrawContours(_cleanedImage.Image, countur, -1, new MCvScalar(255, 0, 255));
             }              
 
             return _cleanedImage;
         }
 
-        public ImageWrapper<Bgr, byte> RemoveDust()
+        public Image<Bgr, byte> RemoveDust()
         {
-            ImageWrapper<Bgr, byte> cleanedImage = _orgImage.CopyBlank(); ;
+            Image<Bgr, byte> cleanedImage = _orgImage.CopyBlank(); ;
 
             //_dustMask;
 
@@ -72,20 +72,20 @@ namespace Domain
             //https://docs.opencv.org/3.4.1/df/d3d/tutorial_py_inpainting.html
             //https://docs.opencv.org/3.1.0/df/d3d/tutorial_py_inpainting.html
             //https://docs.opencv.org/3.4.1/df/d3d/tutorial_py_inpainting.html
-            CvInvoke.Inpaint(_orgImage.Image, _dustMask.Image, cleanedImage.Image, 50, Emgu.CV.CvEnum.InpaintType.Telea);
+            CvInvoke.Inpaint(_orgImage, _dustMask, cleanedImage, 50, Emgu.CV.CvEnum.InpaintType.Telea);
 
             //ProgressManager.AddSteps(5);
-            //using(ImageWrapper<Gray, byte> binaryOrgImage = MorphologicalProcessing.CreateBinaryImage(_orgImage, 100))
+            //using(Image<Gray, byte> binaryOrgImage = MorphologicalProcessing.CreateBinaryImage(_orgImage, 100))
             //{
             //    ProgressManager.DoStep();
             //    #region WhiteOnBlack
-            //    using (ImageWrapper<Bgr, byte> brigtherPatchImage = _orgImage.CopyBlank())
+            //    using (Image<Bgr, byte> brigtherPatchImage = _orgImage.CopyBlank())
             //    {
             //        ProgressManager.DoStep();
-            //        using(ImageWrapper<Gray, byte> brigtherSpotsMask = MorphologicalProcessing.MultipleImages(binaryOrgImage, _dustMask))
+            //        using(Image<Gray, byte> brigtherSpotsMask = MorphologicalProcessing.MultipleImages(binaryOrgImage, _dustMask))
             //        {
             //            ProgressManager.DoStep();
-            //            using (ImageWrapper<Bgr, byte> brightSpotsPatchImage = MorphologicalProcessing.Erode(_orgImage, new Size(3, 3), 10))
+            //            using (Image<Bgr, byte> brightSpotsPatchImage = MorphologicalProcessing.Erode(_orgImage, new Size(3, 3), 10))
             //            {
             //                ProgressManager.DoStep();
             //                patchImage = MorphologicalProcessing.CombineTwoImages(brigtherPatchImage, brightSpotsPatchImage, brigtherSpotsMask);
@@ -98,7 +98,7 @@ namespace Domain
             //}
 
 
-            //ImageWrapper<Bgr, byte> _cleanedImage = _orgImage.CopyBlank();
+            //Image<Bgr, byte> _cleanedImage = _orgImage.CopyBlank();
             //_cleanedImage = MorphologicalProcessing.CombineTwoImages(_orgImage, patchImage, _dustMask);
             //patchImage.Dispose();
             //_cleanedImage = _cleanedImage.SmoothBlur(10, 10);
@@ -114,6 +114,9 @@ namespace Domain
             _conturMatrix = null;
             _orgImage.Dispose();
             _dustMask.Dispose();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
     }
 }

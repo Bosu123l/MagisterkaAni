@@ -43,13 +43,13 @@ namespace Domain
             }
         }
 
-        private ImageWrapper<Bgr, byte> _image;
+        private Image<Bgr, byte> _image;
 
         private double _blueTone;
         private double _greenTone;
         private double _redTone;
 
-        public Smudge(ImageWrapper<Bgr, byte> image)
+        public Smudge(Image<Bgr, byte> image)
         {
             _image = image.Copy();
         }
@@ -59,7 +59,7 @@ namespace Domain
             Bgr bgr = new Bgr();
             MCvScalar mCvScalar = new MCvScalar();
             double blue = 0, green = 0, red = 0, sum = 1;
-            _image.Image.AvgSdv(out bgr, out mCvScalar);
+            _image.AvgSdv(out bgr, out mCvScalar);
 
             blue = bgr.Blue;
             green = bgr.Green;
@@ -71,27 +71,27 @@ namespace Domain
             _redTone = red / sum;
         }
 
-        private void RepairColor(ref ImageWrapper<Bgr, byte> cleanedImage, ImageWrapper<Gray, byte> grayImage, ImageWrapper<Gray, byte> generalImageMask, BgrColor bgrColor, double colorTone, CmpType cmpType)
+        private void RepairColor(ref Image<Bgr, byte> cleanedImage, Image<Gray, byte> grayImage, Image<Gray, byte> generalImageMask, BgrColor bgrColor, double colorTone, CmpType cmpType)
         {
-            using(ImageWrapper<Gray,byte>defectsMask = CreateMaskOfOverInappropriateColorProportions(grayImage,cleanedImage/*_image*/, colorTone, bgrColor, cmpType))
+            using(Image<Gray,byte>defectsMask = CreateMaskOfOverInappropriateColorProportions(grayImage,cleanedImage/*_image*/, colorTone, bgrColor, cmpType))
             {
-                using (ImageWrapper<Gray, byte> repairMask = generalImageMask.Mul(defectsMask))
+                using (Image<Gray, byte> repairMask = generalImageMask.Mul(defectsMask))
                 {                    
-                    ImageWrapper<Bgr, byte> cleanedPatchImage = cleanedImage.CopyBlank();
-                    cleanedPatchImage.Image[0] = cleanedImage.Image[(int)bgrColor].Mul(BlueTone * 3);
-                    cleanedPatchImage.Image[1] = cleanedImage.Image[(int)bgrColor].Mul(GreenTone * 3);
-                    cleanedPatchImage.Image[2] = cleanedImage.Image[(int)bgrColor].Mul(RedTone * 3);
+                    Image<Bgr, byte> cleanedPatchImage = cleanedImage.CopyBlank();
+                    cleanedPatchImage[0] = cleanedImage[(int)bgrColor].Mul(BlueTone * 3);
+                    cleanedPatchImage[1] = cleanedImage[(int)bgrColor].Mul(GreenTone * 3);
+                    cleanedPatchImage[2] = cleanedImage[(int)bgrColor].Mul(RedTone * 3);
 
                     cleanedImage = MorphologicalProcessing.CombineTwoImages(cleanedImage, cleanedPatchImage, repairMask);
                 }
             }
         }
-        private ImageWrapper<Gray, byte> CreateMaskOfOverInappropriateColorProportions(ImageWrapper<Gray, byte> grayImage, ImageWrapper<Bgr, byte> image, double tone, BgrColor color, CmpType cmpType, double margin=0.00)
+        private Image<Gray, byte> CreateMaskOfOverInappropriateColorProportions(Image<Gray, byte> grayImage, Image<Bgr, byte> image, double tone, BgrColor color, CmpType cmpType, double margin=0.00)
         {
             double interval = 0;
-            float count = (image.Image?.CountNonzero()[(int)color]) ?? 1;
+            float count = (image?.CountNonzero()[(int)color]) ?? 1;
             float nonZeroCount;
-            ImageWrapper<Gray, byte> resultMask = grayImage.CopyBlank();
+            Image<Gray, byte> resultMask = grayImage.CopyBlank();
 
             switch (cmpType)
             {
@@ -100,16 +100,16 @@ namespace Domain
                 default: { interval = tone; }break;
             }
 
-            using (ImageWrapper<Gray, byte> model = new ImageWrapper<Gray, byte>(grayImage.Image.Mul(interval * 3.0)))
+            using (Image<Gray, byte> model = grayImage.Mul(interval * 3.0))
             {
-                using (ImageWrapper<Gray, byte> cmpImage = new ImageWrapper<Gray, byte>(_image.Image[(int)color].Cmp(model.Image[0], cmpType)))
+                using (Image<Gray, byte> cmpImage = _image[(int)color].Cmp(model[0], cmpType))
                 {
-                    using (ImageWrapper<Gray, byte> disColorMask = MorphologicalProcessing.CreateBinaryImage(cmpImage))
+                    using (Image<Gray, byte> disColorMask = MorphologicalProcessing.CreateBinaryImage(cmpImage))
                     {                        
                         Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(3, 3), new Point(-1, -1));
-                        CvInvoke.MorphologyEx(disColorMask.Image, resultMask.Image, MorphOp.Open, kernel, new Point(-1, -1), 1, BorderType.Replicate, new MCvScalar(1.0));
+                        CvInvoke.MorphologyEx(disColorMask, resultMask, MorphOp.Open, kernel, new Point(-1, -1), 1, BorderType.Replicate, new MCvScalar(1.0));
 
-                        nonZeroCount = resultMask.Image[0]?.CountNonzero()[0] ?? 0;
+                        nonZeroCount = resultMask[0]?.CountNonzero()[0] ?? 0;
                     }                                       
                 }
             }
@@ -124,15 +124,15 @@ namespace Domain
             }
         }
 
-        public ImageWrapper<Bgr, byte> CleanSmudges()
+        public Image<Bgr, byte> CleanSmudges()
         {
             SetColorProportions();
-            ImageWrapper<Bgr, byte> cleanedImage = _image.Copy();
+            Image<Bgr, byte> cleanedImage = _image.Copy();
 
-            using (ImageWrapper<Gray, byte> grayImage = _image.Convert<Gray, byte>().Copy())
+            using (Image<Gray, byte> grayImage = _image.Convert<Gray, byte>().Copy())
             {
                 #region BritherRegions
-                using (ImageWrapper<Gray, byte> bwGeneralMask = MorphologicalProcessing.GeneralImageBinary(_image))
+                using (Image<Gray, byte> bwGeneralMask = MorphologicalProcessing.GeneralImageBinary(_image))
                 {                   
                     #region Blue
                     RepairColor(ref cleanedImage, grayImage, bwGeneralMask, BgrColor.Blue, BlueTone, CmpType.GreaterThan);
@@ -144,7 +144,7 @@ namespace Domain
                     RepairColor(ref cleanedImage, grayImage, bwGeneralMask, BgrColor.Red, RedTone, CmpType.GreaterThan);
                     #endregion Red
 
-                    using (ImageWrapper<Gray, byte> bwGeneralMaskNegativ = MorphologicalProcessing.GenerateBinaryImageNegative(bwGeneralMask))
+                    using (Image<Gray, byte> bwGeneralMaskNegativ = MorphologicalProcessing.GenerateBinaryImageNegative(bwGeneralMask))
                     {
                         #region Blue
                         RepairColor(ref cleanedImage, grayImage, bwGeneralMaskNegativ, BgrColor.Blue, BlueTone, CmpType.LessThan);
@@ -166,13 +166,13 @@ namespace Domain
             return cleanedImage;
         }
         
-        private ImageWrapper<Bgr, byte> AligneColor(ImageWrapper<Bgr, byte> image)
+        private Image<Bgr, byte> AligneColor(Image<Bgr, byte> image)
         {
-            using (ImageWrapper<Gray, byte> grayImage = image.Convert<Gray,byte>().Copy())
+            using (Image<Gray, byte> grayImage = image.Convert<Gray,byte>().Copy())
             {
-                image.Image[(int)BgrColor.Blue] = grayImage.Image.Mul(BlueTone * 3);
-                image.Image[(int)BgrColor.Green] = grayImage.Image.Mul(GreenTone * 3);
-                image.Image[(int)BgrColor.Red] = grayImage.Image.Mul(RedTone * 3);
+                image[(int)BgrColor.Blue] = grayImage.Mul(BlueTone * 3);
+                image[(int)BgrColor.Green] = grayImage.Mul(GreenTone * 3);
+                image[(int)BgrColor.Red] = grayImage.Mul(RedTone * 3);
             }
             return image;
         }
@@ -180,6 +180,8 @@ namespace Domain
         public void Dispose()
         {
             _image.Dispose();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
     }
 }

@@ -15,15 +15,15 @@ namespace Domain
     {
         private const float _minFactor = 0.0000002f;
         private const float _maxFactor = 0.0002f;
-        private ImageWrapper<Bgr, byte> _inputImage;
+        private Image<Bgr, byte> _inputImage;
         private int _maxThreasholdOfDustContourSize = 100;
         private VectorOfVectorOfPoint _defectsContoursMatrix;
         private Point[][] _smallDefectsContoursMatrix;
         private Point[][] _largeDefectsContoursMatrix;
-        private ImageWrapper<Gray, byte> _patchMask;
-        private ImageWrapper<Gray, byte> _maskOfDefects;
+        private Image<Gray, byte> _patchMask;
+        private Image<Gray, byte> _maskOfDefects;
 
-        public ImageWrapper<Bgr, byte> ReturnTmpImg;
+        public Image<Bgr, byte> ReturnTmpImg;
 
         public VectorOfVectorOfPoint DefectsContoursMatrix
         {
@@ -106,7 +106,7 @@ namespace Domain
             }
         }
 
-        public ImageWrapper<Gray, byte> PatchMask
+        public Image<Gray, byte> PatchMask
         {
             get
             {
@@ -117,7 +117,7 @@ namespace Domain
                 return _patchMask;
             }
         }
-        public ImageWrapper<Gray, byte> MaskOfDefects
+        public Image<Gray, byte> MaskOfDefects
         {
             get
             {
@@ -129,7 +129,7 @@ namespace Domain
             }
         }        
 
-        public DefectsFinder(ImageWrapper<Bgr, byte> image)
+        public DefectsFinder(Image<Bgr, byte> image)
         {
             _inputImage = image.Copy();
         }
@@ -143,10 +143,10 @@ namespace Domain
 
             ProgressManager.AddSteps(6);
 
-            using (ImageWrapper<Gray, float> grayImage = _inputImage.Convert<Gray, float>())
+            using (Image<Gray, float> grayImage = _inputImage.Convert<Gray, float>())
             {
                 ProgressManager.DoStep();
-                using (ImageWrapper<Gray, float> laplaceImge = grayImage.Laplace(9))
+                using (Image<Gray, float> laplaceImge = grayImage.Laplace(9))
                 {
                     ProgressManager.DoStep();                   
 
@@ -162,13 +162,13 @@ namespace Domain
                     _defectsContoursMatrix = new VectorOfVectorOfPoint();
                     using (Mat hier = new Mat())
                     {
-                        CvInvoke.FindContours(_patchMask.Image, _defectsContoursMatrix, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+                        CvInvoke.FindContours(_patchMask, _defectsContoursMatrix, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
                     }
                     ProgressManager.DoStep();
                    
                     ReturnTmpImg = _inputImage.Copy();
                     
-                    CvInvoke.DrawContours(ReturnTmpImg.Image, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));                    
+                    CvInvoke.DrawContours(ReturnTmpImg, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));                    
                 }                     
             }
 
@@ -177,13 +177,13 @@ namespace Domain
             //_inputImage = MorphologicalProcessing.Erode(_inputImage, new Size(3, 3), 3);           
         }
 
-        private void GetThresholds(out int a1, out int a2, out int b1, out int b2, ImageWrapper<Gray, float> sourceImage)
+        private void GetThresholds(out int a1, out int a2, out int b1, out int b2, Image<Gray, float> sourceImage)
         {
             ProgressManager.AddSteps(5);
             using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0.0f, 255.0f)))
             {
                 ProgressManager.DoStep();
-                histogram.Calculate(new Image<Gray, byte>[] { sourceImage.Convert<Gray, byte>().Image }, false, null);
+                histogram.Calculate(new Image<Gray, byte>[] { sourceImage.Convert<Gray, byte>() }, false, null);
 
                 ProgressManager.DoStep();
                 List<float> hist = new List<float>(histogram.GetBinValues());
@@ -201,16 +201,16 @@ namespace Domain
                 ProgressManager.DoStep();
             }                
         }
-        private ImageWrapper<Gray, byte> GetMaskOfDefects(int a1, int a2, int b1, int b2, ImageWrapper<Gray, float> sourceImage)
+        private Image<Gray, byte> GetMaskOfDefects(int a1, int a2, int b1, int b2, Image<Gray, float> sourceImage)
         {
             ProgressManager.AddSteps(3);
-            using (ImageWrapper<Gray, byte> cannyImg1 = sourceImage.Convert<Gray, byte>().Canny(a1, a2))
+            using (Image<Gray, byte> cannyImg1 = sourceImage.Convert<Gray, byte>().Canny(a1, a2))
             {
                 ProgressManager.DoStep();
-                using (ImageWrapper<Gray, byte> cannyImg2 = sourceImage.Convert<Gray, byte>().Canny(b1, b2))
+                using (Image<Gray, byte> cannyImg2 = sourceImage.Convert<Gray, byte>().Canny(b1, b2))
                 {
                     ProgressManager.DoStep();
-                    using (ImageWrapper<Gray, byte> cannyImg = cannyImg1.Add(cannyImg2))
+                    using (Image<Gray, byte> cannyImg = cannyImg1.Add(cannyImg2))
                     {
                         ProgressManager.DoStep();
                         return MorphologicalProcessing.Dilate(cannyImg, new Size(3, 3), 3); 
@@ -232,6 +232,9 @@ namespace Domain
             if (_maskOfDefects != null) _maskOfDefects.Dispose();
             _largeDefectsContoursMatrix = null;
             _smallDefectsContoursMatrix = null;
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
     }
 }

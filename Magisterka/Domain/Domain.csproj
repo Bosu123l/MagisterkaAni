@@ -112,7 +112,6 @@
     <Compile Include="ExitCodes.cs" />
     <Compile Include="FileOperations.cs" />
     <Compile Include="ImageProcessing.cs" />
-    <Compile Include="ImageWrapper.cs" />
     <Compile Include="MorphologicalProcessing.cs" />
     <Compile Include="ProgressManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

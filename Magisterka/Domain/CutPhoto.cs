@@ -8,7 +8,7 @@ using Point = System.Drawing.Point;
 
 namespace Domain
 {
-    public class CutPhoto
+    public class CutPhoto: IDisposable
     {
         private Image<Bgr, byte> _orginalImage;
         private Image<Bgr, byte> _cutedImage;
@@ -287,6 +287,15 @@ namespace Domain
             //image = Cut(image);
 
             return _cutedImage;
+        }
+
+        public void Dispose()
+        {
+            _cutedImage.Dispose();
+            _orginalImage.Dispose();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
     }
 }

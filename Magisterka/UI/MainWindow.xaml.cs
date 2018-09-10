@@ -4,12 +4,13 @@ using System.Windows;
 using Emgu.CV.Structure;
 using Domain;
 using System.Threading.Tasks;
+using Emgu.CV;
 
 namespace UI
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private ImageWrapper<Bgr, byte> _imgeView
+        private Image<Bgr, byte> _imgeView
         {
             set
             {
@@ -51,7 +52,7 @@ namespace UI
             ImageProcessing.ImageAfterChange += ImageProcessing_ImageAfterChange; ;
         }
 
-        private void ImageProcessing_ImageAfterChange(object sender, ImageWrapper<Bgr, byte> e)
+        private void ImageProcessing_ImageAfterChange(object sender, Image<Bgr, byte> e)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {

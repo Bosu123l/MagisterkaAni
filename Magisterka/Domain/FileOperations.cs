@@ -131,7 +131,7 @@ namespace Domain
 
         #endregion publicParameters
 
-        public static void SaveImageFileAs(ImageWrapper<Bgr, byte> image)
+        public static void SaveImageFileAs(Image<Bgr, byte> image)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.AddExtension = true;
@@ -155,7 +155,7 @@ namespace Domain
             }
         }
 
-        public static void SaveImageFile(ImageWrapper<Bgr, byte> image)
+        public static void SaveImageFile(Image<Bgr, byte> image)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.AddExtension = true;
@@ -181,7 +181,7 @@ namespace Domain
             }
         }
 
-        public static ImageWrapper<Bgr, byte> GetImageFromDirectory()
+        public static Image<Bgr, byte> GetImageFromDirectory()
         {
             try
             {
@@ -196,7 +196,7 @@ namespace Domain
                 {
                     FilePath = openFileDialog.FileName;
                     SourceDirectory = _fileDirectory;
-                    return new ImageWrapper<Bgr, byte>(new Image<Bgr, byte>(FilePath));
+                    return new Image<Bgr, byte>(FilePath);
                 }
                 return null;
             }
@@ -206,7 +206,7 @@ namespace Domain
             }
         }
 
-        public static ImageWrapper<Bgr, byte> GetImageFromScanner()
+        public static Image<Bgr, byte> GetImageFromScanner()
         {
             Process scannerManager = new Process();
             string scanFilePattrn = @"^\d{8}_SC\d{4}";
@@ -240,7 +240,7 @@ namespace Domain
                                 throw new Exception("Scanned file not found!");
                             }
                             FilePath = lastAddedFilePath;
-                            return new ImageWrapper<Bgr, byte>(FilePath);
+                            return new Image<Bgr, byte>(FilePath);
                         }
                     case ExitCodes.ExitCode.ERROR_CANCELLED:
                         { return null; }

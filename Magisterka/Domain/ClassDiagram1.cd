@@ -10,9 +10,10 @@
   <Class Name="Domain.CutPhoto">
     <Position X="15.5" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAQAAACYAASAAAAAAAAAAAAAABAACAAAAgAABAACAAA=</HashCode>
+      <HashCode>AAQAAACYACSAAAAAAAAAAAAAABAACAAAAgAABAACAAA=</HashCode>
       <FileName>CutPhoto.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Domain.DefectsFinder" BaseTypeListCollapsed="true">
     <Position X="12.5" Y="0.5" Width="2.75" />
@@ -43,14 +44,6 @@
       <HashCode>QCIAAAAAAAABIAAAAQAAAAMAAAARAABAAAAACEAAAAA=</HashCode>
       <FileName>ImageProcessing.cs</FileName>
     </TypeIdentifier>
-  </Class>
-  <Class Name="Domain.ImageWrapper&lt;TColor, TDepth&gt;" BaseTypeListCollapsed="true">
-    <Position X="0.5" Y="0.5" Width="2.75" />
-    <TypeIdentifier>
-      <HashCode>gAMAAIAIACAAAAAAAIgAAAAAEiAAQBAAIAAAEAAAAAI=</HashCode>
-      <FileName>ImageWrapper.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Domain.MorphologicalProcessing">
     <Position X="3.5" Y="0.5" Width="2.5" />
