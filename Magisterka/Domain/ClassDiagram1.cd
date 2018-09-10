@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Domain.CustomMessageBox">
+    <Position X="17.25" Y="6.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CustomMessageBox.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.CutPhoto">
+    <Position X="15.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAACYAASAAAAAAAAAAAAAABAACAAAAgAABAACAAA=</HashCode>
+      <FileName>CutPhoto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.DefectsFinder" BaseTypeListCollapsed="true">
+    <Position X="12.5" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAJAgGIAAAJCAEAAQIAAYAAACAACAAAAQAAAAAg=</HashCode>
+      <FileName>DefectsFinder.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Domain.Dust" BaseTypeListCollapsed="true">
+    <Position X="12.5" Y="6.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAACAAAAAQAAAAAAAAgABAAAAAAAIAAAAAAQA=</HashCode>
+      <FileName>Dust.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Domain.FileOperations">
+    <Position X="10" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAKQgAAAAAIAAQEQgAGAGAAAIAIAAAAAQhAAAAAIgA=</HashCode>
+      <FileName>FileOperations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.ImageProcessing">
+    <Position X="3.5" Y="3.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>QCIAAAAAAAABIAAAAQAAAAMAAAARAABAAAAACEAAAAA=</HashCode>
+      <FileName>ImageProcessing.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.ImageWrapper&lt;TColor, TDepth&gt;" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>gAMAAIAIACAAAAAAAIgAAAAAEiAAQBAAIAAAEAAAAAI=</HashCode>
+      <FileName>ImageWrapper.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Domain.MorphologicalProcessing">
+    <Position X="3.5" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAQAAQAAAAAAAAQAYAAAAAEAAAAAAAgQAAAAAA=</HashCode>
+      <FileName>MorphologicalProcessing.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.Aligning">
+    <Position X="15.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAEAAAAAAAAAAAI=</HashCode>
+      <FileName>Aligning.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.ProgressManager">
+    <Position X="17.25" Y="0.5" Width="2" />
+    <NestedTypes>
+      <Class Name="Domain.ProgressManager.Step" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ProgressManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Delegate Name="Domain.ProgressManager.RefreshProgress" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ProgressManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>IAAAIAAAAAABAAAAACAAAACAYAAAAAAAAAAAAADgAAA=</HashCode>
+      <FileName>ProgressManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.RelayCommand" BaseTypeListCollapsed="true">
+    <Position X="19.25" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAQAAEAEAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RelayCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Domain.Scratches">
+    <Position X="6.25" Y="5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AgAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>Scratches.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.Smudge" BaseTypeListCollapsed="true">
+    <Position X="6.25" Y="0.5" Width="3.5" />
+    <NestedTypes>
+      <Enum Name="Domain.Smudge.BgrColor" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Smudge.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAABEAACAAAAAQAABCAAAABkAAQAAAAAAACIABAAA=</HashCode>
+      <FileName>Smudge.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="ExitCodes">
+    <Position X="17.25" Y="4.5" Width="1.75" />
+    <NestedTypes>
+      <Enum Name="ExitCodes.ExitCode" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ExitCodes.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAA=</HashCode>
+      <FileName>ExitCodes.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
