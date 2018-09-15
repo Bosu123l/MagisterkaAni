@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Domain.CustomMessageBox">
-    <Position X="17.25" Y="6.5" Width="1.75" />
+    <Position X="17.25" Y="6" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
       <FileName>CustomMessageBox.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Domain.CutPhoto">
-    <Position X="15.5" Y="2.5" Width="1.5" />
+    <Position X="15.5" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAACYACSAAAAAAAAAAAAAABAACAAAAgAABAACAAA=</HashCode>
       <FileName>CutPhoto.cs</FileName>
@@ -61,6 +61,9 @@
   </Class>
   <Class Name="Domain.ProgressManager">
     <Position X="17.25" Y="0.5" Width="2" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
     <NestedTypes>
       <Class Name="Domain.ProgressManager.Step" Collapsed="true">
         <TypeIdentifier>
@@ -79,7 +82,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Domain.RelayCommand" BaseTypeListCollapsed="true">
-    <Position X="19.25" Y="4.5" Width="1.75" />
+    <Position X="19.5" Y="4" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAACAAQAAEAEAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>RelayCommand.cs</FileName>
@@ -109,7 +112,10 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="ExitCodes">
-    <Position X="17.25" Y="4.5" Width="1.75" />
+    <Position X="19.5" Y="0.5" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
     <NestedTypes>
       <Enum Name="ExitCodes.ExitCode" Collapsed="true">
         <TypeIdentifier>
