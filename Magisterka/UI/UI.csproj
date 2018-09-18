@@ -257,6 +257,21 @@
   <ItemGroup>
     <Resource Include="Icons\experiment.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\icons8-robot-3-100.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\icons8-eco-cleaning-100.png" />
+    <Resource Include="Icons\icons8-experiment-96.png" />
+    <Resource Include="Icons\icons8-plaster-100.png" />
+    <Resource Include="Icons\icons8-robot-2-100.png" />
+    <Resource Include="Icons\icons8-szczotka-do-kurzu-100.png" />
+    <Resource Include="Icons\icons8-ustawienia-3-100.png" />
+    <Resource Include="Icons\scratches.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\icons8-fantazja-96.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.3.3.0.2824\build\Emgu.CV.targets" Condition="Exists('..\packages\EMGU.CV.3.3.0.2824\build\Emgu.CV.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

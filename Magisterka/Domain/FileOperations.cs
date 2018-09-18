@@ -15,7 +15,7 @@ namespace Domain
         private const string _readFileExtensions = "TIFF |*.tif;*.tiff";
         private const string _writeOtherFileExtensions = "TIFF |*.tif;*.tiff|" +
                                                           "PNG  |*.png| " +
-                                                          "JPEG |*.jpg;*jpeg;";
+                                                          "JPEG |*.jpg;*.jpeg;";
         private static string _defaultDestinationDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "OldPhotos");
         private static string _defaultSourcDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Scanner");
         private static string _defaultScanDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Scanner");

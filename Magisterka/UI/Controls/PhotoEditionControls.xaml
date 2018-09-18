@@ -33,6 +33,13 @@
                 ValueChanged="AlignImageValueChangedExecute" Ticks="{Binding AlignTicks, ElementName=userControl, Mode=OneWay}"/>
         <GroupBox Grid.Column="1" Header="Edit" FontSize="14" FontWeight="SemiBold" >
             <StackPanel Orientation="Vertical">
+                <Button x:Name="AutomaticRepair"
+                    ToolTip="Automatic repair"
+                    Command="{Binding AutomaticRepairClickedCommand, ElementName=userControl, Mode=OneWay}">
+                    <Button.OpacityMask>
+                        <ImageBrush ImageSource="/UI;component/Icons/icons8-robot-3-100.png"/>
+                    </Button.OpacityMask>
+                </Button>
                 <Button x:Name="Experiment"
                     ToolTip="Experiment"
                     Command="{Binding DoExperimenClickedCommand, ElementName=userControl, Mode=OneWay}">
@@ -44,7 +51,14 @@
                         ToolTip="Dust reduction"
                         Command="{Binding DustReductionClickedCommand, ElementName=userControl, Mode=OneWay}">
                     <Button.OpacityMask>
-                        <ImageBrush ImageSource="/UI;component/Icons/icons8-mop-100.png"/>
+                        <ImageBrush ImageSource="/UI;component/Icons/icons8-szczotka-do-kurzu-100.png"/>
+                    </Button.OpacityMask>
+                </Button>
+                <Button x:Name="Scratches"
+                    ToolTip="Remove scratches"
+                    Command="{Binding RemoveScratchesClickedCommand, ElementName=userControl, Mode=OneWay}">
+                    <Button.OpacityMask>
+                        <ImageBrush ImageSource="/UI;component/Icons/scratches.png"/>
                     </Button.OpacityMask>
                 </Button>
                 <Button x:Name="_smudgeCleaner"                
@@ -52,6 +66,13 @@
                         Command="{Binding SmudgeReductionClickCommand, ElementName=userControl, Mode=OneWay}" >
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/erase.png"/>
+                    </Button.OpacityMask>
+                </Button>
+                <Button x:Name="_setRegionWithoutRepair"                
+                        ToolTip="Set region without repair"
+                        Command="{Binding SetRegionWithoutRepairClickCommand, ElementName=userControl, Mode=OneWay}" >
+                    <Button.OpacityMask>
+                        <ImageBrush ImageSource="/UI;component/Icons/icons8-fantazja-96.png"/>
                     </Button.OpacityMask>
                 </Button>
                 <Button Command="{Binding CutPhotoClickCommand, ElementName=userControl, Mode=OneWay}" 
@@ -76,6 +97,13 @@
                         <ImageBrush ImageSource="/UI;component/Icons/icons8-available-updates-96.png"/>
                     </ToggleButton.OpacityMask>
                 </ToggleButton>
+                <Button x:Name="_settings"
+                        ToolTip="Settings"
+                        Command="{Binding SettingsClickCommand, ElementName=userControl, Mode=OneWay}" >
+                    <Button.OpacityMask>
+                        <ImageBrush ImageSource="/UI;component/Icons/icons8-ustawienia-3-100.png"/>
+                    </Button.OpacityMask>
+                </Button>
             </StackPanel>
         </GroupBox>
     </Grid>

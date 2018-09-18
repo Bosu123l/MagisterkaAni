@@ -104,7 +104,7 @@ namespace Domain
             {
                 using (Image<Gray, byte> cmpImage = _image[(int)color].Cmp(model[0], cmpType))
                 {
-                    using (Image<Gray, byte> disColorMask = MorphologicalProcessing.CreateBinaryImage(cmpImage))
+                    using (Image<Gray, byte> disColorMask = cmpImage.ThresholdBinary(new Gray(1), new Gray(255)))
                     {                        
                         Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(3, 3), new Point(-1, -1));
                         CvInvoke.MorphologyEx(disColorMask, resultMask, MorphOp.Open, kernel, new Point(-1, -1), 1, BorderType.Replicate, new MCvScalar(1.0));
@@ -132,7 +132,7 @@ namespace Domain
             using (Image<Gray, byte> grayImage = _image.Convert<Gray, byte>().Copy())
             {
                 #region BritherRegions
-                using (Image<Gray, byte> bwGeneralMask = MorphologicalProcessing.GeneralImageBinary(_image))
+                using (Image<Gray, byte> bwGeneralMask = MorphologicalProcessing.GeneralBluredBinaryImage(_image))
                 {                   
                     #region Blue
                     RepairColor(ref cleanedImage, grayImage, bwGeneralMask, BgrColor.Blue, BlueTone, CmpType.GreaterThan);
