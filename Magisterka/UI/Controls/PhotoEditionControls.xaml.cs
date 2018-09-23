@@ -12,58 +12,23 @@ namespace UI
     /// </summary>
     public partial class PhotoEditionControls : UserControl, INotifyPropertyChanged
     {
-        public string AlignPhotoToggled
-        {
-            get
-            {
-                return _alignPhotoToggled.ToString();
-            }
-            set
-            {
-                if (value != null)
-                {
-                    _alignPhotoToggled = bool.Parse(value);
-                    OnPropertyChanged(nameof(AlignPhotoToggled));
-                    OnPropertyChanged(nameof(AlignPhotoVisibility));
-                }
-            }
-        }
-        public string AlignPhotoVisibility
-        {
-            get {
-                if (_alignPhotoToggled == true)
-                {
-                    return "Visible";
-                }
-                else
-                {
-                    return "Collapsed";
-                }
-            }
-        }
-        public List<double> AlignTicks
-        {
-            get{ 
-                if(_alignTicks ==null)
-                {
-                    _alignTicks  = new List<double>();
-
-                    int value = -45;
-                    do {
-                        _alignTicks.Add(value++);
-                    } while (value < 45);
-                }
-                return _alignTicks ;
-            }
-        }
-        private bool _alignPhotoToggled=false;
-        private List<double> _alignTicks;
-
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        #region AutomaticRepair
+        public event EventHandler AutomaticRepairClicked;
+        public ICommand AutomaticRepairClickedCommand
+        {
+            get { return new RelayCommand(AutomaticRepairClickExecute); }
+        }
+        private void AutomaticRepairClickExecute(object obj)
+        {
+            AutomaticRepairClicked?.Invoke(this, EventArgs.Empty);
+        }
+        #endregion AutomaticRepair
 
         #region DoExperiment
         public event EventHandler DoExperimenClicked;
@@ -93,54 +58,81 @@ namespace UI
         }
         #endregion DustReduction
 
-        #region SmudgeReduction
-        public event EventHandler SmudgeReductionClick;
-        public ICommand SmudgeReductionClickCommand
+        #region Scratches
+        public event EventHandler ScratchesClicked;
+        public ICommand ScratchesClickedCommand
         {
-            get { return new RelayCommand(SmudgeReductionClickCommandExecute); }
+            get { return new RelayCommand(ScratchesClickExecute); }
         }
-        private void SmudgeReductionClickCommandExecute(object obj)
+        private void ScratchesClickExecute(object obj)
         {
-            SmudgeReductionClick?.Invoke(this, EventArgs.Empty);
+            ScratchesClicked?.Invoke(this, EventArgs.Empty);
+        }
+        #endregion Scratches
+
+        #region SmudgeReduction
+        public event EventHandler SmudgeReductionClicked;
+        public ICommand SmudgeReductionClickedCommand
+        {
+            get { return new RelayCommand(SmudgeReductionClickedCommandExecute); }
+        }
+        private void SmudgeReductionClickedCommandExecute(object obj)
+        {
+            SmudgeReductionClicked?.Invoke(this, EventArgs.Empty);
         }
         #endregion SmudgeReduction
 
-        #region CutPhoto
-        public event EventHandler CutPhotoClick;
-        public ICommand CutPhotoClickCommand
+        #region SetRegionWithoutRepair
+        public event EventHandler SetRegionWithoutRepairClicked;
+        public ICommand SetRegionWithoutRepairClickedCommand
         {
-            get { return new RelayCommand(CutPhotoClickCommandExecute); }
+            get { return new RelayCommand(SetRegionWithoutRepairClickExecute); }
         }
-        private void CutPhotoClickCommandExecute(object obj)
+        private void SetRegionWithoutRepairClickExecute(object obj)
         {
-            CutPhotoClick?.Invoke(this, EventArgs.Empty);
+            SetRegionWithoutRepairClicked?.Invoke(this, EventArgs.Empty);
+        }
+        #endregion SetRegionWithoutRepair
+
+        #region CutPhoto
+        public event EventHandler CutPhotoClicked;
+        public ICommand CutPhotoClickedCommand
+        {
+            get { return new RelayCommand(CutPhotoClickedCommandExecute); }
+        }
+        private void CutPhotoClickedCommandExecute(object obj)
+        {
+            CutPhotoClicked?.Invoke(this, EventArgs.Empty);
         }
         #endregion CutPhoto
 
         #region RotateImage
-        public event EventHandler RotateImageClick;
-        public ICommand RotateImageClickCommand
+        public event EventHandler RotateImageClicked;
+        public ICommand RotateImageClickedCommand
         {
             get { return new RelayCommand(RotateImageClickExecute); }
         }
         private void RotateImageClickExecute(object obj)
         {
-            RotateImageClick?.Invoke(this, EventArgs.Empty);
+            RotateImageClicked?.Invoke(this, EventArgs.Empty);
         }
         #endregion RotateImage
 
-        #region AlignImageClick 
-        public event EventHandler AlignImageValueChanged;
-              
-        private void AlignImageValueChangedExecute(object sender, EventArgs e)
+        #region Settings
+        public event EventHandler SettingsClicked;
+        public ICommand SettingsClickedCommand
         {
-            AlignImageValueChanged?.Invoke(this, e);
+            get { return new RelayCommand(SettingsClickExecute); }
         }
-        #endregion AlignImageClick
+        private void SettingsClickExecute(object obj)
+        {
+            SettingsClicked?.Invoke(this, EventArgs.Empty);
+        }
+        #endregion Settings
 
         public PhotoEditionControls()
         {
-            InitializeComponent();
+            InitializeComponent();           
         }
     }
 }

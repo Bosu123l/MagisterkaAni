@@ -49,7 +49,7 @@ namespace UI
             InitializeComponent();
             InitializeButtonsEvents();
 
-            ImageProcessing.ImageAfterChange += ImageProcessing_ImageAfterChange; ;
+            ImageProcessing.ImageAfterChange += ImageProcessing_ImageAfterChange; 
         }
 
         private void ImageProcessing_ImageAfterChange(object sender, Image<Bgr, byte> e)
@@ -65,17 +65,18 @@ namespace UI
             this.FileControl.GetPhotoFromScannerClicked += GetPhotoFromScanner;
             this.FileControl.GetPhotoFromFolderClicked += GetPhotoFromFile;
             this.FileControl.ChangeScanDestynationFolderClicked += SetScanPath;
-            this.FileControl.SavePhotoAsClicked += SavePhotoAs;
             this.FileControl.SavePhotoClicked += SavePhoto;
-
+            this.FileControl.SavePhotoAsClicked += SavePhotoAs;
+                     
+            this.PhotoEditionControl.AutomaticRepairClicked += AutomaticRepair;
             this.PhotoEditionControl.DoExperimenClicked += Test;
             this.PhotoEditionControl.DustReductionClicked += DustReduction;
-            this.PhotoEditionControl.SmudgeReductionClick += SmudgeCleaner;
-            this.PhotoEditionControl.CutPhotoClick += CutPhotoBorder;
-
-            this.PhotoEditionControl.RotateImageClick += RotateImage;
-            this.PhotoEditionControl.AlignImageValueChanged += AlignImageClick;
-
+            this.PhotoEditionControl.ScratchesClicked += ScratchesReduction;
+            this.PhotoEditionControl.SmudgeReductionClicked += SmudgeCleaner;
+            this.PhotoEditionControl.SetRegionWithoutRepairClicked += SetRegionWithoutRepair;
+            this.PhotoEditionControl.CutPhotoClicked += CutPhotoBorder;
+            this.PhotoEditionControl.RotateImageClicked += RotateImage;
+            this.PhotoEditionControl.SettingsClicked += OpenSettings;
 
             this.ViewControl.OpenOldPhotoInNewWindowClicked += PreviewOrginalPhoto;
             this.ViewControl.OpenPhotoInNewWindowClicked += PreviewEditPhoto;
@@ -174,6 +175,10 @@ namespace UI
         #endregion FileOperation
 
         #region OperationsOnPhoto
+        private async void AutomaticRepair(object sender, EventArgs e)
+        {
+
+        }
         private async void DustReduction(object sender, EventArgs e)
         {
             ProgressBar progressBar = new ProgressBar();
@@ -243,6 +248,10 @@ namespace UI
                 EnableControl = true;
             }
         }
+        private async void ScratchesReduction(object sender, EventArgs e)
+        {
+
+        }
         private async void RotateImage(object sender, EventArgs e)
         {
             ProgressBar progressBar = new ProgressBar(true);
@@ -263,28 +272,14 @@ namespace UI
                 EnableControl = true;
             }
         }
-        private async void AlignImageClick(object sender, EventArgs e)
+        private async void SetRegionWithoutRepair(object sender, EventArgs e)
         {
-            ProgressBar progressBar = new ProgressBar(true);
-            try
-            {
-                EnableControl = false;
-                progressBar.Show();
-                RoutedPropertyChangedEventArgs<double> args = (RoutedPropertyChangedEventArgs<double>)e;
-                await Task.Run(() => { ImageProcessing.AlignImage(args.NewValue); });
-                _imgeView = ImageProcessing.ImageAfter;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            finally
-            {
-                progressBar.Close();
-                EnableControl = true;
-            }
-        }
 
+        }
+        private async void OpenSettings(object sender, EventArgs e)
+        {
+
+        }
         private async void Test(object sender, EventArgs e)
         {
             ProgressBar progressBar = new ProgressBar();
@@ -296,8 +291,6 @@ namespace UI
                  {
                      ImageProcessing.Test();
                  });
-
-                _imgeView = ImageProcessing.ImageAfter;
             }
             catch (Exception ex)
             {

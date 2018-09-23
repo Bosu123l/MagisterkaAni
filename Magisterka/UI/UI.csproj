@@ -216,35 +216,19 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Icons\icons8-broom-100.png" />
     <Resource Include="Icons\icons8-crop-96.png" />
     <Resource Include="Icons\icons8-mop-100.png" />
     <Resource Include="Icons\icons8-open-100.png" />
-    <Resource Include="Icons\icons8-open-pane-100.png" />
-    <Resource Include="Icons\icons8-pictures-folder-100.png" />
     <Resource Include="Icons\icons8-save-96.png" />
     <Resource Include="Icons\icons8-save-as-96.png" />
     <Resource Include="Icons\icons8-scanner-96.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Icons\blur.png" />
-    <Resource Include="Icons\collapse.png" />
     <Resource Include="Icons\erase.png" />
-    <Resource Include="Icons\expand.png" />
-    <Resource Include="Icons\housekeeping.png" />
     <Resource Include="Icons\open-in-popup.png" />
-    <Resource Include="Icons\restart.png" />
-    <Resource Include="Icons\rotate-left.png" />
     <Resource Include="Icons\rotate-right.png" />
-    <Resource Include="Icons\search.png" />
-    <Resource Include="Icons\vacuum-cleaner.png" />
-    <Resource Include="Icons\zoom-in.png" />
-    <Resource Include="Icons\zoom-out.png" />
-    <Resource Include="Icons\zoom-to-actual-size.png" />
-    <Resource Include="Icons\zoom-to-extents.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Icons\edit-image.png" />
     <Resource Include="Icons\open-in-window.png" />
   </ItemGroup>
   <ItemGroup>
@@ -261,10 +245,6 @@
     <Resource Include="Icons\icons8-robot-3-100.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Icons\icons8-eco-cleaning-100.png" />
-    <Resource Include="Icons\icons8-experiment-96.png" />
-    <Resource Include="Icons\icons8-plaster-100.png" />
-    <Resource Include="Icons\icons8-robot-2-100.png" />
     <Resource Include="Icons\icons8-szczotka-do-kurzu-100.png" />
     <Resource Include="Icons\icons8-ustawienia-3-100.png" />
     <Resource Include="Icons\scratches.png" />

@@ -27,10 +27,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
-        <Slider x:Name="_alignSlider" Grid.Column="0" Minimum="-45" Maximum="45" Orientation="Vertical" 
-                SmallChange="0.5" TickFrequency="0.5" Visibility="{Binding AlignPhotoVisibility, ElementName=userControl, Mode=OneWay}" 
-                ValueChanged="AlignImageValueChangedExecute" Ticks="{Binding AlignTicks, ElementName=userControl, Mode=OneWay}"/>
+        </Grid.ColumnDefinitions>       
         <GroupBox Grid.Column="1" Header="Edit" FontSize="14" FontWeight="SemiBold" >
             <StackPanel Orientation="Vertical">
                 <Button x:Name="AutomaticRepair"
@@ -56,26 +53,26 @@
                 </Button>
                 <Button x:Name="Scratches"
                     ToolTip="Remove scratches"
-                    Command="{Binding RemoveScratchesClickedCommand, ElementName=userControl, Mode=OneWay}">
+                    Command="{Binding ScratchesClickedCommand, ElementName=userControl, Mode=OneWay}">
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/scratches.png"/>
                     </Button.OpacityMask>
                 </Button>
                 <Button x:Name="_smudgeCleaner"                
                         ToolTip="Clear smudges"
-                        Command="{Binding SmudgeReductionClickCommand, ElementName=userControl, Mode=OneWay}" >
+                        Command="{Binding SmudgeReductionClickedCommand, ElementName=userControl, Mode=OneWay}" >
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/erase.png"/>
                     </Button.OpacityMask>
                 </Button>
                 <Button x:Name="_setRegionWithoutRepair"                
                         ToolTip="Set region without repair"
-                        Command="{Binding SetRegionWithoutRepairClickCommand, ElementName=userControl, Mode=OneWay}" >
+                        Command="{Binding SetRegionWithoutRepairClickedCommand, ElementName=userControl, Mode=OneWay}" >
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/icons8-fantazja-96.png"/>
                     </Button.OpacityMask>
                 </Button>
-                <Button Command="{Binding CutPhotoClickCommand, ElementName=userControl, Mode=OneWay}" 
+                <Button Command="{Binding CutPhotoClickedCommand, ElementName=userControl, Mode=OneWay}" 
                 x:Name="_cutPhoto"                 
                 ToolTip="Cut photo">
                     <Button.OpacityMask>
@@ -84,22 +81,14 @@
                 </Button>
                 <Button x:Name="_rorateImage"
                         ToolTip="Rotate image"
-                        Command="{Binding RotateImageClickCommand, ElementName=userControl, Mode=OneWay}" >
+                        Command="{Binding RotateImageClickedCommand, ElementName=userControl, Mode=OneWay}" >
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/rotate-right.png"/>
                     </Button.OpacityMask>
-                </Button>
-                <ToggleButton 
-                    x:Name="_alignImage"
-                    ToolTip="Align photo"
-                    IsChecked="{Binding AlignPhotoToggled, ElementName=userControl}">
-                    <ToggleButton.OpacityMask>
-                        <ImageBrush ImageSource="/UI;component/Icons/icons8-available-updates-96.png"/>
-                    </ToggleButton.OpacityMask>
-                </ToggleButton>
+                </Button>                
                 <Button x:Name="_settings"
                         ToolTip="Settings"
-                        Command="{Binding SettingsClickCommand, ElementName=userControl, Mode=OneWay}" >
+                        Command="{Binding SettingsClickedCommand, ElementName=userControl, Mode=OneWay}" >
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/icons8-ustawienia-3-100.png"/>
                     </Button.OpacityMask>

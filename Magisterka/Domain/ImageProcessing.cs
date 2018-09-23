@@ -1,6 +1,7 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using Emgu.CV.Util;
 using System;
 using System.Drawing;
 
@@ -91,20 +92,25 @@ namespace Domain
             ImageAfter = Aligning.RotateOn90(ImageAfter);
             ImageBefor = Aligning.RotateOn90(ImageBefor);
         }
-        public static void AlignImage(double angle)
-        {
-            ImageAfter = Aligning.Rotate(ImageAfter, angle);
-            ImageBefor = Aligning.Rotate(ImageBefor, angle);
-        }
-
         public async static void Test()
         {
-            //CvInvoke.PyrMeanShiftFiltering(ImageBefor.Image, ImageAfter.Image, 40, 60, 3, new  MCvTermCriteria());
-            ImageAfter = ImageBefor.Rotate(17, new Bgr(Color.Black), false);
-            //ImageAfter.Image.Data[1, 1, 0] = 0;
-            //ImageAfter.Image.Data[1, 1, 1] = 0;
-            //ImageAfter.Image.Data[1, 1, 2] = 255;
+            Image<Gray, byte> canny = ImageBefor.Convert<Gray, byte>().CopyBlank();
+            CvInvoke.Canny(ImageBefor, canny, 100, 150, 3, true);
+            using (VectorOfPointF vp = new VectorOfPointF())
+            {
+                CvInvoke.HoughLines(canny, vp, 1, Math.PI / 180, 150, 0, 0);
 
+                Image<Bgr, Byte> lineImage = ImageBefor.Copy();
+
+                var elemnetsOfVp = vp.ToArray();
+                for (int i = 0; i < elemnetsOfVp.Length - 1; i++)
+                {
+                    var line = new LineSegment2DF(elemnetsOfVp[i], elemnetsOfVp[i + 1]);
+                    lineImage.Draw(line, new Bgr(Color.Red), 10);
+                }
+
+                ImageAfter = lineImage.Copy();
+            }
         }
     }
 

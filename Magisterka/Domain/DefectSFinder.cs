@@ -13,10 +13,10 @@ namespace Domain
 {
     public class DefectsFinder : IDisposable
     {
-        private const float _minFactor = 0.0000002f;
-        private const float _maxFactor = 0.0002f;
+        private const float _minFactor = 0.00000015f;
+        private const float _maxFactor = 0.00015f;
         private Image<Bgr, byte> _inputImage;
-        private int _maxThreasholdOfDustContourSize = 100;
+        private int _maxThreasholdOfDustContourSize = 15000;
         private VectorOfVectorOfPoint _defectsContoursMatrix;
         private Point[][] _smallDefectsContoursMatrix;
         private Point[][] _largeDefectsContoursMatrix;
@@ -148,27 +148,31 @@ namespace Domain
                 ProgressManager.DoStep();
                 using (Image<Gray, float> laplaceImge = grayImage.Laplace(9))
                 {
-                    ProgressManager.DoStep();                   
+                    //ReturnTmpImg = laplaceImge.Convert<Bgr,byte>();
+                    ProgressManager.DoStep();
 
                     GetThresholds(out a1, out a2, out b1, out b2, laplaceImge); //ProgressManager.DoneStep();
-                    _patchMask = GetMaskOfDefects(a1, a2, b1, b2, laplaceImge); //ProgressManager.DoneStep();
-
-                    ReturnTmpImg = laplaceImge.Copy().Convert<Bgr,byte>();
+                    _patchMask = GetMaskOfDefects(a1, a2, b1, b2, laplaceImge); //ProgressManager.DoneStep();                    
 
                     _maskOfDefects = MorphologicalProcessing.Dilate(_patchMask, new Size(3, 3), 2).Copy();
                     ProgressManager.DoStep();
-
-                    
+                  
                     _defectsContoursMatrix = new VectorOfVectorOfPoint();
                     using (Mat hier = new Mat())
                     {
-                        CvInvoke.FindContours(_patchMask, _defectsContoursMatrix, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+                        CvInvoke.FindContours(_maskOfDefects/*_patchMask*/, _defectsContoursMatrix, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
                     }
                     ProgressManager.DoStep();
-                   
+
+                    //VectorOfVectorOfPoint defect = new VectorOfVectorOfPoint(LargeDefectsContoursMatrix);
+                    var fieldSize = CalculateDefectsFields();
+                    //var area = CvInvoke.ContourArea(defect[0]);
+
+                    VectorOfVectorOfPoint defect = new VectorOfVectorOfPoint();
+                    fieldSize.Keys.Take(7000).ToList().ForEach(x=>defect.Push(x));
                     ReturnTmpImg = _inputImage.Copy();
-                    
-                    CvInvoke.DrawContours(ReturnTmpImg, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));                    
+                    CvInvoke.FillPoly(ReturnTmpImg, defect, new MCvScalar(255, 0, 255), LineType.AntiAlias);
+                    //CvInvoke.DrawContours(ReturnTmpImg, _defectsContoursMatrix, -1, new MCvScalar(255, 0, 255));
                 }                     
             }
 
@@ -208,16 +212,29 @@ namespace Domain
             {
                 ProgressManager.DoStep();
                 using (Image<Gray, byte> cannyImg2 = sourceImage.Convert<Gray, byte>().Canny(b1, b2))
-                {
+                {                    
                     ProgressManager.DoStep();
                     using (Image<Gray, byte> cannyImg = cannyImg1.Add(cannyImg2))
-                    {
+                    {                       
                         ProgressManager.DoStep();
                         return MorphologicalProcessing.Dilate(cannyImg, new Size(3, 3), 3); 
                     }
                 }                   
             } 
         }
+
+        Dictionary<VectorOfPoint, double> CalculateDefectsFields()
+        {
+            Dictionary<VectorOfPoint, double> fieldsSize = new Dictionary<VectorOfPoint, double>();
+
+            for (int i = 0; i < DefectsContoursMatrix.Size; i++)
+            {
+                fieldsSize.Add(DefectsContoursMatrix[i], CvInvoke.ContourArea(DefectsContoursMatrix[i]));
+            }
+
+            return fieldsSize.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+        }
+
         private void SplitDefectContoursBySize()
         {
             SmallDefectsContoursMatrix = DefectsContoursMatrix.ToArrayOfArray().Where(x => x.Count() <= _maxThreasholdOfDustContourSize).OrderByDescending(x => x.Count()).ToArray();
