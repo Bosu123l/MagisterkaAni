@@ -1,9 +1,10 @@
-﻿using Domain;
-using Emgu.CV;
+﻿using Emgu.CV;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using System;
+using System.ComponentModel;
 using System.Drawing;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace UI
@@ -16,25 +17,26 @@ namespace UI
             {
                 LoadImage(value);
             }
-        }   
-
+        }          
         private Image<Bgr, byte> _image;
-
+        
         public ImgeViewer()
         {
             InitializeComponent();         
-            PhotoView.OnZoomScaleChange += PhotoView_OnZoomScaleChange;
+            ZoomPhotoView.OnZoomScaleChange += ZoomPhotoView_OnZoomScaleChange;
         }
 
-        private void PhotoView_OnZoomScaleChange(object sender, EventArgs e)
+        private void ZoomPhotoView_OnZoomScaleChange(object sender, EventArgs e)
         {
             if(sender is PanAndZoomPictureBox)
             {
                 PanAndZoomPictureBox pictureBox = (PanAndZoomPictureBox)sender;               
 
-                if (pictureBox.ZoomScale < 1)
+                if (pictureBox.ZoomScale <= 1 || mouseDown)
                 {                    
-                    pictureBox.SetZoomScale(1,new Point(1,1));
+                    pictureBox.SetZoomScale(1,new System.Drawing.Point(1,1));
+                    pictureBox.HorizontalScrollBar.Visible = false;
+                    pictureBox.VerticalScrollBar.Visible = false;
                     return;
                 }
             }
@@ -42,7 +44,7 @@ namespace UI
 
         public void LoadImage(Image<Bgr, byte> image)
         {
-            PhotoView.Image = image.Bitmap;           
+            ZoomPhotoView.Image = image.Bitmap;
 
             _image = image.Copy();
 
@@ -71,7 +73,6 @@ namespace UI
                 histogramBox.Refresh();
             }               
         }
-
         private void AddSummaryHistogram()
         {
            using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0f, 255f)))
@@ -94,5 +95,87 @@ namespace UI
             BlueHistogram.ClearHistogram();
         }
 
+        public event EventHandler<Rectangle> RectangleLoaded;
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #region SelectROI
+        public Rectangle CutRectangle
+        {
+            get
+            {
+                return rect;
+            }
+        }
+        Rectangle rect;
+        System.Drawing.Point startPoint;
+        System.Drawing.Point endPoint;
+        bool mouseDown = false;
+
+        public void CutBorderInitialize()
+        {
+            ZoomPhotoView.SetZoomScale(1, new System.Drawing.Point(1, 1));           
+            ZoomPhotoView.MouseDown += PhotoView_MouseDown;
+            ZoomPhotoView.MouseUp += PhotoView_MouseUp;
+            ZoomPhotoView.MouseMove += PhotoView_MouseMove;
+            ZoomPhotoView.Paint += PhotoView_PaintRectangle;            
+        }
+
+        public void CutBorderFinalize()
+        {
+            mouseDown = false;
+            ZoomPhotoView.MouseDown -= PhotoView_MouseDown;
+            ZoomPhotoView.MouseUp -= PhotoView_MouseUp;
+            ZoomPhotoView.MouseMove -= PhotoView_MouseMove;
+            ZoomPhotoView.Paint -= PhotoView_PaintRectangle;
+        }
+        
+
+        private void PhotoView_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            startPoint = e.Location;
+            mouseDown = true;
+        }
+
+        private void PhotoView_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            if(mouseDown)
+            {
+                endPoint = e.Location;
+                ZoomPhotoView.Invalidate();
+            }
+        }
+
+        private void PhotoView_PaintRectangle(object sender, System.Windows.Forms.PaintEventArgs e)
+        {
+            if(rect!=null)
+            {
+                e.Graphics.DrawRectangle(Pens.DeepSkyBlue, GetRectangle());
+            }
+        }        
+
+        private Rectangle GetRectangle()
+        {
+            rect = new Rectangle()
+            {
+                Location = startPoint,
+                Width = endPoint.X - startPoint.X,
+                Height = endPoint.Y - startPoint.Y
+            };
+
+            return rect;
+        }
+
+        private void PhotoView_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            endPoint = e.Location;
+            GetRectangle();          
+            RectangleLoaded?.Invoke(sender, rect);
+            CutBorderFinalize();           
+        }       
+        #endregion SelectROI    
     }
 }

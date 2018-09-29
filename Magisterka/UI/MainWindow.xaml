@@ -12,8 +12,8 @@
             <ColumnDefinition />
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <local:ImgeViewer x:Name="ImgeView" />
-        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Hidden">
+        <local:ImgeViewer x:Name="ImageView" />
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Hidden" IsEnabled="{Binding BlockControls, ElementName=window}">
             <StackPanel  Orientation="Vertical" HorizontalAlignment="Right">
                 <local:FileControls x:Name="FileControl"/>
                 <local:PhotoEditionControls x:Name="PhotoEditionControl"/>

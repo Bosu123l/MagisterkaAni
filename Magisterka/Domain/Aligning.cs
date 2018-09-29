@@ -14,7 +14,7 @@ namespace Domain
 
         public static Image<Bgr, byte> Rotate(Image<Bgr, byte> image, double angle = 1)
         {
-            return image.Rotate(angle, new Bgr());
+            return image.Rotate(angle, new Bgr(), false);
         }
 
         public static Image<Bgr, byte> RotateOn90(Image<Bgr, byte> image)

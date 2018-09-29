@@ -5,6 +5,7 @@ using Emgu.CV.Structure;
 using Domain;
 using System.Threading.Tasks;
 using Emgu.CV;
+using System.Drawing;
 
 namespace UI
 {
@@ -14,14 +15,14 @@ namespace UI
         {
             set
             {
-                ImgeView.ViewedImage = value;
+                ImageView.ViewedImage = value;
             }
         }
         public string BlockControls
         {
             get
             {
-                return EnableControl ? "True" : "False";
+                return EnableControl.ToString();
             }
         }
         public bool EnableControl
@@ -99,8 +100,7 @@ namespace UI
                 {
                     if (image != null)
                     {
-                        ImageProcessing.SetImage(image);
-                        _imgeView = ImageProcessing.ImageAfter;
+                        ImageProcessing.SetImage(image);                        
                     }
                 }
             }
@@ -122,8 +122,7 @@ namespace UI
                 {
                     if (image != null)
                     {
-                        ImageProcessing.SetImage(image);
-                        _imgeView = ImageProcessing.ImageAfter;
+                        ImageProcessing.SetImage(image);                       
                     }
                 }
             }
@@ -175,132 +174,47 @@ namespace UI
         #endregion FileOperation
 
         #region OperationsOnPhoto
-        private async void AutomaticRepair(object sender, EventArgs e)
+        private void AutomaticRepair(object sender, EventArgs e)
         {
-
+            InvokeAction(new Action(ImageProcessing.AutomaticRepair), true);
         }
-        private async void DustReduction(object sender, EventArgs e)
+        private void DustReduction(object sender, EventArgs e)
         {
-            ProgressBar progressBar = new ProgressBar();
-            try
-            {
-                EnableControl = false;
-                progressBar.Show();
-                await Task.Run(() =>
-                {
-                    ImageProcessing.ReduceDust();
-                });
-                _imgeView = ImageProcessing.ImageAfter;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + ex.StackTrace, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            finally
-            {
-                progressBar.Close();
-                EnableControl = true;
-            }
+            InvokeAction(new Action(ImageProcessing.ReduceDust), true);
         }
         private void CutPhotoBorder(object sender, EventArgs e)
         {
-            ProgressBar progressBar = new ProgressBar();
-            try
-            {
-                EnableControl = false;
-                progressBar.Show();
-                Task.Run(() =>
-                {
-                    ImageProcessing.CutImage();
-                });
-                _imgeView = ImageProcessing.ImageAfter;
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            finally
-            {
-                progressBar.Close();
-                EnableControl = true;
-            }
+            ImageView.CutBorderInitialize();
+            ImageView.RectangleLoaded += GetCutImageRectangle;
         }
-        private async void SmudgeCleaner(object sender, EventArgs e)
+        private void GetCutImageRectangle(object sender, Rectangle e)
+        {           
+            ImageProcessing.CutImage(ImageView.ZoomPhotoView.Size, e);
+        }
+
+        private  void SmudgeCleaner(object sender, EventArgs e)
         {
-            ProgressBar progressBar = new ProgressBar();
-            try
-            {
-                EnableControl = false;
-                progressBar.Show();
-                await Task.Run(() =>
-                {
-                    ImageProcessing.ReduceSmudges();
-                });
-                _imgeView = ImageProcessing.ImageAfter;
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            finally
-            {
-                progressBar.Close();
-                EnableControl = true;
-            }
+            InvokeAction(new Action(ImageProcessing.ReduceSmudges), true);
         }
-        private async void ScratchesReduction(object sender, EventArgs e)
+        private  void ScratchesReduction(object sender, EventArgs e)
+        {
+            InvokeAction(new Action(ImageProcessing.ReduceScratches), true);
+        }
+        private  void RotateImage(object sender, EventArgs e)
+        {
+            InvokeAction(new Action(ImageProcessing.RotateImage), true, true);
+        }
+        private  void SetRegionWithoutRepair(object sender, EventArgs e)
+        {
+            ImageProcessing.SetRegionWithoutRepair();
+        }
+        private  void OpenSettings(object sender, EventArgs e)
         {
 
         }
-        private async void RotateImage(object sender, EventArgs e)
+        private  void Test(object sender, EventArgs e)
         {
-            ProgressBar progressBar = new ProgressBar(true);
-            try
-            {
-                EnableControl = false;
-                progressBar.Show();
-                await Task.Run(() => { ImageProcessing.RotateImage(); });
-                _imgeView = ImageProcessing.ImageAfter;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            finally
-            {
-                progressBar.Close();
-                EnableControl = true;
-            }
-        }
-        private async void SetRegionWithoutRepair(object sender, EventArgs e)
-        {
-
-        }
-        private async void OpenSettings(object sender, EventArgs e)
-        {
-
-        }
-        private async void Test(object sender, EventArgs e)
-        {
-            ProgressBar progressBar = new ProgressBar();
-            try
-            {
-                EnableControl = false;
-                progressBar.Show();
-                await Task.Run(() =>
-                 {
-                     ImageProcessing.Test();
-                 });
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show(ex.Message + ex.HelpLink, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            finally
-            {
-                progressBar.Close();
-                EnableControl = true;
-            }
+            InvokeAction(new Action(ImageProcessing.Test), true, true);
         }
 
         #endregion OperationsOnPhoto
@@ -316,7 +230,42 @@ namespace UI
             PreviewWindow PW = new PreviewWindow(ImageProcessing.ImageBefor.Bitmap);
             PW.Show();
         }
-
-        #endregion ViewOperations     
+        #endregion ViewOperations   
+        
+        private async void InvokeAction(Action action, bool progressbar=false, bool progressbarIndeterminate=false)
+        {
+            ProgressBar progressBar = new ProgressBar(progressbarIndeterminate);
+            try
+            {
+                EnableControl = false;
+                if (progressbar)
+                {
+                    progressBar.Show();
+                } 
+                await Task.Run(() => { action.Invoke(); });
+            }
+            catch(ArgumentNullException anEx)
+            {
+                if(anEx.Message==nameof(ImageProcessing.ImageBefor))
+                {
+                    MessageBox.Show("Load image at first!", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                }else
+                {
+                    throw new Exception(anEx.Message, anEx);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                if (progressbar)
+                {
+                    progressBar.Close();
+                }                   
+                EnableControl = true;
+            }
+        }
     }
 }

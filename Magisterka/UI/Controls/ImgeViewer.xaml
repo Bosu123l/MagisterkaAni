@@ -12,10 +12,10 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="3"/>
             <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>        
-        <WindowsFormsHost Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1" Background="{x:Null}">
-            <emgu:PanAndZoomPictureBox  x:Name="PhotoView" Dock="Fill" SizeMode="Zoom" BackColor="Transparent"/>
-        </WindowsFormsHost>
+        </Grid.RowDefinitions>
+        <WindowsFormsHost Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1" Background="{x:Null}" Visibility="{Binding ZoomImageBoxVisible, ElementName=imgViewWindow}">
+            <emgu:PanAndZoomPictureBox  x:Name="ZoomPhotoView" Dock="Fill" SizeMode="Zoom" BackColor="Transparent"/>
+        </WindowsFormsHost>       
         <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Background="#FF6B95BF"></GridSplitter>
         <Expander Grid.Row="2" IsExpanded="False" Header="Histograms" >
             <TabControl Grid.Row="3" TabStripPlacement="Left">
