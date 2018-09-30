@@ -2,7 +2,6 @@
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
-using System;
 using System.Drawing;
 
 namespace Domain
@@ -45,7 +44,7 @@ namespace Domain
 
             using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint(conturMatrix))
             {
-                CvInvoke.FillPoly(mask, contours, new MCvScalar(255, 255, 255), LineType.AntiAlias);
+                CvInvoke.FillPoly(mask, contours, new MCvScalar(255, 255, 255), LineType.FourConnected);
                 mask._Dilate(2);
                 return mask;
             }

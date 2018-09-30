@@ -1,4 +1,5 @@
 ﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using System;
@@ -71,22 +72,46 @@ namespace Domain
         {
             if (ImageBefor != null)
             {
-                Image<Gray, byte> canny = ImageBefor.Convert<Gray, byte>().CopyBlank();
-                CvInvoke.Canny(ImageBefor, canny, 100, 150, 3, true);
-                using (VectorOfPointF vp = new VectorOfPointF())
+                //Image<Bgra, byte> bgraImage = ImageBefor.Convert<Bgra, byte>();
+                //for (int i = 0; i < 4; i++)
+                //{
+                //    ImageAfter = bgraImage[i].Convert<Bgr, byte>(); Thread.Sleep(3000);
+                //}
+
+                //Image<Hls, byte> hsvImage = ImageBefor.Convert<Hls, byte>();
+                //for (int i = 0; i < 3; i++)
+                //{
+                //    ImageAfter = hsvImage[i].Convert<Bgr, byte>();Thread.Sleep(3000);
+                //}
+
+                //Image<Lab, byte> LabImage = ImageBefor.Convert<Lab, byte>();
+                //for (int i = 0; i < 3; i++)
+                //{
+                //    ImageAfter = LabImage[i].Convert<Bgr, byte>(); Thread.Sleep(3000);
+                //}
+
+                //Image<Luv, byte> LuvImage = ImageBefor.Convert<Luv, byte>();
+                //for (int i = 0; i < 3; i++)
+                //{
+                //    ImageAfter = LuvImage[i].Convert<Bgr, byte>(); Thread.Sleep(3000);
+                //}
+
+
+
+                //Image<Ycc, byte> YccImage = ImageBefor.Convert<Ycc, byte>();
+                //for (int i = 0; i < 3; i++)
+                //{
+                //    ImageAfter = YccImage[i].Convert<Bgr, byte>(); Thread.Sleep(3000);
+                //}
+                using (DefectsFinder df = new DefectsFinder(ImageBefor))
                 {
-                    CvInvoke.HoughLines(canny, vp, 1, Math.PI / 180, 150, 0, 0);
-
-                    Image<Bgr, Byte> lineImage = ImageBefor.Copy();
-
-                    var elemnetsOfVp = vp.ToArray();
-                    for (int i = 0; i < elemnetsOfVp.Length - 1; i++)
+                    df.SearchDefects();
+                    CvInvoke.FillPoly(ImageAfter, new VectorOfVectorOfPoint( df.LargeDefectsContoursMatrix[0]), new MCvScalar(255, 0, 255), LineType.FourConnected);
+                    using (ClearImage ci = new ClearImage(ImageAfter))
                     {
-                        var line = new LineSegment2DF(elemnetsOfVp[i], elemnetsOfVp[i + 1]);
-                        lineImage.Draw(line, new Bgr(Color.Red), 10);
+                        //ImageAfter = ci.ClearImageByDefects();
+                        ci.SpiralClean(df.LargeDefectsContoursMatrix[0]);
                     }
-
-                    ImageAfter = lineImage.Copy();
                 }
             }
             else
@@ -101,15 +126,11 @@ namespace Domain
                 ProgressManager.AddSteps(3);
                 using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
                 {
-                    ProgressManager.AddSteps(defectsFinder.SmallDefectsContoursMatrix.Length);
-                    using (Dust dust = new Dust(ImageBefor, defectsFinder.MaskOfDefects, defectsFinder.SmallDefectsContoursMatrix))
+                    defectsFinder.SearchDefects();
+                    using (Dust dust = new Dust(ImageBefor, defectsFinder.SmallDefectsContoursMatrix))
                     {
-                        ImageAfter = defectsFinder.ReturnTmpImg;
-                        //for (int i=0; i< defectsFinder.SmallDefectsContoursMatrix.Length; i++)
-                        //{
-                        //    ImageAfter = dust.RemoveDefect(defectsFinder.SmallDefectsContoursMatrix[i]);
-                        //    ProgressManager.DoStep();
-                        //}                   
+                        CvInvoke.FillPoly(ImageAfter, defectsFinder.SmallDefectsContoursMatrix, new MCvScalar(255,0,255), LineType.FourConnected);
+                        ImageAfter = dust.RemoveDustDefects();
                     }
                 }
             }else
@@ -120,6 +141,15 @@ namespace Domain
         public static void ReduceScratches()
         {
             if (ImageBefor != null) {
+                using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
+                {
+                    defectsFinder.SearchDefects();
+                    using (Scratches dust = new Scratches(ImageBefor, defectsFinder.LargeDefectsContoursMatrix))
+                    {
+                        CvInvoke.FillPoly(ImageAfter, defectsFinder.LargeDefectsContoursMatrix, new MCvScalar(255, 0, 255), LineType.FourConnected);
+                        ImageAfter = dust.RemoveScrates();
+                    }
+                }
             }
             else
             {
@@ -144,6 +174,7 @@ namespace Domain
         {
             if (ImageBefor != null)
             {
+
             }
             else
             {

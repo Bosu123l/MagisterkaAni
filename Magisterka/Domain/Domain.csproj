@@ -105,6 +105,7 @@
   <ItemGroup>
     <Compile Include="Aligning.cs" />
     <Compile Include="Annotations.cs" />
+    <Compile Include="ClearImage.cs" />
     <Compile Include="CustomMessageBox.cs" />
     <Compile Include="CutPhoto.cs" />
     <Compile Include="DefectsFinder.cs" />
