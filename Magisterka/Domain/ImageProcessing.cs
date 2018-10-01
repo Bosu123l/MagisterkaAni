@@ -106,11 +106,17 @@ namespace Domain
                 using (DefectsFinder df = new DefectsFinder(ImageBefor))
                 {
                     df.SearchDefects();
-                    CvInvoke.FillPoly(ImageAfter, new VectorOfVectorOfPoint( df.LargeDefectsContoursMatrix[0]), new MCvScalar(255, 0, 255), LineType.FourConnected);
-                    using (ClearImage ci = new ClearImage(ImageAfter))
+                    //CvInvoke.FillPoly(ImageAfter, new VectorOfVectorOfPoint( df.LargeDefectsContoursMatrix[2]), new MCvScalar(255, 0, 255), LineType.FourConnected);
+                    using (ClearImage ci = new ClearImage(ImageBefor))
                     {
                         //ImageAfter = ci.ClearImageByDefects();
-                        ci.SpiralClean(df.LargeDefectsContoursMatrix[0]);
+                        ImageAfter = ci.SpiralCleanLargeDefects(df.LargeDefectsContoursMatrix);
+
+                        using (Dust dust = new Dust(ImageAfter, df.SmallDefectsContoursMatrix))
+                        {
+                            //CvInvoke.FillPoly(ImageAfter, defectsFinder.SmallDefectsContoursMatrix, new MCvScalar(255,0,255), LineType.FourConnected);
+                            ImageAfter = dust.RemoveDustDefects();
+                        }
                     }
                 }
             }
@@ -127,9 +133,9 @@ namespace Domain
                 using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
                 {
                     defectsFinder.SearchDefects();
-                    using (Dust dust = new Dust(ImageBefor, defectsFinder.SmallDefectsContoursMatrix))
+                    using (Dust dust = new Dust(ImageBefor, defectsFinder.DefectsContoursMatrix))
                     {
-                        CvInvoke.FillPoly(ImageAfter, defectsFinder.SmallDefectsContoursMatrix, new MCvScalar(255,0,255), LineType.FourConnected);
+                        //CvInvoke.FillPoly(ImageAfter, defectsFinder.SmallDefectsContoursMatrix, new MCvScalar(255,0,255), LineType.FourConnected);
                         ImageAfter = dust.RemoveDustDefects();
                     }
                 }

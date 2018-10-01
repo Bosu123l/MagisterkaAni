@@ -46,6 +46,12 @@ namespace Domain
 
         public Image<Bgr, byte> RemoveDustDefects()
         {
+            SetDefectsCountours();
+            using (ClearImage cl = new ClearImage(_orgImage))
+            {
+                return cl.SpiralClean();
+            }
+               
             int xSetp = _kernelSize / 2;
             int yStep = _kernelSize / 2;
             int width = _orgImage.Width - _kernelSize;

@@ -256,7 +256,7 @@ namespace UI
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message+ex.StackTrace, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {

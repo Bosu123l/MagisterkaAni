@@ -9,34 +9,41 @@ using System.Linq;
 
 namespace Domain
 {
-    public class ClearImage: IDisposable
+    public class ClearImage : IDisposable
     {
         struct MatElement
         {
-            public int _x;
-            public int _y;
+            public int _h;
+            public int _w;
             public MCvScalar _color;
         }
 
         private Image<Bgr, byte> _orgImage;
         MCvScalar _defectsColor = new MCvScalar(255, 0, 255);
-        private int _kernelSize = 5;
+        private int _kernelSize = 9;
 
         public ClearImage(Image<Bgr, byte> orgImage)
         {
-            _orgImage = orgImage;
+            if (orgImage != null)
+            {
+                _orgImage = orgImage.Copy();
+            }
+            else
+            {
+                throw new ArgumentNullException(nameof(orgImage));
+            }
         }
 
         public Image<Bgr, byte> ClearImageByDefects()
         {
-            int xSetp=_kernelSize/2;
-            int yStep= _kernelSize / 2;
+            int xSetp = _kernelSize / 2;
+            int yStep = _kernelSize / 2;
             int width = _orgImage.Width - _kernelSize;
             int height = _orgImage.Height - _kernelSize;
 
-            for (int x = 0; x < height; x+=xSetp)
+            for (int x = 0; x < height; x += xSetp)
             {
-                for (int y = 0; y < width; y+=yStep)
+                for (int y = 0; y < width; y += yStep)
                 {
                     List<MatElement> mat = GetMat(x, y);
                     if (mat != null)
@@ -48,26 +55,35 @@ namespace Domain
 
             return _orgImage;
         }
-        
-        private List<MatElement> GetMat(int sx, int sy)
+
+        private List<MatElement> GetMat(int min_h, int min_w)
         {
             List<MatElement> mat = new List<MatElement>();
             bool isDefect = false;
-            for (int x = 0; x < _kernelSize; x ++)
+
+            for (int h = 0; h < _kernelSize; h++)
             {
-                for (int y = 0; y < _kernelSize; y++)
+                int H = min_h + h;
+                for (int w = 0; w < _kernelSize; w++)
                 {
-                    int X = sx + x;
-                    int Y = sy + y;
-                    if(_orgImage[X, Y].MCvScalar.Equals(_defectsColor) && isDefect==false)
+                    
+                    int W = min_w + w;
+                    try
                     {
-                        isDefect = true;
+                        if (_orgImage[H, W].MCvScalar.Equals(_defectsColor) && isDefect == false)
+                        {
+                            isDefect = true;
+                        }
+                        mat.Add(new MatElement() { _h = H, _w = W, _color = _orgImage[H, W].MCvScalar });
                     }
-                    mat.Add(new MatElement() { _x = X, _y = Y, _color = _orgImage[X, Y].MCvScalar });
+                    catch (Exception ex)
+                    {
+                        var exe = ex.Message;
+                    }  
                 }
             }
 
-            if(isDefect)
+            if (isDefect)
             {
                 return mat;
             }
@@ -78,9 +94,9 @@ namespace Domain
         {
             var clearMat = mat.Where(x => !x._color.Equals(_defectsColor)).ToList();
 
-            if(clearMat.Count>0)
-            {           
-                MCvScalar sum = new MCvScalar();           
+            if (clearMat.Count > 0)
+            {
+                MCvScalar sum = new MCvScalar();
                 double V0, V1, V2;
 
                 clearMat.ForEach(x =>
@@ -88,70 +104,68 @@ namespace Domain
                     sum.V0 += x._color.V0;
                     sum.V1 += x._color.V1;
                     sum.V2 += x._color.V2;
-                });            
+                });
 
                 V0 = sum.V0 / clearMat.Count;
                 V1 = sum.V1 / clearMat.Count;
                 V2 = sum.V2 / clearMat.Count;
-            
-                mat.Where(x => x._color.Equals(_defectsColor)).ToList().ForEach(x => {
-                    _orgImage.Data[x._x, x._y, 0] = (byte)V0;
-                    _orgImage.Data[x._x, x._y, 1] = (byte)V1;
-                    _orgImage.Data[x._x, x._y, 2] = (byte)V2;
-                } );
+
+                mat.Where(x => x._color.Equals(_defectsColor)).ToList().ForEach(x =>
+                {
+                    _orgImage.Data[x._h, x._w, 0] = (byte)V0;
+                    _orgImage.Data[x._h, x._w, 1] = (byte)V1;
+                    _orgImage.Data[x._h, x._w, 2] = (byte)V2;
+                });
             }
         }
 
-        public void SpiralClean(VectorOfPoint defectContur)
+        public Image<Bgr, byte> SpiralClean()
         {
             int step = _kernelSize / 2;
             int minH, minW, maxH, maxW;
+            int maxImgH, maxImgW;
             List<Point> defect = new List<Point>();
 
-           // CvInvoke.FillPoly(_orgImage, new VectorOfVectorOfPoint(defectContur), _defectsColor, LineTwpe.FourConnected);
+            maxImgH = (_orgImage.Height - _kernelSize);
+            maxImgW = (_orgImage.Width - _kernelSize);
 
-            for (int i = 0; i < defectContur.Size; i++)
-            {
-                defect.Add(defectContur[i]);
-            }
+            minH = 0;
+            maxH = _orgImage.Height - _kernelSize;
 
-            minH = defect.Min(dh => dh.X);
-            minH = (minH - step) > 0 ? (minH - step) : 0;
-
-            maxH = defect.Max(dh => dh.Y);
-            maxH = (maxH + step +_kernelSize) <= _orgImage.Height ? (maxH + step) : _orgImage.Height;
-
-
-            minW = defect.Min(dw => dw.Y);
-            minW = (minW - step) > 0 ? (minW - step) : 0;
-            maxW = defect.Max(dw => dw.Y);
-            maxW = (maxW + step + _kernelSize) <= _orgImage.Width ? (maxW + step) : _orgImage.Width;
+            minW = 0;
+            maxW = _orgImage.Width - _kernelSize;
 
             int h = minH, w = minW;
 
-            while (true)
+            while (minH < maxH || minW < maxW)
             {
-
                 for (w = minW; w < maxW; w += step)
                 {
                     SpiralCleanMat(h, w);
                 }
+
+                w = maxW > 0 ? maxW : 0;
 
                 for (h = minH; h < maxH; h += step)
                 {
                     SpiralCleanMat(h, w);
                 }
 
+                h = maxH > 0 ? maxH : 0;
+
                 for (; w > minW; w -= step)
                 {
                     SpiralCleanMat(h, w);
                 }
 
+                w = minW < maxImgW ? minW : maxImgW;
 
                 for (; h > minH; h -= step)
                 {
                     SpiralCleanMat(h, w);
                 }
+
+                h = minH < maxImgH ? minH : maxImgH;
 
                 minH += step;
                 minW += step;
@@ -159,11 +173,93 @@ namespace Domain
                 maxH -= step;
                 maxW -= step;
             }
+
+            return _orgImage;
         }
 
-        private void SpiralCleanMat(int x, int y)
+        public Image<Bgr,byte> SpiralCleanLargeDefects(VectorOfVectorOfPoint defects)
         {
-            List<MatElement> mat = GetMat(x, y);
+            for (int i = 0; i < defects.Size; i++)
+            {
+                SpiralClean(defects[i]);
+            }
+            return _orgImage;
+        }
+
+        public Image<Bgr, byte> SpiralClean(VectorOfPoint defectContur)
+        {
+            int step = _kernelSize / 2;
+            int minH, minW, maxH, maxW;
+            int maxImgH, maxImgW;
+            List<Point> defect = new List<Point>();
+
+            CvInvoke.FillPoly(_orgImage, new VectorOfVectorOfPoint(defectContur), _defectsColor, LineType.FourConnected);
+
+            for (int i = 0; i < defectContur.Size; i++)
+            {
+                defect.Add(defectContur[i]);
+            }
+
+            maxImgH = (_orgImage.Height - _kernelSize);
+            maxImgW = (_orgImage.Width - _kernelSize); 
+
+            minH = defect.Min(dh => dh.Y);
+            minH = (minH - step) > 0 ? (minH - step) : 0;
+
+            maxH = defect.Max(dh => dh.Y);
+            maxH = (maxH + step + _kernelSize) <= _orgImage.Height ? (maxH + step) : maxImgH;
+
+
+            minW = defect.Min(dw => dw.X);
+            minW = (minW - step) > 0 ? (minW - step) : 0;
+            maxW = defect.Max(dw => dw.X);
+            maxW = (maxW + step + _kernelSize) <= _orgImage.Width ? (maxW + step) : maxImgW; 
+
+            int h = minH, w = minW;
+
+            while (minH < maxH || minW < maxW)
+            {
+                for (w = minW; w < maxW; w += step)
+                {
+                    SpiralCleanMat(h, w);
+                }
+
+                w = maxW > 0? maxW : 0;
+
+                for (h = minH; h < maxH; h += step)
+                {
+                    SpiralCleanMat(h, w);
+                }
+
+                h = maxH > 0? maxH : 0;
+
+                for (; w > minW; w -= step)
+                {
+                    SpiralCleanMat(h, w);
+                }
+
+                w = minW < maxImgW? minW : maxImgW;
+
+                for (; h > minH; h -= step)
+                {
+                    SpiralCleanMat(h, w);
+                }
+
+                h = minH < maxImgH?  minH : maxImgH;
+
+                minH += step;
+                minW += step;
+
+                maxH -= step;
+                maxW -= step;
+            }
+
+            return _orgImage;
+        }
+
+        private void SpiralCleanMat(int h, int w)
+        {
+            List<MatElement> mat = GetMat(h, w);
             if (mat != null)
             {
                 RepairMat(mat);
@@ -179,7 +275,7 @@ namespace Domain
 
         public void Dispose()
         {
-            
+
         }
     }
 }
