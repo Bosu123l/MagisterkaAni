@@ -50,6 +50,12 @@
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/icons8-szczotka-do-kurzu-100.png"/>
                     </Button.OpacityMask>
+                    <Button.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Left to right averaging defects"  Command="{Binding DustReductionLeftToRightAveragingDefectsMethodClickedCommand, ElementName=userControl, Mode=OneWay}"/>
+                            <MenuItem Header="Spiral averaging defects"         Command="{Binding DustReductionSpiralAveragingDefectsMethodClickedCommand, ElementName=userControl, Mode=OneWay}"/>
+                        </ContextMenu>
+                    </Button.ContextMenu>
                 </Button>
                 <Button x:Name="Scratches"
                     ToolTip="Remove scratches"
@@ -57,10 +63,18 @@
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/scratches.png"/>
                     </Button.OpacityMask>
+                    <Button.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="InPaint NS method"     Command="{Binding ScratchesReductionInPaintNSMethodClickedCommand, ElementName=userControl, Mode=OneWay}"/>
+                            <MenuItem Header="InPaint Telea method"  Command="{Binding ScratchesReductionInPaintTeleaMethodClickedCommand, ElementName=userControl, Mode=OneWay}"/>
+                            <MenuItem Header="Spiral single defects" Command="{Binding ScratchesReductionSpiralSingleDefectsMethodClickedCommand, ElementName=userControl, Mode=OneWay}"/>
+                            <MenuItem Header="Spiral whole photo"    Command="{Binding ScratchesReductionSpiralWholePhotoMethodClickedCommand, ElementName=userControl, Mode=OneWay}"/>
+                        </ContextMenu>
+                    </Button.ContextMenu>
                 </Button>
                 <Button x:Name="_smudgeCleaner"                
                         ToolTip="Clear smudges"
-                        Command="{Binding SmudgeReductionClickedCommand, ElementName=userControl, Mode=OneWay}" >
+                        Command="{Binding SmudgeReductionClickedCommand, ElementName=userControl, Mode=OneWay}">
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/erase.png"/>
                     </Button.OpacityMask>

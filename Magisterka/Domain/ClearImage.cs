@@ -266,6 +266,21 @@ namespace Domain
             }
         }
 
+        public Image<Bgr,byte> InPaintMethod(VectorOfVectorOfPoint defects, InpaintType ip)
+        {
+            for (int i = 0; i < defects.Size; i++)
+            {
+                InPaintCleaner(defects[i], ip);
+            }
+            return _orgImage;
+        }
+
+        private void InPaintCleaner(VectorOfPoint defect, InpaintType ip)
+        {
+            var mask = GetMaskOfDefect(defect);
+            CvInvoke.Inpaint(_orgImage, mask, _orgImage, 1.0, ip);
+        }
+
         private Image<Gray, byte> GetMaskOfDefect(VectorOfPoint defect)
         {
             Image<Gray, byte> mask = _orgImage[0].CopyBlank();

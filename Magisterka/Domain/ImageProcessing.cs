@@ -1,9 +1,10 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
-using Emgu.CV.Util;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace Domain
 {
@@ -72,6 +73,49 @@ namespace Domain
         {
             if (ImageBefor != null)
             {
+
+                //Image<Hsv, byte> bgraImage = ImageBefor.Convert<Hsv, byte>();
+                //for (int i = 0; i < 3; i++)
+                //{
+                //    ImageAfter = bgraImage[i].Convert<Bgr, byte>(); Thread.Sleep(3000);
+                //}
+
+                Image<Hsv, byte> hsvImage = ImageBefor.Convert<Hsv, byte>();
+                hsvImage[1] = hsvImage[1].Add(new Gray(255));
+                hsvImage[2] = hsvImage[2].Add(new Gray(255));
+
+                List<double> hue = new List<double>();
+
+                for (int x = 0; x < hsvImage.Height; x ++)
+                {
+                    for (int y = 0; y < hsvImage.Width; y ++)
+                    {
+                        hue.Add(hsvImage[x, y].Hue);
+                    }
+                }
+
+                var max = hue.GroupBy(x=>x).OrderByDescending(x=>x.Count()).First().Key;
+                hue = hue.GroupBy(x => x).Select(x=>x.Key).ToList();
+                var median = hue[hue.Count / 2];
+                
+                for (int x = 0; x < hsvImage.Height; x++)
+                {
+                    for (int y = 0; y < hsvImage.Width; y++)
+                    {
+                        var pix = hsvImage[x, y].Hue;
+
+                        if(pix>max+10 || pix<max-10)
+                        {
+                            hsvImage.Data[x,y,0] = 90;
+                        }else
+                        {
+                            hsvImage.Data[x, y, 0] = 180;
+                        }
+                    }
+                }
+
+                ImageAfter = hsvImage.Convert<Bgr, byte>(); 
+             
                 //Image<Bgra, byte> bgraImage = ImageBefor.Convert<Bgra, byte>();
                 //for (int i = 0; i < 4; i++)
                 //{
@@ -103,28 +147,42 @@ namespace Domain
                 //{
                 //    ImageAfter = YccImage[i].Convert<Bgr, byte>(); Thread.Sleep(3000);
                 //}
-                using (DefectsFinder df = new DefectsFinder(ImageBefor))
-                {
-                    df.SearchDefects();
-                    //CvInvoke.FillPoly(ImageAfter, new VectorOfVectorOfPoint( df.LargeDefectsContoursMatrix[2]), new MCvScalar(255, 0, 255), LineType.FourConnected);
-                    using (ClearImage ci = new ClearImage(ImageBefor))
-                    {
-                        //ImageAfter = ci.ClearImageByDefects();
-                        ImageAfter = ci.SpiralCleanLargeDefects(df.LargeDefectsContoursMatrix);
 
-                        using (Dust dust = new Dust(ImageAfter, df.SmallDefectsContoursMatrix))
-                        {
-                            //CvInvoke.FillPoly(ImageAfter, defectsFinder.SmallDefectsContoursMatrix, new MCvScalar(255,0,255), LineType.FourConnected);
-                            ImageAfter = dust.RemoveDustDefects();
-                        }
-                    }
-                }
+                //using (DefectsFinder df = new DefectsFinder(ImageBefor))
+                //{
+                //    df.SearchDefects();
+                //    //CvInvoke.FillPoly(ImageAfter, new VectorOfVectorOfPoint( df.LargeDefectsContoursMatrix[2]), new MCvScalar(255, 0, 255), LineType.FourConnected);
+                //    using (ClearImage ci = new ClearImage(ImageBefor))
+                //    {
+                //        //ImageAfter = ci.ClearImageByDefects();
+                //        ImageAfter = ci.SpiralCleanLargeDefects(df.LargeDefectsContoursMatrix);
+
+                //        using (Dust dust = new Dust(ImageAfter, df.SmallDefectsContoursMatrix))
+                //        {
+                //            //CvInvoke.FillPoly(ImageAfter, defectsFinder.SmallDefectsContoursMatrix, new MCvScalar(255,0,255), LineType.FourConnected);
+                //            ImageAfter = dust.RemoveDustDefects();
+                //        }
+                //    }
+                //}
+
+
+                //using (DefectsFinder df = new DefectsFinder(ImageBefor))
+                //{
+                //    df.SearchDefects();
+                //    //CvInvoke.FillPoly(ImageAfter, new VectorOfVectorOfPoint( df.LargeDefectsContoursMatrix[2]), new MCvScalar(255, 0, 255), LineType.FourConnected);
+                //    using (ClearImage ci = new ClearImage(ImageBefor))
+                //    {
+                //        ImageAfter = ci.InPaintMethod(df.LargeDefectsContoursMatrix, InpaintType.NS);
+                //    }
+                //}
             }
             else
             {
                 throw new ArgumentNullException(nameof(ImageBefor));
             }           
-        }       
+        }
+
+        #region Dust
         public static void ReduceDust()
         {
             if(ImageBefor!=null)
@@ -144,6 +202,9 @@ namespace Domain
                 throw new ArgumentNullException(nameof(ImageBefor));
             }
         }
+        #endregion Dust
+
+        #region Scratches
         public static void ReduceScratches()
         {
             if (ImageBefor != null) {
@@ -162,6 +223,8 @@ namespace Domain
                 throw new ArgumentNullException(nameof(ImageBefor));
             }
         }
+        #endregion Scratches
+
         public static void ReduceSmudges()
         {
             if (ImageBefor != null)
