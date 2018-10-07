@@ -126,28 +126,17 @@ namespace UI
             #endregion ScratchesReductionInPaintTeleaMethodClickedCommand
 
             #region ScratchesReductionSpiralSingleDefectsMethodClickedCommand
-            public event EventHandler cratchesReductionSpiralSingleDefectsMethodClicked;
-            public ICommand cratchesReductionSpiralSingleDefectsMethodClickedCommand
+            public event EventHandler ScratchesReductionSpiralSingleDefectsMethodClicked;
+            public ICommand ScratchesReductionSpiralSingleDefectsMethodClickedCommand
             {
-                get { return new RelayCommand(cratchesReductionSpiralSingleDefectsMethodClickExecute); }
+                get { return new RelayCommand(ScratchesReductionSpiralSingleDefectsMethodClickExecute); }
             }
-            private void cratchesReductionSpiralSingleDefectsMethodClickExecute(object obj)
+            private void ScratchesReductionSpiralSingleDefectsMethodClickExecute(object obj)
             {
-                cratchesReductionSpiralSingleDefectsMethodClicked?.Invoke(this, EventArgs.Empty);
+                ScratchesReductionSpiralSingleDefectsMethodClicked?.Invoke(this, EventArgs.Empty);
             }
             #endregion ScratchesReductionSpiralSingleDefectsMethodClickedCommand
 
-            #region ScratchesReductionSpiralWholePhotoMethodClickedCommand
-            public event EventHandler ScratchesReductionSpiralWholePhotoMethodClicked;
-            public ICommand ScratchesReductionSpiralWholePhotoMethodClickedCommand
-            {
-                get { return new RelayCommand(ScratchesReductionSpiralWholePhotoMethodClickExecute); }
-            }
-            private void ScratchesReductionSpiralWholePhotoMethodClickExecute(object obj)
-            {
-                ScratchesReductionSpiralWholePhotoMethodClicked?.Invoke(this, EventArgs.Empty);
-            }
-            #endregion ScratchesReductionSpiralWholePhotoMethodClickedCommand
         #endregion ScratchesAlternativeMethods
 
 
@@ -216,6 +205,6 @@ namespace UI
         public PhotoEditionControls()
         {
             InitializeComponent();           
-        }
+        }        
     }
 }

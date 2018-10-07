@@ -152,7 +152,7 @@ namespace Domain
                 //{
                 //    df.SearchDefects();
                 //    //CvInvoke.FillPoly(ImageAfter, new VectorOfVectorOfPoint( df.LargeDefectsContoursMatrix[2]), new MCvScalar(255, 0, 255), LineType.FourConnected);
-                //    using (ClearImage ci = new ClearImage(ImageBefor))
+                //    using (ImageCleaner ci = new ImageCleaner(ImageBefor))
                 //    {
                 //        //ImageAfter = ci.ClearImageByDefects();
                 //        ImageAfter = ci.SpiralCleanLargeDefects(df.LargeDefectsContoursMatrix);
@@ -170,7 +170,7 @@ namespace Domain
                 //{
                 //    df.SearchDefects();
                 //    //CvInvoke.FillPoly(ImageAfter, new VectorOfVectorOfPoint( df.LargeDefectsContoursMatrix[2]), new MCvScalar(255, 0, 255), LineType.FourConnected);
-                //    using (ClearImage ci = new ClearImage(ImageBefor))
+                //    using (ImageCleaner ci = new ImageCleaner(ImageBefor))
                 //    {
                 //        ImageAfter = ci.InPaintMethod(df.LargeDefectsContoursMatrix, InpaintType.NS);
                 //    }
@@ -185,7 +185,11 @@ namespace Domain
         #region Dust
         public static void ReduceDust()
         {
-            if(ImageBefor!=null)
+            DustReductionSpiralAveragingDefectsMethod();
+        }
+        public static void DustReductionLeftToRightAveragingDefectsMethod()
+        {
+            if (ImageBefor != null)
             {
                 ProgressManager.AddSteps(3);
                 using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
@@ -193,11 +197,30 @@ namespace Domain
                     defectsFinder.SearchDefects();
                     using (Dust dust = new Dust(ImageBefor, defectsFinder.DefectsContoursMatrix))
                     {
-                        //CvInvoke.FillPoly(ImageAfter, defectsFinder.SmallDefectsContoursMatrix, new MCvScalar(255,0,255), LineType.FourConnected);
-                        ImageAfter = dust.RemoveDustDefects();
+                        ImageAfter = dust.DustReductionLeftToRight();
                     }
                 }
-            }else
+            }
+            else
+            {
+                throw new ArgumentNullException(nameof(ImageBefor));
+            }
+        }
+        public static void DustReductionSpiralAveragingDefectsMethod()
+        {
+            if (ImageBefor != null)
+            {
+                ProgressManager.AddSteps(3);
+                using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
+                {
+                    defectsFinder.SearchDefects();
+                    using (Dust dust = new Dust(ImageBefor, defectsFinder.DefectsContoursMatrix))
+                    {
+                        ImageAfter = dust.DustReductionSpiralAveranging();
+                    }
+                }
+            }
+            else
             {
                 throw new ArgumentNullException(nameof(ImageBefor));
             }
@@ -207,14 +230,55 @@ namespace Domain
         #region Scratches
         public static void ReduceScratches()
         {
-            if (ImageBefor != null) {
+            ScratchesReductionSpiralSingleDefectsMethod();
+        }
+
+        public static void ScratchesReductionInPaintNSMethod()
+        {
+            if (ImageBefor != null)
+            {
                 using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
                 {
                     defectsFinder.SearchDefects();
-                    using (Scratches dust = new Scratches(ImageBefor, defectsFinder.LargeDefectsContoursMatrix))
+                    using (Scratches scratches = new Scratches(ImageBefor, defectsFinder.LargeDefectsContoursMatrix))
                     {
-                        CvInvoke.FillPoly(ImageAfter, defectsFinder.LargeDefectsContoursMatrix, new MCvScalar(255, 0, 255), LineType.FourConnected);
-                        ImageAfter = dust.RemoveScrates();
+                        ImageAfter = scratches.InpaintNSMethod();
+                    }
+                }
+            }
+            else
+            {
+                throw new ArgumentNullException(nameof(ImageBefor));
+            }
+        }
+        public static void ScratchesReductionInPaintTeleaMethod()
+        {
+            if (ImageBefor != null)
+            {
+                using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
+                {
+                    defectsFinder.SearchDefects();
+                    using (Scratches scratches = new Scratches(ImageBefor, defectsFinder.LargeDefectsContoursMatrix))
+                    {
+                        ImageAfter = scratches.InpaintTeleaMethod();
+                    }
+                }
+            }
+            else
+            {
+                throw new ArgumentNullException(nameof(ImageBefor));
+            }
+        }
+        public static void ScratchesReductionSpiralSingleDefectsMethod()
+        {
+            if (ImageBefor != null)
+            {
+                using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
+                {
+                    defectsFinder.SearchDefects();
+                    using (Scratches scratches = new Scratches(ImageBefor, defectsFinder.LargeDefectsContoursMatrix))
+                    {
+                        ImageAfter = scratches.DustReductionSpiralAveranging();
                     }
                 }
             }

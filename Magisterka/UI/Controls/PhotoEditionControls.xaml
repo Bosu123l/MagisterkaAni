@@ -64,11 +64,10 @@
                         <ImageBrush ImageSource="/UI;component/Icons/scratches.png"/>
                     </Button.OpacityMask>
                     <Button.ContextMenu>
-                        <ContextMenu>
+                        <ContextMenu>                            
                             <MenuItem Header="InPaint NS method"     Command="{Binding ScratchesReductionInPaintNSMethodClickedCommand, ElementName=userControl, Mode=OneWay}"/>
                             <MenuItem Header="InPaint Telea method"  Command="{Binding ScratchesReductionInPaintTeleaMethodClickedCommand, ElementName=userControl, Mode=OneWay}"/>
-                            <MenuItem Header="Spiral single defects" Command="{Binding ScratchesReductionSpiralSingleDefectsMethodClickedCommand, ElementName=userControl, Mode=OneWay}"/>
-                            <MenuItem Header="Spiral whole photo"    Command="{Binding ScratchesReductionSpiralWholePhotoMethodClickedCommand, ElementName=userControl, Mode=OneWay}"/>
+                            <MenuItem Header="Spiral single defects" Command="{Binding ScratchesReductionSpiralSingleDefectsMethodClickedCommand, ElementName=userControl, Mode=OneWay}"/>                           
                         </ContextMenu>
                     </Button.ContextMenu>
                 </Button>

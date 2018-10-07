@@ -72,8 +72,14 @@ namespace UI
             this.PhotoEditionControl.AutomaticRepairClicked += AutomaticRepair;
             this.PhotoEditionControl.DoExperimenClicked += Test;
             this.PhotoEditionControl.DustReductionClicked += DustReduction;
+            this.PhotoEditionControl.DustReductionLeftToRightAveragingDefectsMethodClicked += DustReductionLeftToRightAveragingDefectsMethodClickedCommand;
+            this.PhotoEditionControl.DustReductionSpiralAveragingDefectsMethodClicked += DustReductionSpiralAveragingDefectsMethodClickedCommand;
             this.PhotoEditionControl.ScratchesClicked += ScratchesReduction;
+            this.PhotoEditionControl.ScratchesReductionInPaintNSMethodClicked += ScratchesReductionInPaintNSMethodClickedCommand;
+            this.PhotoEditionControl.ScratchesReductionInPaintTeleaMethodClicked += ScratchesReductionInPaintTeleaMethodClickedCommand;
+            this.PhotoEditionControl.ScratchesReductionSpiralSingleDefectsMethodClicked += ScratchesReductionSpiralSingleDefectsMethodClickedCommand;
             this.PhotoEditionControl.SmudgeReductionClicked += SmudgeCleaner;
+            
             this.PhotoEditionControl.SetRegionWithoutRepairClicked += SetRegionWithoutRepair;
             this.PhotoEditionControl.CutPhotoClicked += CutPhotoBorder;
             this.PhotoEditionControl.RotateImageClicked += RotateImage;
@@ -182,6 +188,16 @@ namespace UI
         {
             InvokeAction(new Action(ImageProcessing.ReduceDust), true);
         }
+
+        private void DustReductionLeftToRightAveragingDefectsMethodClickedCommand(object sender, EventArgs e)
+        {
+            InvokeAction(new Action(ImageProcessing.DustReductionLeftToRightAveragingDefectsMethod), true);
+        }
+        private void DustReductionSpiralAveragingDefectsMethodClickedCommand(object sender, EventArgs e)
+        {
+            InvokeAction(new Action(ImageProcessing.DustReductionSpiralAveragingDefectsMethod), true);
+        }
+
         private void CutPhotoBorder(object sender, EventArgs e)
         {
             ImageView.CutBorderInitialize();
@@ -192,14 +208,28 @@ namespace UI
             ImageProcessing.CutImage(ImageView.ZoomPhotoView.Size, e);
         }
 
-        private  void SmudgeCleaner(object sender, EventArgs e)
+        private void SmudgeCleaner(object sender, EventArgs e)
         {
             InvokeAction(new Action(ImageProcessing.ReduceSmudges), true);
         }
-        private  void ScratchesReduction(object sender, EventArgs e)
+        private void ScratchesReduction(object sender, EventArgs e)
         {
             InvokeAction(new Action(ImageProcessing.ReduceScratches), true);
         }
+
+        private void ScratchesReductionInPaintNSMethodClickedCommand(object sender, EventArgs e)
+        {
+            InvokeAction(new Action(ImageProcessing.ScratchesReductionInPaintNSMethod), true);
+        }
+        private void ScratchesReductionInPaintTeleaMethodClickedCommand(object sender, EventArgs e)
+        {
+            InvokeAction(new Action(ImageProcessing.ScratchesReductionInPaintTeleaMethod), true);
+        }
+        private void ScratchesReductionSpiralSingleDefectsMethodClickedCommand(object sender, EventArgs e)
+        {
+            InvokeAction(new Action(ImageProcessing.ScratchesReductionSpiralSingleDefectsMethod), true);
+        }       
+
         private  void RotateImage(object sender, EventArgs e)
         {
             InvokeAction(new Action(ImageProcessing.RotateImage), true, true);
