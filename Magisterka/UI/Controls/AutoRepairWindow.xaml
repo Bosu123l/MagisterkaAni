@@ -1,0 +1,25 @@
+﻿<Window x:Class="UI.Controls.AutoRepairWindow"
+        x:Name="_autoRepairWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UI.Controls"
+        mc:Ignorable="d"
+        Title="Select autorepair modules" SizeToContent="WidthAndHeight" MinWidth="300"
+        FontSize="16"
+        WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow">
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CheckBox Grid.Row="0" Content="Clean smudges"  IsChecked="{Binding CleanSmudges}" VerticalAlignment="Center" Margin="10"/>
+        <CheckBox Grid.Row="1" Content="Clean scrates"  IsChecked="{Binding CleanScrates}" VerticalAlignment="Center" Margin="10"/>
+        <CheckBox Grid.Row="2" Content="Clean dust"     IsChecked="{Binding CleanDust}" VerticalAlignment="Center" Margin="10"/>
+        <Button Grid.Row="3"  Content="Start"/>
+    </Grid>
+   
+</Window>

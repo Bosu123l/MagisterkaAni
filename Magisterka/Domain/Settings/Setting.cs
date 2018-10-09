@@ -1,42 +1,87 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
+using System.Xml.Serialization;
 
 namespace Domain.Settings
 {
-    public static class Setting
+    public class Settings
     {
-        public static int LargeDefectsKernel
+        private static string _settingsFilePath = "../PhotoCleaner.config";
+        
+        public static int ScratchesKernelSize
         {
-            get;
-            set;
+            get { return _largeDefectsKernel; }
+            set
+            {
+                if(value>2 && value<100)
+                {
+                    _largeDefectsKernel = value;
+                }
+            }
         }
-        public static int SmallDefectsKernel
+        public static int DustKernelSize
         {
-            get;
-            set;
+            get { return _smallDefectsKernel; }
+            set
+            {
+                if (value > 2 && value < 100)
+                {
+                    _smallDefectsKernel = value;
+                }
+            }
         }
         public static float SmudgesMargin
         {
-            get;
-            set;
+            get { return _smudgesMargin; }
+            set
+            {
+                if (value >=0.0f && value < 1.0f)
+                {
+                    _smudgesMargin = value;
+                }
+            }
         }
 
-        public static int _largeDefectsKernel;
-        public static int _smallDefectsKernel;
-        public static float _smudgesMargin;
+        public static int _largeDefectsKernel = 5;
+        public static int _smallDefectsKernel = 5;
+        public static float _smudgesMargin = 0.0f;
 
 
-        public static void GetSettings()
+        public static void LoadSettings()
         {
+            if (!File.Exists(_settingsFilePath))
+            {
+                File.Create(_settingsFilePath).Close();
+            }
 
+            using (FileStream stream = new FileStream(_settingsFilePath, FileMode.Open))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(XMLSetting));
+                XMLSetting xml = (XMLSetting)serializer.Deserialize(stream);
+
+                ScratchesKernelSize = xml.ScratchesKernelSize;
+                DustKernelSize = xml.DustKernelSize;
+                SmudgesMargin = xml.SmudgesMargin;
+
+                stream.Close();
+            }
         }
 
         public static void SaveSettings()
-        {
+        {            
+            using (var stream = new FileStream(_settingsFilePath, FileMode.OpenOrCreate))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(XMLSetting));
+                XMLSetting xml = new XMLSetting()
+                {
+                    ScratchesKernelSize = ScratchesKernelSize,
+                    DustKernelSize = DustKernelSize,
+                    SmudgesMargin = SmudgesMargin
+                };     
 
+                serializer.Serialize(stream, xml);
+
+                stream.Close();                
+            }
         }
     }
 }

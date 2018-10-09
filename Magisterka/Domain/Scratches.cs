@@ -13,7 +13,7 @@ namespace Domain
     {
         private VectorOfVectorOfPoint _conturMatrix;
         private Image<Bgr, byte> _orgImage;
-        private int _kernelSize = 5;
+        private int _kernelSize = Settings.Settings.ScratchesKernelSize;
         
         public Scratches(Image<Bgr, byte> orgImage, VectorOfVectorOfPoint conturMatrix)
         {

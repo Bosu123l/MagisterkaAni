@@ -114,11 +114,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\AutoRepairWindow.xaml.cs">
+      <DependentUpon>AutoRepairWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ImgeViewer.xaml.cs">
       <DependentUpon>ImgeViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\PhotoEditionControls.xaml.cs">
       <DependentUpon>PhotoEditionControls.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProgressBar.xaml.cs">
       <DependentUpon>ProgressBar.xaml</DependentUpon>
@@ -127,11 +133,19 @@
     <Compile Include="Controls\ViewControls.xaml.cs">
       <DependentUpon>ViewControls.xaml</DependentUpon>
     </Compile>
+    <Page Include="Controls\AutoRepairWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\FileControls.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\ImgeViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

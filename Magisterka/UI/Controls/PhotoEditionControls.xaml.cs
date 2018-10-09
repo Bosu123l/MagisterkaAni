@@ -57,35 +57,6 @@ namespace UI
             DustReductionClicked?.Invoke(this, EventArgs.Empty);
         }
 
-        #region DustReductionAlternativeMethods
-            #region DustReductionLeftToRightAveragingDefectsMethod
-                public event EventHandler DustReductionLeftToRightAveragingDefectsMethodClicked;
-
-                public ICommand DustReductionLeftToRightAveragingDefectsMethodClickedCommand
-                {
-                    get { return new RelayCommand(DustReductionLeftToRightAveragingDefectsMethodClickedCommandExecute); }
-                }
-
-                private void DustReductionLeftToRightAveragingDefectsMethodClickedCommandExecute(object obj)
-                {
-                    DustReductionLeftToRightAveragingDefectsMethodClicked?.Invoke(this, EventArgs.Empty);
-                }
-            #endregion DustReductionLeftToRightAveragingDefectsMethod
-            #region DustReductionSpiralAveragingDefectsMethod
-                public event EventHandler DustReductionSpiralAveragingDefectsMethodClicked;
-
-                public ICommand DustReductionSpiralAveragingDefectsMethodClickedCommand
-                {
-                    get { return new RelayCommand(DustReductionSpiralAveragingDefectsMethodClickedCommandExecute); }
-                }
-
-                private void DustReductionSpiralAveragingDefectsMethodClickedCommandExecute(object obj)
-                {
-                    DustReductionSpiralAveragingDefectsMethodClicked?.Invoke(this, EventArgs.Empty);
-                }
-            #endregion DustReductionSpiralAveragingDefectsMethod
-        #endregion DustReductionAlternativeMethods
-
         #endregion DustReduction
 
         #region Scratches
@@ -98,48 +69,6 @@ namespace UI
         {
             ScratchesClicked?.Invoke(this, EventArgs.Empty);
         }
-
-
-        #region ScratchesAlternativeMethods
-            #region ScratchesReductionInPaintNSMethodClickedCommand
-            public event EventHandler ScratchesReductionInPaintNSMethodClicked;
-            public ICommand ScratchesReductionInPaintNSMethodClickedCommand
-            {
-                get { return new RelayCommand(ScratchesReductionInPaintNSMethodClickExecute); }
-            }
-            private void ScratchesReductionInPaintNSMethodClickExecute(object obj)
-            {
-                ScratchesReductionInPaintNSMethodClicked?.Invoke(this, EventArgs.Empty);
-            }
-            #endregion ScratchesReductionInPaintNSMethodClickedCommand
-
-            #region ScratchesReductionInPaintTeleaMethodClickedCommand
-            public event EventHandler ScratchesReductionInPaintTeleaMethodClicked;
-            public ICommand ScratchesReductionInPaintTeleaMethodClickedCommand
-            {
-                get { return new RelayCommand(ScratchesReductionInPaintTeleaMethodClickExecute); }
-            }
-            private void ScratchesReductionInPaintTeleaMethodClickExecute(object obj)
-            {
-                ScratchesReductionInPaintTeleaMethodClicked?.Invoke(this, EventArgs.Empty);
-            }
-            #endregion ScratchesReductionInPaintTeleaMethodClickedCommand
-
-            #region ScratchesReductionSpiralSingleDefectsMethodClickedCommand
-            public event EventHandler ScratchesReductionSpiralSingleDefectsMethodClicked;
-            public ICommand ScratchesReductionSpiralSingleDefectsMethodClickedCommand
-            {
-                get { return new RelayCommand(ScratchesReductionSpiralSingleDefectsMethodClickExecute); }
-            }
-            private void ScratchesReductionSpiralSingleDefectsMethodClickExecute(object obj)
-            {
-                ScratchesReductionSpiralSingleDefectsMethodClicked?.Invoke(this, EventArgs.Empty);
-            }
-            #endregion ScratchesReductionSpiralSingleDefectsMethodClickedCommand
-
-        #endregion ScratchesAlternativeMethods
-
-
         #endregion Scratches
 
         #region SmudgeReduction
@@ -200,11 +129,38 @@ namespace UI
         {
             SettingsClicked?.Invoke(this, EventArgs.Empty);
         }
-        #endregion Settings
+        #endregion Settings 
+
+        public event EventHandler ScratchesReductionInPaintNSMethodClick;
+        public event EventHandler ScratchesReductionInPaintTeleaMethodClick;
+        public event EventHandler ScratchesReductionSpiralSingleDefectsMethodClick;
+        public event EventHandler DustReductionLeftToRightAveragingDefectsMethodClick;
+        public event EventHandler DustReductionSpiralAveragingDefectsMethodClick;
 
         public PhotoEditionControls()
         {
-            InitializeComponent();           
+            InitializeComponent();
+        }       
+
+        private void ScratchesReductionInPaintNSMethod(object sender, RoutedEventArgs e)
+        {
+            ScratchesReductionInPaintNSMethodClick?.Invoke(sender, e);
+        } 
+        private void ScratchesReductionInPaintTeleaMethod(object sender, RoutedEventArgs e)
+        {
+            ScratchesReductionInPaintTeleaMethodClick?.Invoke(sender, e);
+        }
+        private void ScratchesReductionSpiralSingleDefectsMethod(object sender, RoutedEventArgs e)
+        {
+            ScratchesReductionSpiralSingleDefectsMethodClick?.Invoke(sender, e);
         }        
+        private void DustReductionLeftToRightAveragingDefectsMethod(object sender, RoutedEventArgs e)
+        {
+            DustReductionLeftToRightAveragingDefectsMethodClick?.Invoke(sender, e);
+        }
+        private void DustReductionSpiralAveragingDefectsMethod(object sender, RoutedEventArgs e)
+        {
+            DustReductionSpiralAveragingDefectsMethodClick?.Invoke(sender, e);
+        }
     }
 }

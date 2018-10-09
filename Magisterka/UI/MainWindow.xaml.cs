@@ -6,6 +6,8 @@ using Domain;
 using System.Threading.Tasks;
 using Emgu.CV;
 using System.Drawing;
+using UI.Controls;
+using Domain.Settings;
 
 namespace UI
 {
@@ -50,6 +52,7 @@ namespace UI
             InitializeComponent();
             InitializeButtonsEvents();
 
+            Settings.LoadSettings();
             ImageProcessing.ImageAfterChange += ImageProcessing_ImageAfterChange; 
         }
 
@@ -72,12 +75,12 @@ namespace UI
             this.PhotoEditionControl.AutomaticRepairClicked += AutomaticRepair;
             this.PhotoEditionControl.DoExperimenClicked += Test;
             this.PhotoEditionControl.DustReductionClicked += DustReduction;
-            this.PhotoEditionControl.DustReductionLeftToRightAveragingDefectsMethodClicked += DustReductionLeftToRightAveragingDefectsMethodClickedCommand;
-            this.PhotoEditionControl.DustReductionSpiralAveragingDefectsMethodClicked += DustReductionSpiralAveragingDefectsMethodClickedCommand;
+            this.PhotoEditionControl.DustReductionLeftToRightAveragingDefectsMethodClick += DustReductionLeftToRightAveragingDefectsMethod;
+            this.PhotoEditionControl.DustReductionSpiralAveragingDefectsMethodClick += DustReductionSpiralAveragingDefectsMethod;
             this.PhotoEditionControl.ScratchesClicked += ScratchesReduction;
-            this.PhotoEditionControl.ScratchesReductionInPaintNSMethodClicked += ScratchesReductionInPaintNSMethodClickedCommand;
-            this.PhotoEditionControl.ScratchesReductionInPaintTeleaMethodClicked += ScratchesReductionInPaintTeleaMethodClickedCommand;
-            this.PhotoEditionControl.ScratchesReductionSpiralSingleDefectsMethodClicked += ScratchesReductionSpiralSingleDefectsMethodClickedCommand;
+            this.PhotoEditionControl.ScratchesReductionInPaintNSMethodClick += ScratchesReductionInPaintNSMethod;
+            this.PhotoEditionControl.ScratchesReductionInPaintTeleaMethodClick += ScratchesReductionInPaintTeleaMethod;
+            this.PhotoEditionControl.ScratchesReductionSpiralSingleDefectsMethodClick += ScratchesReductionSpiralSingleDefectsMethod;
             this.PhotoEditionControl.SmudgeReductionClicked += SmudgeCleaner;
             
             this.PhotoEditionControl.SetRegionWithoutRepairClicked += SetRegionWithoutRepair;
@@ -182,6 +185,9 @@ namespace UI
         #region OperationsOnPhoto
         private void AutomaticRepair(object sender, EventArgs e)
         {
+            AutoRepairWindow ar = new AutoRepairWindow();
+            ar.ShowDialog();
+
             InvokeAction(new Action(ImageProcessing.AutomaticRepair), true);
         }
         private void DustReduction(object sender, EventArgs e)
@@ -189,11 +195,11 @@ namespace UI
             InvokeAction(new Action(ImageProcessing.ReduceDust), true);
         }
 
-        private void DustReductionLeftToRightAveragingDefectsMethodClickedCommand(object sender, EventArgs e)
+        private void DustReductionLeftToRightAveragingDefectsMethod(object sender, EventArgs e)
         {
             InvokeAction(new Action(ImageProcessing.DustReductionLeftToRightAveragingDefectsMethod), true);
         }
-        private void DustReductionSpiralAveragingDefectsMethodClickedCommand(object sender, EventArgs e)
+        private void DustReductionSpiralAveragingDefectsMethod(object sender, EventArgs e)
         {
             InvokeAction(new Action(ImageProcessing.DustReductionSpiralAveragingDefectsMethod), true);
         }
@@ -217,15 +223,15 @@ namespace UI
             InvokeAction(new Action(ImageProcessing.ReduceScratches), true);
         }
 
-        private void ScratchesReductionInPaintNSMethodClickedCommand(object sender, EventArgs e)
+        private void ScratchesReductionInPaintNSMethod(object sender, EventArgs e)
         {
             InvokeAction(new Action(ImageProcessing.ScratchesReductionInPaintNSMethod), true);
         }
-        private void ScratchesReductionInPaintTeleaMethodClickedCommand(object sender, EventArgs e)
+        private void ScratchesReductionInPaintTeleaMethod(object sender, EventArgs e)
         {
             InvokeAction(new Action(ImageProcessing.ScratchesReductionInPaintTeleaMethod), true);
         }
-        private void ScratchesReductionSpiralSingleDefectsMethodClickedCommand(object sender, EventArgs e)
+        private void ScratchesReductionSpiralSingleDefectsMethod(object sender, EventArgs e)
         {
             InvokeAction(new Action(ImageProcessing.ScratchesReductionSpiralSingleDefectsMethod), true);
         }       
@@ -240,7 +246,8 @@ namespace UI
         }
         private  void OpenSettings(object sender, EventArgs e)
         {
-
+            SettingsWindow sw = new SettingsWindow();
+            sw.ShowDialog();
         }
         private  void Test(object sender, EventArgs e)
         {

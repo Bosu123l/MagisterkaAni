@@ -42,8 +42,10 @@ namespace Domain
                 return _redTone;
             }
         }
+        
 
         private Image<Bgr, byte> _image;
+        private float _margin = Settings.Settings.SmudgesMargin;
 
         private double _blueTone;
         private double _greenTone;
@@ -73,7 +75,7 @@ namespace Domain
 
         private void RepairColor(ref Image<Bgr, byte> cleanedImage, Image<Gray, byte> grayImage, Image<Gray, byte> generalImageMask, BgrColor bgrColor, double colorTone, CmpType cmpType)
         {
-            using(Image<Gray,byte>defectsMask = CreateMaskOfOverInappropriateColorProportions(grayImage,cleanedImage/*_image*/, colorTone, bgrColor, cmpType))
+            using(Image<Gray,byte>defectsMask = CreateMaskOfOverInappropriateColorProportions(grayImage,cleanedImage/*_image*/, colorTone, bgrColor, cmpType, _margin))
             {
                 using (Image<Gray, byte> repairMask = generalImageMask.Mul(defectsMask))
                 {                    
@@ -86,7 +88,7 @@ namespace Domain
                 }
             }
         }
-        private Image<Gray, byte> CreateMaskOfOverInappropriateColorProportions(Image<Gray, byte> grayImage, Image<Bgr, byte> image, double tone, BgrColor color, CmpType cmpType, double margin=0.00)
+        private Image<Gray, byte> CreateMaskOfOverInappropriateColorProportions(Image<Gray, byte> grayImage, Image<Bgr, byte> image, double tone, BgrColor color, CmpType cmpType, double margin)
         {
             double interval = 0;
             float count = (image?.CountNonzero()[(int)color]) ?? 1;

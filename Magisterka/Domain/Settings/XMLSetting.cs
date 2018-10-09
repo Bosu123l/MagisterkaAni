@@ -2,22 +2,22 @@
 
 namespace Domain.Settings
 {
-    [XmlType(nameof(Setting))]
+    [XmlType(nameof(Settings))]
     public class XMLSetting
     {
-        [XmlAttribute(nameof(Setting.LargeDefectsKernel))]
-        public int LargeDefectsKernel
+        [XmlAttribute(nameof(Settings.ScratchesKernelSize))]
+        public int ScratchesKernelSize
         {
             get;
             set;
         }
-        [XmlAttribute(nameof(Setting.SmallDefectsKernel))]
-        public int SmallDefectsKernel
+        [XmlAttribute(nameof(Settings.DustKernelSize))]
+        public int DustKernelSize
         {
             get;
             set;
         }
-        [XmlAttribute(nameof(Setting.SmudgesMargin))]
+        [XmlAttribute(nameof(Settings.SmudgesMargin))]
         public float SmudgesMargin
         {
             get;
