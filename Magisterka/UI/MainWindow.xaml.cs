@@ -74,13 +74,19 @@ namespace UI
                      
             this.PhotoEditionControl.AutomaticRepairClicked += AutomaticRepair;
             this.PhotoEditionControl.DoExperimenClicked += Test;
+            #region Dust
             this.PhotoEditionControl.DustReductionClicked += DustReduction;
             this.PhotoEditionControl.DustReductionLeftToRightAveragingDefectsMethodClick += DustReductionLeftToRightAveragingDefectsMethod;
             this.PhotoEditionControl.DustReductionSpiralAveragingDefectsMethodClick += DustReductionSpiralAveragingDefectsMethod;
+            #endregion Dust
+
+            #region Scatches
             this.PhotoEditionControl.ScratchesClicked += ScratchesReduction;
             this.PhotoEditionControl.ScratchesReductionInPaintNSMethodClick += ScratchesReductionInPaintNSMethod;
             this.PhotoEditionControl.ScratchesReductionInPaintTeleaMethodClick += ScratchesReductionInPaintTeleaMethod;
             this.PhotoEditionControl.ScratchesReductionSpiralSingleDefectsMethodClick += ScratchesReductionSpiralSingleDefectsMethod;
+            #endregion Scatches
+
             this.PhotoEditionControl.SmudgeReductionClicked += SmudgeCleaner;
             
             this.PhotoEditionControl.SetRegionWithoutRepairClicked += SetRegionWithoutRepair;
@@ -183,12 +189,42 @@ namespace UI
         #endregion FileOperation
 
         #region OperationsOnPhoto
-        private void AutomaticRepair(object sender, EventArgs e)
+        private async void AutomaticRepair(object sender, EventArgs e)
         {
-            AutoRepairWindow ar = new AutoRepairWindow();
-            ar.ShowDialog();
+            AutoRepairWindow arw = new AutoRepairWindow();
+            arw.ShowDialog();
 
-            InvokeAction(new Action(ImageProcessing.AutomaticRepair), true);
+            if(arw.DialogResult==true)
+            {
+                ProgressBar progressBar = new ProgressBar();
+                try
+                {
+                    EnableControl = false;                   
+                    progressBar.Show();
+                    
+                    await Task.Run(() => { ImageProcessing.AutomaticRepair(arw.CleanDust, arw.CleanScrates, arw.CleanSmudges); });
+                }
+                catch (ArgumentNullException anEx)
+                {
+                    if (anEx.Message == nameof(ImageProcessing.ImageBefor))
+                    {
+                        MessageBox.Show("Load image at first!", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else
+                    {
+                        throw new Exception(anEx.Message, anEx);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message + ex.StackTrace, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                finally
+                {
+                    progressBar.Close();                   
+                    EnableControl = true;
+                }
+            }
         }
         private void DustReduction(object sender, EventArgs e)
         {

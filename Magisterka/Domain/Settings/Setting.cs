@@ -63,7 +63,7 @@ namespace Domain.Settings
                 SmudgesMargin = xml.SmudgesMargin;
 
                 stream.Close();
-            }
+            } 
         }
 
         public static void SaveSettings()

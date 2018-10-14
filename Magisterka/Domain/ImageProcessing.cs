@@ -1,5 +1,4 @@
 ﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System;
 using System.Collections.Generic;
@@ -59,17 +58,51 @@ namespace Domain
             }
         }
 
-        public static void AutomaticRepair()
+        public static void AutomaticRepair(bool dust, bool scratches, bool smudges)
         {
+            int steps = 0;
+
+            steps = dust ? steps + 1 : steps;
+            steps = scratches ? steps + 1 : steps;
+            steps = smudges ? steps + 1 : steps;
+
             if (ImageBefor != null)
             {
-            }
-            else
-            {
-                throw new ArgumentNullException(nameof(ImageBefor));
+                ProgressManager.AddSteps(3);
+
+                if(smudges)
+                {
+                    using (Smudge smudge = new Smudge(ImageBefor))
+                    {
+                        ImageAfter = smudge.CleanSmudges();
+                    }
+                }
+
+                if(dust || scratches)
+                {
+                    using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
+                    {
+                        defectsFinder.SearchDefects();
+                        if(dust)
+                        {
+                            using (Dust dustCleaner = new Dust(ImageAfter, defectsFinder.SmallDefectsContoursMatrix))
+                            {
+                                ImageAfter = dustCleaner.DustReductionLeftToRight();
+                            }
+                        }
+                       
+                        if (scratches)
+                        {
+                            using (Scratches scratchesCleaner = new Scratches(ImageAfter, defectsFinder.LargeDefectsContoursMatrix))
+                            {
+                                ImageAfter = scratchesCleaner.DustReductionSpiralAveranging();
+                            }
+                        }                      
+                    }
+                }               
             }
         }
-        public async static void Test()
+        public static void Test()
         {
             if (ImageBefor != null)
             {
@@ -86,36 +119,37 @@ namespace Domain
 
                 List<double> hue = new List<double>();
 
-                for (int x = 0; x < hsvImage.Height; x ++)
+                for (int x = 0; x < hsvImage.Height; x++)
                 {
-                    for (int y = 0; y < hsvImage.Width; y ++)
+                    for (int y = 0; y < hsvImage.Width; y++)
                     {
                         hue.Add(hsvImage[x, y].Hue);
                     }
                 }
 
-                var max = hue.GroupBy(x=>x).OrderByDescending(x=>x.Count()).First().Key;
-                hue = hue.GroupBy(x => x).Select(x=>x.Key).ToList();
+                var max = hue.GroupBy(x => x).OrderByDescending(x => x.Count()).First().Key;
+                hue = hue.GroupBy(x => x).Select(x => x.Key).ToList();
                 var median = hue[hue.Count / 2];
-                
+
                 for (int x = 0; x < hsvImage.Height; x++)
                 {
                     for (int y = 0; y < hsvImage.Width; y++)
                     {
                         var pix = hsvImage[x, y].Hue;
 
-                        if(pix>max+10 || pix<max-10)
+                        if (pix > max + 10 || pix < max - 10)
                         {
-                            hsvImage.Data[x,y,0] = 90;
-                        }else
+                            hsvImage.Data[x, y, 0] = 90;
+                        }
+                        else
                         {
                             hsvImage.Data[x, y, 0] = 180;
                         }
                     }
                 }
 
-                ImageAfter = hsvImage.Convert<Bgr, byte>(); 
-             
+                ImageAfter = hsvImage.Convert<Bgr, byte>();
+
                 //Image<Bgra, byte> bgraImage = ImageBefor.Convert<Bgra, byte>();
                 //for (int i = 0; i < 4; i++)
                 //{
@@ -179,7 +213,7 @@ namespace Domain
             else
             {
                 throw new ArgumentNullException(nameof(ImageBefor));
-            }           
+            }
         }
 
         #region Dust
@@ -195,15 +229,11 @@ namespace Domain
                 using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
                 {
                     defectsFinder.SearchDefects();
-                    using (Dust dust = new Dust(ImageBefor, defectsFinder.DefectsContoursMatrix))
+                    using (Dust dust = new Dust(ImageBefor, defectsFinder.SmallDefectsContoursMatrix))
                     {
                         ImageAfter = dust.DustReductionLeftToRight();
                     }
                 }
-            }
-            else
-            {
-                throw new ArgumentNullException(nameof(ImageBefor));
             }
         }
         public static void DustReductionSpiralAveragingDefectsMethod()
@@ -214,15 +244,11 @@ namespace Domain
                 using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
                 {
                     defectsFinder.SearchDefects();
-                    using (Dust dust = new Dust(ImageBefor, defectsFinder.DefectsContoursMatrix))
+                    using (Dust dust = new Dust(ImageBefor, defectsFinder.SmallDefectsContoursMatrix))
                     {
                         ImageAfter = dust.DustReductionSpiralAveranging();
                     }
                 }
-            }
-            else
-            {
-                throw new ArgumentNullException(nameof(ImageBefor));
             }
         }
         #endregion Dust
@@ -246,10 +272,6 @@ namespace Domain
                     }
                 }
             }
-            else
-            {
-                throw new ArgumentNullException(nameof(ImageBefor));
-            }
         }
         public static void ScratchesReductionInPaintTeleaMethod()
         {
@@ -263,10 +285,6 @@ namespace Domain
                         ImageAfter = scratches.InpaintTeleaMethod();
                     }
                 }
-            }
-            else
-            {
-                throw new ArgumentNullException(nameof(ImageBefor));
             }
         }
         public static void ScratchesReductionSpiralSingleDefectsMethod()
@@ -282,10 +300,6 @@ namespace Domain
                     }
                 }
             }
-            else
-            {
-                throw new ArgumentNullException(nameof(ImageBefor));
-            }
         }
         #endregion Scratches
 
@@ -298,20 +312,12 @@ namespace Domain
                     ImageAfter = smudge.CleanSmudges();
                 }
             }
-            else
-            {
-                throw new ArgumentNullException(nameof(ImageBefor));
-            }
         }        
         public static void SetRegionWithoutRepair()
         {
             if (ImageBefor != null)
             {
 
-            }
-            else
-            {
-                throw new ArgumentNullException(nameof(ImageBefor));
             }
         }
         public static void CutImage(Size viewWindowSize, Rectangle rectangleToCut)
@@ -322,10 +328,6 @@ namespace Domain
                 ImageBefor = ci.CutImageByRectangle(ImageBefor);
                 ImageAfter = ci.CutImageByRectangle(ImageAfter);               
             }
-            else
-            {
-                throw new ArgumentNullException(nameof(ImageBefor));
-            }
         }
         public static void RotateImage()
         {
@@ -333,10 +335,6 @@ namespace Domain
             {
                 ImageAfter = Aligning.RotateOn90(ImageAfter);
                 ImageBefor = Aligning.RotateOn90(ImageBefor);
-            }
-            else
-            {
-                throw new ArgumentNullException(nameof(ImageBefor));
             }
         }       
     }

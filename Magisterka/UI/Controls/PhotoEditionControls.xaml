@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:UI"
              mc:Ignorable="d">
     <UserControl.Resources>
         <Style TargetType="Button" BasedOn="{StaticResource OpacityMenuButton}"/>
@@ -39,7 +38,8 @@
                 </Button>
                 <Button x:Name="Experiment"
                     ToolTip="Experiment"
-                    Command="{Binding DoExperimenClickedCommand, ElementName=userControl, Mode=OneWay}">
+                    Command="{Binding DoExperimenClickedCommand, ElementName=userControl, Mode=OneWay}"
+                    Visibility="Collapsed">
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/experiment.png"/>
                     </Button.OpacityMask>

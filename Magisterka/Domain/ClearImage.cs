@@ -43,7 +43,7 @@ namespace Domain
                 throw new ArgumentNullException(nameof(defects));
             }
 
-            if (kernel < 2)
+            if (kernel > 1)
             {
                 _kernelSize = kernel;
             }
@@ -133,7 +133,7 @@ namespace Domain
 
                 SpiralClean(minH, minW, maxH, maxW, maxImgH, maxImgW);
             }
-            return _orgImage;
+            return _orgImage.Copy();
         }
         public void SpiralClean(int minH, int minW, int maxH, int maxW, int maxImgH, int maxImgW)
         {                                                                   
@@ -248,7 +248,8 @@ namespace Domain
         
         public void Dispose()
         {
-
+            _orgImage.Dispose();
+            _defects = null;
         }
     }
 }

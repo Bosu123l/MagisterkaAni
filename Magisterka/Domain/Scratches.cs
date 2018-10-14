@@ -64,7 +64,6 @@ namespace Domain
         #endregion SpiralCleaner
 
         #region Inpaint
-
         public Image<Bgr, byte> InpaintTeleaMethod()
         {
             return InpaintMethod(_conturMatrix, InpaintType.Telea);
@@ -88,7 +87,6 @@ namespace Domain
             var mask = GetMaskOfDefect(defect);
             CvInvoke.Inpaint(_orgImage, mask, _orgImage, 1.0, ip);
         }
-
         #endregion Inpaint
 
         public void Dispose()
