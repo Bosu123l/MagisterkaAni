@@ -8,17 +8,16 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Domain.CutPhoto">
-    <Position X="6" Y="6.25" Width="2.5" />
+    <Position X="4.5" Y="6.25" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AAQAAACYACSAAAAAAAAAAAAAABAACAAAAgAABAACAAA=</HashCode>
+      <HashCode>ACgAAAAAAAgAAAACQAAAAAAAQAAAAAAAAQIEAIAAAAA=</HashCode>
       <FileName>CutPhoto.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Domain.DefectsFinder" BaseTypeListCollapsed="true">
-    <Position X="9.25" Y="0.5" Width="3.5" />
+    <Position X="8" Y="3.25" Width="4" />
     <TypeIdentifier>
-      <HashCode>AEAAAAJAgGIAAAJCAEAAQIAAYAAACAACAAAAQAAAAAg=</HashCode>
+      <HashCode>AEAAAAIAgGIAAAJCAEAAQIAAYAAACAACAAAAQAAgAAA=</HashCode>
       <FileName>DefectsFinder.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -26,34 +25,37 @@
   <Class Name="Domain.Dust" BaseTypeListCollapsed="true">
     <Position X="0.5" Y="13.5" Width="3.75" />
     <TypeIdentifier>
-      <HashCode>AAAgAAAAACAAAAAQAAAAAAAAgABAAAAAAAIAAAAAAQA=</HashCode>
+      <HashCode>AAAgAAAAACAAAAAAgAAAAAAAEAAAAAIAAAAAACAAAQA=</HashCode>
       <FileName>Dust.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Domain.FileOperations">
-    <Position X="5.5" Y="0.5" Width="3.25" />
+    <Position X="4.5" Y="0.5" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AAAKQgAAAAAIAAQEQgAGAGAAAIAIAAAAAQhAAAAAIgA=</HashCode>
       <FileName>FileOperations.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Domain.ImageProcessing">
-    <Position X="0.5" Y="4" Width="3.75" />
+    <Position X="0.5" Y="3" Width="3.75" />
+    <Compartments>
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
-      <HashCode>QCIAAAAAAAABIAAAAQAAAAMAAAARAABAAAAACEAAAAA=</HashCode>
+      <HashCode>QCAACJAgAAABIAAAAQAAAAMAAAARAABAAAAACGBgQAA=</HashCode>
       <FileName>ImageProcessing.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Domain.MorphologicalProcessing">
-    <Position X="0.5" Y="1" Width="3.75" />
+    <Position X="0.5" Y="0.5" Width="3.75" />
     <TypeIdentifier>
       <HashCode>QAAAAAAAAAAAAAAAAAAQAYAAAAAEAAAAAAAgAAAAgAA=</HashCode>
       <FileName>MorphologicalProcessing.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Domain.Aligning">
-    <Position X="9.75" Y="7.25" Width="2.5" />
+    <Position X="8.5" Y="9.5" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAEAAAAAAAAAAAI=</HashCode>
       <FileName>Aligning.cs</FileName>
@@ -90,14 +92,15 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Domain.Scratches">
-    <Position X="9.5" Y="9.25" Width="3" />
+    <Position X="5.25" Y="9.5" Width="3" />
     <TypeIdentifier>
-      <HashCode>AgAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAA=</HashCode>
+      <HashCode>AAAgAAAAEGAAAAAEgCAAAAAAEAAAAAAAAAAAACAACQA=</HashCode>
       <FileName>Scratches.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Domain.Smudge" BaseTypeListCollapsed="true">
-    <Position X="0.5" Y="8.75" Width="4.75" />
+    <Position X="0.5" Y="9.75" Width="4.75" />
     <NestedTypes>
       <Enum Name="Domain.Smudge.BgrColor" Collapsed="true">
         <TypeIdentifier>
@@ -106,13 +109,13 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAABEAACAAAAAQAABCAAAABkAAQAAAAAAACIABAAA=</HashCode>
+      <HashCode>AAAAABEAAiAAAAAQAABCAAAABkAAQAAAAAAACKABAAA=</HashCode>
       <FileName>Smudge.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ExitCodes">
-    <Position X="21" Y="0.5" Width="3.5" />
+    <Position X="15.25" Y="7" Width="3.5" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
@@ -127,6 +130,21 @@
       <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAA=</HashCode>
       <FileName>ExitCodes.cs</FileName>
     </TypeIdentifier>
+  </Class>
+  <Class Name="Domain.ImageCleaner">
+    <Position X="19.75" Y="8.5" Width="4" />
+    <NestedTypes>
+      <Struct Name="Domain.ImageCleaner.MatElement" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ClearImage.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ABAQEAAAACAAAAAAIAABIAgAEgAAABAAAAAAACAAAQA=</HashCode>
+      <FileName>ClearImage.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

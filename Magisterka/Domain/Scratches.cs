@@ -13,9 +13,10 @@ namespace Domain
     {
         private VectorOfVectorOfPoint _conturMatrix;
         private Image<Bgr, byte> _orgImage;
+        private Image<Gray, byte> _exclFromCleaning;
         private int _kernelSize = Settings.Settings.ScratchesKernelSize;
         
-        public Scratches(Image<Bgr, byte> orgImage, VectorOfVectorOfPoint conturMatrix)
+        public Scratches(Image<Bgr, byte> orgImage, VectorOfVectorOfPoint conturMatrix, Image<Gray, byte> exclFromCleaning)
         {
             if (orgImage != null)
             {
@@ -34,6 +35,8 @@ namespace Domain
             {
                 throw new ArgumentNullException(nameof(conturMatrix));
             }
+
+            _exclFromCleaning = exclFromCleaning;
         }
 
         public Image<Bgr,byte>RemoveScrates()
@@ -56,7 +59,7 @@ namespace Domain
         #region SpiralCleaner
         public Image<Bgr,byte> DustReductionSpiralAveranging()
         {
-            using (ImageCleaner ic = new ImageCleaner(_orgImage, _conturMatrix, _kernelSize))
+            using (ImageCleaner ic = new ImageCleaner(_orgImage, _conturMatrix, _kernelSize, _exclFromCleaning))
             {
                 return ic.SpiralCleanSingleDefects();
             }

@@ -45,6 +45,7 @@ namespace Domain
         
 
         private Image<Bgr, byte> _image;
+        private Image<Gray, byte> _exclFromCleaning;
         private float _margin = Settings.Settings.SmudgesMargin;
 
         private double _blueTone;

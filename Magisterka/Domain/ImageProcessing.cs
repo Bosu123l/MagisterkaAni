@@ -11,7 +11,7 @@ namespace Domain
     {
         private static Image<Bgr, byte> _imageBefor;
         private static Image<Bgr, byte> _imageAfter;
-
+        private static Image<Gray, byte> _exclFromCleaning;
         public static event EventHandler<Image<Bgr, byte>> ImageAfterChange;
 
         public static void OnImageAfterChange(Image<Bgr, byte> image)
@@ -85,7 +85,7 @@ namespace Domain
                         defectsFinder.SearchDefects();
                         if(dust)
                         {
-                            using (Dust dustCleaner = new Dust(ImageAfter, defectsFinder.SmallDefectsContoursMatrix))
+                            using (Dust dustCleaner = new Dust(ImageAfter, defectsFinder.SmallDefectsContoursMatrix, _exclFromCleaning))
                             {
                                 ImageAfter = dustCleaner.DustReductionLeftToRight();
                             }
@@ -93,7 +93,7 @@ namespace Domain
                        
                         if (scratches)
                         {
-                            using (Scratches scratchesCleaner = new Scratches(ImageAfter, defectsFinder.LargeDefectsContoursMatrix))
+                            using (Scratches scratchesCleaner = new Scratches(ImageAfter, defectsFinder.LargeDefectsContoursMatrix, _exclFromCleaning))
                             {
                                 ImageAfter = scratchesCleaner.DustReductionSpiralAveranging();
                             }
@@ -229,7 +229,7 @@ namespace Domain
                 using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
                 {
                     defectsFinder.SearchDefects();
-                    using (Dust dust = new Dust(ImageBefor, defectsFinder.SmallDefectsContoursMatrix))
+                    using (Dust dust = new Dust(ImageBefor, defectsFinder.SmallDefectsContoursMatrix, _exclFromCleaning))
                     {
                         ImageAfter = dust.DustReductionLeftToRight();
                     }
@@ -244,7 +244,7 @@ namespace Domain
                 using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
                 {
                     defectsFinder.SearchDefects();
-                    using (Dust dust = new Dust(ImageBefor, defectsFinder.SmallDefectsContoursMatrix))
+                    using (Dust dust = new Dust(ImageBefor, defectsFinder.SmallDefectsContoursMatrix, _exclFromCleaning))
                     {
                         ImageAfter = dust.DustReductionSpiralAveranging();
                     }
@@ -266,7 +266,7 @@ namespace Domain
                 using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
                 {
                     defectsFinder.SearchDefects();
-                    using (Scratches scratches = new Scratches(ImageBefor, defectsFinder.LargeDefectsContoursMatrix))
+                    using (Scratches scratches = new Scratches(ImageBefor, defectsFinder.LargeDefectsContoursMatrix, _exclFromCleaning))
                     {
                         ImageAfter = scratches.InpaintNSMethod();
                     }
@@ -280,7 +280,7 @@ namespace Domain
                 using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
                 {
                     defectsFinder.SearchDefects();
-                    using (Scratches scratches = new Scratches(ImageBefor, defectsFinder.LargeDefectsContoursMatrix))
+                    using (Scratches scratches = new Scratches(ImageBefor, defectsFinder.LargeDefectsContoursMatrix, _exclFromCleaning))
                     {
                         ImageAfter = scratches.InpaintTeleaMethod();
                     }
@@ -294,7 +294,7 @@ namespace Domain
                 using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
                 {
                     defectsFinder.SearchDefects();
-                    using (Scratches scratches = new Scratches(ImageBefor, defectsFinder.LargeDefectsContoursMatrix))
+                    using (Scratches scratches = new Scratches(ImageBefor, defectsFinder.LargeDefectsContoursMatrix, _exclFromCleaning))
                     {
                         ImageAfter = scratches.DustReductionSpiralAveranging();
                     }

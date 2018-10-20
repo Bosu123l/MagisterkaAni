@@ -55,9 +55,11 @@ namespace ScannerManager
         {
             try
             {
-                _twain32 = new Twain32();
-                _twain32.ShowUI = true;
-                _twain32.IsTwain2Enable = true;
+                _twain32 = new Twain32
+                {
+                    ShowUI = true,
+                    IsTwain2Enable = true
+                };
                 _twain32.OpenDSM();
 
                 #region GetScanners
@@ -182,9 +184,11 @@ namespace ScannerManager
             try
             {
                 _twain32?.Dispose();
-                _twain32 = new Twain32();
-                _twain32.ShowUI = true;
-                _twain32.IsTwain2Enable = true;
+                _twain32 = new Twain32
+                {
+                    ShowUI = true,
+                    IsTwain2Enable = true
+                };
 
                 _twain32.OpenDSM();
                 _twain32.SourceIndex = Scanners.IndexOf(SelectedScanner);
@@ -230,7 +234,7 @@ namespace ScannerManager
             CustomMessageBox.Show("Memory error!", e.ToString(), System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
         }
 
-        private void bCancel_Click(object sender, RoutedEventArgs e)
+        private void BCancel_Click(object sender, RoutedEventArgs e)
         {
             _twain32.Dispose();
             Environment.ExitCode = (int)ExitCodes.ExitCode.ERROR_CANCELLED;

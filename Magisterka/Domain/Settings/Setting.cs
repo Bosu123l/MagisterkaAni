@@ -48,26 +48,32 @@ namespace Domain.Settings
 
         public static void LoadSettings()
         {
+            if (File.Exists(_settingsFilePath))
+            {
+                using (FileStream stream = new FileStream(_settingsFilePath, FileMode.Open))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(XMLSetting));
+                    if (stream.Length > 0)
+                    {
+                        XMLSetting xml = (XMLSetting)serializer.Deserialize(stream);
+
+                        ScratchesKernelSize = xml.ScratchesKernelSize;
+                        DustKernelSize = xml.DustKernelSize;
+                        SmudgesMargin = xml.SmudgesMargin;
+                    }
+
+                    stream.Close();
+                }
+            }          
+        }
+
+        public static void SaveSettings()
+        {
             if (!File.Exists(_settingsFilePath))
             {
                 File.Create(_settingsFilePath).Close();
             }
 
-            using (FileStream stream = new FileStream(_settingsFilePath, FileMode.Open))
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(XMLSetting));
-                XMLSetting xml = (XMLSetting)serializer.Deserialize(stream);
-
-                ScratchesKernelSize = xml.ScratchesKernelSize;
-                DustKernelSize = xml.DustKernelSize;
-                SmudgesMargin = xml.SmudgesMargin;
-
-                stream.Close();
-            } 
-        }
-
-        public static void SaveSettings()
-        {            
             using (var stream = new FileStream(_settingsFilePath, FileMode.OpenOrCreate))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(XMLSetting));

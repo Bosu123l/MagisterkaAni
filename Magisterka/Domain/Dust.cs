@@ -1,10 +1,8 @@
 ﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+
 
 namespace Domain
 {
@@ -12,9 +10,10 @@ namespace Domain
     {
         private VectorOfVectorOfPoint _conturMatrix;
         private Image<Bgr, byte> _orgImage;
+        private Image<Gray, byte> _exclFromCleaning;
         private int _kernelSize = Settings.Settings.DustKernelSize;
 
-        public Dust(Image<Bgr, byte> orgImage, VectorOfVectorOfPoint conturMatrix)
+        public Dust(Image<Bgr, byte> orgImage, VectorOfVectorOfPoint conturMatrix, Image<Gray, byte> exclFromCleaning)
         {
             if (orgImage != null) 
             {
@@ -37,7 +36,7 @@ namespace Domain
 
         public Image<Bgr, byte> DustReductionLeftToRight()
         {
-            using (ImageCleaner ic = new ImageCleaner(_orgImage, _conturMatrix, _kernelSize))
+            using (ImageCleaner ic = new ImageCleaner(_orgImage, _conturMatrix, _kernelSize, _exclFromCleaning))
             {
                 return ic.LeftToRightClearWholeImageByDefects().Copy();
             }

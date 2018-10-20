@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"        
         mc:Ignorable="d"
-        Title="Select scanner" Height="350" Width="400" SizeToContent="Height" AllowsTransparency="True" WindowStyle="None">
+        Title="Select scanner" Height="350" Width="400" SizeToContent="Height" AllowsTransparency="True" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" HorizontalContentAlignment="Center">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -25,6 +25,6 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button Grid.Row="1" Height="40" x:Name="bCancel" Content="Cancel" Click="bCancel_Click"/>    
+        <Button Grid.Row="1" Height="40" x:Name="bCancel" Content="Cancel" Click="BCancel_Click"/>    
     </Grid>
 </Window>

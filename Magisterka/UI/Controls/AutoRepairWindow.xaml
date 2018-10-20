@@ -16,7 +16,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <CheckBox Grid.Row="0" Content="Clean smudges"  IsChecked="{Binding CleanSmudges, ElementName=_autoRepairWindow}" VerticalAlignment="Center" Margin="10"/>
-        <CheckBox Grid.Row="1" Content="Clean scrates"  IsChecked="{Binding CleanScrates, ElementName=_autoRepairWindow}" VerticalAlignment="Center" Margin="10"/>
+        <CheckBox Grid.Row="1" Content="Clean scratches"  IsChecked="{Binding CleanScrates, ElementName=_autoRepairWindow}" VerticalAlignment="Center" Margin="10"/>
         <CheckBox Grid.Row="2" Content="Clean dust"     IsChecked="{Binding CleanDust, ElementName=_autoRepairWindow}" VerticalAlignment="Center" Margin="10"/>
         <Button   Grid.Row="3"  Content="Start" Name="btStart"  IsDefault="True" Click="btStart_Click"/>
     </Grid>

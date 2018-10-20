@@ -19,11 +19,12 @@ namespace Domain
         }
 
         private Image<Bgr, byte> _orgImage;
+        private Image<Gray, byte> _exclFromCleaning;
         private VectorOfVectorOfPoint _defects;
         MCvScalar _defectsColor = new MCvScalar(255, 0, 255);
         private int _kernelSize = 9;
 
-        public ImageCleaner(Image<Bgr, byte> orgImage, VectorOfVectorOfPoint defects, int kernel)
+        public ImageCleaner(Image<Bgr, byte> orgImage, VectorOfVectorOfPoint defects, int kernel, Image<Gray, byte> exclFromCleaning=null)
         {
             if (orgImage != null)
             {
