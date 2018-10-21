@@ -129,34 +129,49 @@ namespace Domain
 
         public Image<Bgr, byte> CleanSmudges()
         {
+            ProgressManager.AddSteps(9);
+
             SetColorProportions();
+            ProgressManager.DoStep();
             Image<Bgr, byte> cleanedImage = _image.Copy();
 
             using (Image<Gray, byte> grayImage = _image.Convert<Gray, byte>().Copy())
             {
                 #region BritherRegions
                 using (Image<Gray, byte> bwGeneralMask = MorphologicalProcessing.GeneralBluredBinaryImage(_image))
-                {                   
+                {
+                    ProgressManager.DoStep();
                     #region Blue
                     RepairColor(ref cleanedImage, grayImage, bwGeneralMask, BgrColor.Blue, BlueTone, CmpType.GreaterThan);
+                    ProgressManager.DoStep();
                     #endregion Blue
+                    
                     #region Green
                     RepairColor(ref cleanedImage, grayImage, bwGeneralMask, BgrColor.Green, GreenTone, CmpType.GreaterThan);
+                    ProgressManager.DoStep();
                     #endregion Green
+                    
                     #region Red
                     RepairColor(ref cleanedImage, grayImage, bwGeneralMask, BgrColor.Red, RedTone, CmpType.GreaterThan);
+                    ProgressManager.DoStep();
                     #endregion Red
 
                     using (Image<Gray, byte> bwGeneralMaskNegativ = MorphologicalProcessing.GenerateBinaryImageNegative(bwGeneralMask))
                     {
+                        ProgressManager.DoStep();
                         #region Blue
                         RepairColor(ref cleanedImage, grayImage, bwGeneralMaskNegativ, BgrColor.Blue, BlueTone, CmpType.LessThan);
+                        ProgressManager.DoStep();
                         #endregion Blue
+                       
                         #region Green
                         RepairColor(ref cleanedImage, grayImage, bwGeneralMaskNegativ, BgrColor.Green, GreenTone, CmpType.LessThan);
+                        ProgressManager.DoStep();
                         #endregion Green
+                       
                         #region Red
                         RepairColor(ref cleanedImage, grayImage, bwGeneralMaskNegativ, BgrColor.Red, RedTone, CmpType.LessThan);
+                        ProgressManager.DoStep();
                         #endregion Red
                     }
                 }

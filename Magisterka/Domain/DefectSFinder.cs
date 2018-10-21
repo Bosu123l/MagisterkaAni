@@ -129,7 +129,7 @@ namespace Domain
 
             int a1 = 0, a2 = 0, b1 = 0, b2 = 0;
 
-            ProgressManager.AddSteps(6);
+            ProgressManager.AddSteps(7);
 
             using (Image<Gray, float> grayImage = _inputImage.Convert<Gray, float>())
             {
@@ -141,16 +141,17 @@ namespace Domain
 
                     GetThresholds(out a1, out a2, out b1, out b2, laplaceImge); //ProgressManager.DoneStep();
                     _maskOfDefects = GetMaskOfDefects(a1, a2, b1, b2, laplaceImge); //ProgressManager.DoneStep();          
-
-                    ProgressManager.DoStep();
-                  
+                                     
                     DefectsContoursMatrix = new VectorOfVectorOfPoint();
                     using (Mat hier = new Mat())
                     {
                         CvInvoke.FindContours(_maskOfDefects, DefectsContoursMatrix, hier, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+                        ProgressManager.DoStep();
                     }                    
                 }                     
             }
+
+            SplitDefectContoursBySize();//DoStep 2
         }
 
         private void GetThresholds(out int a1, out int a2, out int b1, out int b2, Image<Gray, float> sourceImage)
@@ -210,7 +211,7 @@ namespace Domain
         private void SplitDefectContoursBySize()
         {           
             var fieldSize = CalculateDefectsFields();
-            
+            ProgressManager.DoStep();
             var largeFields = fieldSize.Where(x => x.Value >= _maxThreasholdOfDustContourSize).ToDictionary(x => x.Key, x => x.Value).Keys.ToList(); 
             var smallFields = fieldSize.Where(x => x.Value < _maxThreasholdOfDustContourSize).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
 
@@ -218,6 +219,7 @@ namespace Domain
             largeFields.ForEach(x => LargeDefectsContoursMatrix.Push(x));
             SmallDefectsContoursMatrix = new VectorOfVectorOfPoint();
             smallFields.ForEach(x => SmallDefectsContoursMatrix.Push(x));
+            ProgressManager.DoStep();
         }
 
         public void Dispose()

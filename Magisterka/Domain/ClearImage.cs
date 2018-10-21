@@ -62,8 +62,13 @@ namespace Domain
             int width = _orgImage.Width - _kernelSize;
             int height = _orgImage.Height - _kernelSize;
 
-            CvInvoke.FillPoly(_orgImage, _defects, _defectsColor, LineType.FourConnected);  
-            
+            int step = 0;
+
+            CvInvoke.FillPoly(_orgImage, _defects, _defectsColor, LineType.FourConnected);
+
+            ProgressManager.AddSteps(101);
+            step = height / 100;
+
             for (int h = 0; h < height; h += hSetp)
             {
                 for (int w = 0; w < width; w += wStep)
@@ -73,6 +78,11 @@ namespace Domain
                     {
                         RepairMat(mat);
                     }
+                }
+
+                if(h%step==0 && h!=0)
+                {
+                    ProgressManager.DoStep();
                 }
             }
             return _orgImage;
@@ -85,6 +95,8 @@ namespace Domain
             int step = _kernelSize / 2;
             int minH, minW, maxH, maxW;
             int maxImgH, maxImgW;
+
+            CvInvoke.FillPoly(_orgImage, _defects, _defectsColor, LineType.FourConnected);
 
             maxImgH = (_orgImage.Height - _kernelSize);
             maxImgW = (_orgImage.Width - _kernelSize);
@@ -106,12 +118,14 @@ namespace Domain
             int maxImgH, maxImgW;
             List<Point> defect = new List<Point>();
 
+            ProgressManager.AddSteps(_defects.Size);
+
             for (int i = 0; i < _defects.Size; i++)
             {
                 VectorOfPoint defectContur = _defects[i];              
 
                 CvInvoke.FillPoly(_orgImage, new VectorOfVectorOfPoint(defectContur), _defectsColor, LineType.FourConnected);
-
+               
                 for (int j = 0; j < defectContur.Size; j++)
                 {
                     defect.Add(defectContur[i]);
@@ -133,16 +147,17 @@ namespace Domain
                 maxW = (maxW + step + _kernelSize) <= _orgImage.Width ? (maxW + step) : maxImgW;
 
                 SpiralClean(minH, minW, maxH, maxW, maxImgH, maxImgW);
+                ProgressManager.DoStep();
             }
+            
             return _orgImage.Copy();
         }
         public void SpiralClean(int minH, int minW, int maxH, int maxW, int maxImgH, int maxImgW)
         {                                                                   
             int step = _kernelSize / 2;
-            List<Point> defect = new List<Point>();
 
-            int h = minH, w = minW;
-
+            int h = minH, w = minW;          
+          
             while (minH < maxH || minW < maxW)
             {
                 for (w = minW; w < maxW; w += step)

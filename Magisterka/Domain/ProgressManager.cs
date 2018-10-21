@@ -65,27 +65,31 @@ namespace Domain
             step.MaxSteps = stepsCount;
             step.DoneSteps = 0;
             double percent = _steps?.Count() > 0 ? _steps.Last().Percent : MaxValueProgressBar;
-            step.Percent = (int)((percent) / (step.MaxSteps > 0 ? step.MaxSteps : 1));
+            step.Percent = ((percent) / (step.MaxSteps > 0 ? step.MaxSteps : 1));
 
             if (_steps == null) _steps = new List<Step>();
             _steps.Add(step);
         }
-        public static void DoStep()
+        public static void DoStep(bool sum=true)
         {
             if (_steps?.Count > 0)
             {
                 int inx = _steps.Count() - 1;
                 _steps[inx].DoneSteps = _steps[inx].DoneSteps + 1;
-                Progress += _steps[inx].Percent;
+                if (sum)
+                {
+                    Progress += _steps[inx].Percent;
+                }
 
                 if (_steps[inx].DoneSteps == _steps[inx].MaxSteps)
-                {
+                {                    
                     _steps.RemoveAt(inx);
-                    DoStep();
+                    DoStep(false);                                      
                     if (inx == 0 || Progress >= MaxValueProgressBar)
                     {
                         Progress = MaxValueProgressBar;
-                    }
+                        return;
+                    }                   
                 }
             }
         }

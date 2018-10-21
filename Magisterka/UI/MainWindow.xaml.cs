@@ -248,6 +248,7 @@ namespace UI
         private void GetCutImageRectangle(object sender, Rectangle e)
         {           
             ImageProcessing.CutImage(ImageView.ZoomPhotoView.Size, e);
+            ImageView.RectangleLoaded -= GetCutImageRectangle;
         }
 
         private void SmudgeCleaner(object sender, EventArgs e)

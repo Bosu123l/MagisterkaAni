@@ -40,13 +40,8 @@ namespace Domain
         }
 
         public Image<Bgr,byte>RemoveScrates()
-        {
-            for (int i = 0; i < _conturMatrix.Size; i++)
-            {               
-                var mask = GetMaskOfDefect(_conturMatrix[i]);
-                CvInvoke.Inpaint(_orgImage, mask, _orgImage, 5, InpaintType.Telea);
-            }
-            return _orgImage;
+        {           
+            return InpaintTeleaMethod();
         }
 
         private Image<Gray, byte>GetMaskOfDefect(VectorOfPoint defect)
@@ -57,7 +52,7 @@ namespace Domain
         }        
 
         #region SpiralCleaner
-        public Image<Bgr,byte> DustReductionSpiralAveranging()
+        public Image<Bgr,byte> ScratchesReductionSpiralAveranging()
         {
             using (ImageCleaner ic = new ImageCleaner(_orgImage, _conturMatrix, _kernelSize, _exclFromCleaning))
             {
@@ -79,10 +74,13 @@ namespace Domain
 
         private Image<Bgr, byte> InpaintMethod(VectorOfVectorOfPoint defects, InpaintType ip)
         {
+            ProgressManager.AddSteps(_conturMatrix.Size);
             for (int i = 0; i < defects.Size; i++)
             {
                 InpaintCleaner(defects[i], ip);
+                ProgressManager.DoStep();
             }
+
             return _orgImage;
         }
         private void InpaintCleaner(VectorOfPoint defect, InpaintType ip)

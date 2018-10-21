@@ -65,28 +65,31 @@ namespace Domain
             steps = dust ? steps + 1 : steps;
             steps = scratches ? steps + 1 : steps;
             steps = smudges ? steps + 1 : steps;
+            steps = (scratches || smudges) ? steps + 1 : steps;
+            ProgressManager.AddSteps(steps);
 
             if (ImageBefor != null)
             {
-                ProgressManager.AddSteps(3);
-
-                if(smudges)
+                if (smudges)
                 {
+                    //Progress 9 steps
                     using (Smudge smudge = new Smudge(ImageBefor))
                     {
                         ImageAfter = smudge.CleanSmudges();
                     }
                 }
-
+                
                 if(dust || scratches)
                 {
                     using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
                     {
+                        //Progress 8 steps
                         defectsFinder.SearchDefects();
                         if(dust)
                         {
                             using (Dust dustCleaner = new Dust(ImageAfter, defectsFinder.SmallDefectsContoursMatrix, _exclFromCleaning))
-                            {
+                            {   
+                                //Progress 100 steps
                                 ImageAfter = dustCleaner.DustReductionLeftToRight();
                             }
                         }
@@ -95,7 +98,8 @@ namespace Domain
                         {
                             using (Scratches scratchesCleaner = new Scratches(ImageAfter, defectsFinder.LargeDefectsContoursMatrix, _exclFromCleaning))
                             {
-                                ImageAfter = scratchesCleaner.DustReductionSpiralAveranging();
+                                //Progres scratches count
+                                ImageAfter = scratchesCleaner.RemoveScrates();
                             }
                         }                      
                     }
@@ -240,13 +244,14 @@ namespace Domain
         {
             if (ImageBefor != null)
             {
-                ProgressManager.AddSteps(3);
+                ProgressManager.AddSteps(2);
                 using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
                 {
                     defectsFinder.SearchDefects();
                     using (Dust dust = new Dust(ImageBefor, defectsFinder.SmallDefectsContoursMatrix, _exclFromCleaning))
                     {
                         ImageAfter = dust.DustReductionSpiralAveranging();
+                        ProgressManager.DoStep();
                     }
                 }
             }
@@ -291,12 +296,13 @@ namespace Domain
         {
             if (ImageBefor != null)
             {
+                ProgressManager.AddSteps(2);
                 using (DefectsFinder defectsFinder = new DefectsFinder(ImageBefor))
                 {
                     defectsFinder.SearchDefects();
                     using (Scratches scratches = new Scratches(ImageBefor, defectsFinder.LargeDefectsContoursMatrix, _exclFromCleaning))
                     {
-                        ImageAfter = scratches.DustReductionSpiralAveranging();
+                        ImageAfter = scratches.ScratchesReductionSpiralAveranging();
                     }
                 }
             }

@@ -84,6 +84,7 @@ namespace Domain
             image.ROI = _rectangleOfCut;
             Image<Bgr, byte> result = image.CopyBlank();
             image.CopyTo(result);
+            image.ROI = Rectangle.Empty;
             return result;
         }
     }
