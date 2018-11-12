@@ -72,6 +72,7 @@ namespace UI
         #endregion Scratches
 
         #region SmudgeReduction
+
         public event EventHandler SmudgeReductionClicked;
         public ICommand SmudgeReductionClickedCommand
         {
@@ -136,6 +137,8 @@ namespace UI
         public event EventHandler ScratchesReductionSpiralSingleDefectsMethodClick;
         public event EventHandler DustReductionLeftToRightAveragingDefectsMethodClick;
         public event EventHandler DustReductionSpiralAveragingDefectsMethodClick;
+        public event EventHandler BGRSmudgeReductionMetohodClick;
+        public event EventHandler HSVSmudgeReductionMethodClick;
 
         public PhotoEditionControls()
         {
@@ -161,6 +164,16 @@ namespace UI
         private void DustReductionSpiralAveragingDefectsMethod(object sender, RoutedEventArgs e)
         {
             DustReductionSpiralAveragingDefectsMethodClick?.Invoke(sender, e);
+        }
+
+        private void BGRSmudgeReductionMetohod(object sender, RoutedEventArgs e)
+        {
+            BGRSmudgeReductionMetohodClick?.Invoke(sender, e);
+        }
+
+        private void HSVmudgeReductionMetohod(object sender, RoutedEventArgs e)
+        {
+            HSVSmudgeReductionMethodClick?.Invoke(sender, e);
         }
     }
 }

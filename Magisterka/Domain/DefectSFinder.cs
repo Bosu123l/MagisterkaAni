@@ -190,7 +190,7 @@ namespace Domain
                     using (Image<Gray, byte> cannyImg = cannyImg1.Add(cannyImg2))
                     {                       
                         ProgressManager.DoStep();
-                        return MorphologicalProcessing.Dilate(cannyImg, new Size(3, 3), 6); 
+                        return MorphologicalProcessing.Dilate(cannyImg, new Size(3, 3), 3); 
                     }
                 }                   
             } 

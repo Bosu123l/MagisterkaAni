@@ -1,9 +1,11 @@
 ﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 
 namespace Domain
 {
@@ -110,49 +112,54 @@ namespace Domain
         {
             if (ImageBefor != null)
             {
+                //ToHSV();
+                Mat kernel = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Rectangle, new Size(9,9), new Point(-1, -1));
+                ImageAfter = ImageBefor.MorphologyEx(Emgu.CV.CvEnum.MorphOp.Tophat, kernel, new Point(-1, -1), 1, BorderType.Default, new MCvScalar(1.0));
 
                 //Image<Hsv, byte> bgraImage = ImageBefor.Convert<Hsv, byte>();
-                //for (int i = 0; i < 3; i++)
+                ////for (int i = 0; i < 2; i++)
+                ////{
+                //    ImageAfter = bgraImage[2].Convert<Bgr, byte>(); //Thread.Sleep(3000);
+                ////}
+
+                //ImageAfter = ImageBefor.Convert<Gray, float>().Laplace(13).Convert<Bgr,byte>();
+
+                //Image<Hsv, byte> hsvImage = ImageBefor.Convert<Hsv, byte>();
+                //hsvImage[1] = hsvImage[1].Add(new Gray(255));
+                //hsvImage[2] = hsvImage[2].Add(new Gray(255));
+
+                //List<double> hue = new List<double>();
+
+                //for (int x = 0; x < hsvImage.Height; x++)
                 //{
-                //    ImageAfter = bgraImage[i].Convert<Bgr, byte>(); Thread.Sleep(3000);
+                //    for (int y = 0; y < hsvImage.Width; y++)
+                //    {
+                //        hue.Add(hsvImage[x, y].Hue);
+                //    }
                 //}
 
-                Image<Hsv, byte> hsvImage = ImageBefor.Convert<Hsv, byte>();
-                hsvImage[1] = hsvImage[1].Add(new Gray(255));
-                hsvImage[2] = hsvImage[2].Add(new Gray(255));
+                //var max = hue.GroupBy(x => x).OrderByDescending(x => x.Count()).First().Key;
+                //hue = hue.GroupBy(x => x).Select(x => x.Key).ToList();
+                //var median = hue[hue.Count / 2];
 
-                List<double> hue = new List<double>();
+                //for (int x = 0; x < hsvImage.Height; x++)
+                //{
+                //    for (int y = 0; y < hsvImage.Width; y++)
+                //    {
+                //        var pix = hsvImage[x, y].Hue;
 
-                for (int x = 0; x < hsvImage.Height; x++)
-                {
-                    for (int y = 0; y < hsvImage.Width; y++)
-                    {
-                        hue.Add(hsvImage[x, y].Hue);
-                    }
-                }
+                //        if (pix > max + 10 || pix < max - 10)
+                //        {
+                //            hsvImage.Data[x, y, 0] = 90;
+                //        }
+                //        else
+                //        {
+                //            hsvImage.Data[x, y, 0] = 180;
+                //        }
+                //    }
+                //}
 
-                var max = hue.GroupBy(x => x).OrderByDescending(x => x.Count()).First().Key;
-                hue = hue.GroupBy(x => x).Select(x => x.Key).ToList();
-                var median = hue[hue.Count / 2];
-
-                for (int x = 0; x < hsvImage.Height; x++)
-                {
-                    for (int y = 0; y < hsvImage.Width; y++)
-                    {
-                        var pix = hsvImage[x, y].Hue;
-
-                        if (pix > max + 10 || pix < max - 10)
-                        {
-                            hsvImage.Data[x, y, 0] = 90;
-                        }
-                        else
-                        {
-                            hsvImage.Data[x, y, 0] = 180;
-                        }
-                    }
-                }
-
-                ImageAfter = hsvImage.Convert<Bgr, byte>();
+                //ImageAfter = hsvImage.Convert<Bgr, byte>();
 
                 //Image<Bgra, byte> bgraImage = ImageBefor.Convert<Bgra, byte>();
                 //for (int i = 0; i < 4; i++)
@@ -218,6 +225,78 @@ namespace Domain
             {
                 throw new ArgumentNullException(nameof(ImageBefor));
             }
+        }
+
+
+        private static void ToHSV()
+        {
+            //int max = 0;
+            //int saturation = 0;
+            //var hsvImg = ImageBefor.Convert<Hsv, byte>();
+           
+            //    using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0.0f, 180.0f)))
+            //    {                    
+            //        histogram.Calculate(new Image<Gray, byte>[] { hsvImg[0] }, false, null);     
+            //        List<float> hist = new List<float>(histogram.GetBinValues());
+            //        max = hist.IndexOf((int)hist.Max());
+                    
+            //    }
+            //    var imgMax = ImageBefor.Convert<Hsv,byte>()[0].CopyBlank().Add(new Gray(max));
+            //    hsvImg[0] = imgMax;
+
+            //using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0.0f, 255.0f)))
+            //{
+            //    histogram.Calculate(new Image<Gray, byte>[] { hsvImg[1] }, false, null);
+            //    List<float> hist = new List<float>(histogram.GetBinValues());
+            //    saturation = hist.IndexOf((int)hist.Max());
+
+            //}
+            //var satMask = ImageBefor.Convert<Hsv, byte>()[0].CopyBlank().Add(new Gray(saturation));
+            //hsvImg[1] = imgMax;
+
+            //using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0.0f, 255.0f)))
+            //{
+            //    histogram.Calculate(new Image<Gray, byte>[] { hsvImg[2] }, false, null);
+            //    List<float> hist = new List<float>(histogram.GetBinValues());               
+
+            //}
+
+            //ImageAfter = hsvImg[2].Convert<Bgr, byte>();
+
+
+            int max = 0;
+            int saturation = 0;
+            var hsvImg = ImageBefor.Convert<Hsv, byte>();
+
+            using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0.0f, 180.0f)))
+            {
+                histogram.Calculate(new Image<Gray, byte>[] { hsvImg[0] }, false, null);
+                List<float> hist = new List<float>(histogram.GetBinValues());
+                max = hist.IndexOf((int)hist.Max());
+
+            }
+            var imgMax = ImageBefor.Convert<Hsv, byte>()[0].CopyBlank().Add(new Gray(max));
+            hsvImg[0] = imgMax;
+
+            using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0.0f, 255.0f)))
+            {
+                histogram.Calculate(new Image<Gray, byte>[] { hsvImg[1] }, false, null);
+                List<float> hist = new List<float>(histogram.GetBinValues());
+                saturation = hist.IndexOf((int)hist.Max());
+
+            }
+            //var saturationMask = 
+            //var satMask = ImageBefor.Convert<Hsv, byte>()[0].CopyBlank().Add(new Gray(saturation));
+            //hsvImg[1] = imgMax;
+
+            //using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0.0f, 255.0f)))
+            //{
+            //    histogram.Calculate(new Image<Gray, byte>[] { hsvImg[2] }, false, null);
+            //    List<float> hist = new List<float>(histogram.GetBinValues());
+
+            //}
+
+            ImageAfter = hsvImg[2].Convert<Bgr, byte>();
         }
 
         #region Dust
@@ -311,6 +390,11 @@ namespace Domain
 
         public static void ReduceSmudges()
         {
+            ReduceSmudgesBGR();
+        }
+        
+        public static void ReduceSmudgesBGR()
+        {
             if (ImageBefor != null)
             {
                 using (Smudge smudge = new Smudge(ImageBefor))
@@ -318,7 +402,19 @@ namespace Domain
                     ImageAfter = smudge.CleanSmudges();
                 }
             }
-        }        
+        }
+
+        public static void ReduceSmudgesHSV()
+        {
+            if (ImageBefor != null)
+            {
+                using (Smudge smudge = new Smudge(ImageBefor))
+                {
+                    ImageAfter = smudge.CleanHSV();
+                }
+            }
+        }
+
         public static void SetRegionWithoutRepair()
         {
             if (ImageBefor != null)
@@ -330,9 +426,9 @@ namespace Domain
         {
             if (ImageBefor != null)
             {
-                CutPhoto ci = new CutPhoto(ImageBefor.Size, viewWindowSize, rectangleToCut);               
+                CutPhoto ci = new CutPhoto(ImageBefor.Size, viewWindowSize, rectangleToCut);
                 ImageBefor = ci.CutImageByRectangle(ImageBefor);
-                ImageAfter = ci.CutImageByRectangle(ImageAfter);               
+                ImageAfter = ci.CutImageByRectangle(ImageAfter);
             }
         }
         public static void RotateImage()
@@ -345,3 +441,4 @@ namespace Domain
         }       
     }
 }
+

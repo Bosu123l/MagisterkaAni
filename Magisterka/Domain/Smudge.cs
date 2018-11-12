@@ -2,7 +2,9 @@
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace Domain
 {
@@ -55,6 +57,32 @@ namespace Domain
         public Smudge(Image<Bgr, byte> image)
         {
             _image = image.Copy();
+        }
+
+        public Image<Bgr, byte> CleanHSV()
+        {
+            int max = 0;
+            int saturation = 0;
+            Image<Hsv, byte> hsvImg = _image.Convert<Hsv, byte>();
+
+            using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0.0f, 180.0f)))
+            {
+                histogram.Calculate(new Image<Gray, byte>[] { hsvImg[0] }, false, null);
+                List<float> hist = new List<float>(histogram.GetBinValues());
+                max = hist.IndexOf((int)hist.Max());
+
+            }
+            var imgMax = _image.Convert<Hsv, byte>()[0].CopyBlank().Add(new Gray(max));
+            hsvImg[0] = imgMax;
+
+            using (DenseHistogram histogram = new DenseHistogram(256, new RangeF(0.0f, 255.0f)))
+            {
+                histogram.Calculate(new Image<Gray, byte>[] { hsvImg[1] }, false, null);
+                List<float> hist = new List<float>(histogram.GetBinValues());
+                saturation = hist.IndexOf((int)hist.Max());
+
+            }
+            return  hsvImg[2].Convert<Bgr, byte>();
         }
 
         public void SetColorProportions()

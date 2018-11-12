@@ -39,7 +39,7 @@
                 <Button x:Name="Experiment"
                     ToolTip="Experiment"
                     Command="{Binding DoExperimenClickedCommand, ElementName=userControl, Mode=OneWay}"
-                    Visibility="Collapsed">
+                        Visibility="Collapsed">
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/experiment.png"/>
                     </Button.OpacityMask>
@@ -77,6 +77,12 @@
                     <Button.OpacityMask>
                         <ImageBrush ImageSource="/UI;component/Icons/erase.png"/>
                     </Button.OpacityMask>
+                    <Button.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="BGR"  Click="BGRSmudgeReductionMetohod"/>
+                            <MenuItem Header="HSV"  Click="HSVmudgeReductionMetohod"/>
+                        </ContextMenu>
+                    </Button.ContextMenu>
                 </Button>
                 <Button x:Name="_setRegionWithoutRepair"                
                         ToolTip="Set region without repair"

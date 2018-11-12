@@ -87,8 +87,12 @@ namespace UI
             this.PhotoEditionControl.ScratchesReductionSpiralSingleDefectsMethodClick += ScratchesReductionSpiralSingleDefectsMethod;
             #endregion Scatches
 
+            #region Smudges
             this.PhotoEditionControl.SmudgeReductionClicked += SmudgeCleaner;
-            
+            this.PhotoEditionControl.BGRSmudgeReductionMetohodClick += ReduceSmudgesBGR;
+            this.PhotoEditionControl.HSVSmudgeReductionMethodClick += ReduceSmudgesHSV;
+            #endregion Smudges
+
             this.PhotoEditionControl.SetRegionWithoutRepairClicked += SetRegionWithoutRepair;
             this.PhotoEditionControl.CutPhotoClicked += CutPhotoBorder;
             this.PhotoEditionControl.RotateImageClicked += RotateImage;
@@ -255,6 +259,16 @@ namespace UI
         {
             InvokeAction(new Action(ImageProcessing.ReduceSmudges), true);
         }
+        private void ReduceSmudgesBGR(object sender, EventArgs e)
+        {
+            InvokeAction(new Action(ImageProcessing.ReduceSmudgesBGR), true);
+        }
+
+        private void ReduceSmudgesHSV(object sender, EventArgs e)
+        {
+            InvokeAction(new Action(ImageProcessing.ReduceSmudgesHSV), true);
+        }
+
         private void ScratchesReduction(object sender, EventArgs e)
         {
             InvokeAction(new Action(ImageProcessing.ReduceScratches), true);
